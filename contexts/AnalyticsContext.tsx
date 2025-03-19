@@ -15,6 +15,7 @@ interface AnalyticsContextType {
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(undefined)
 
 export const AnalyticsProvider = ({ children }: { children: React.ReactNode }) => {
+  // Ensure the analytics object has default values
   const [analytics, setAnalytics] = useState<MessageAnalytics>({
     totalSent: 0,
     totalDelivered: 0,

@@ -19,6 +19,13 @@ import {
   Loader2,
   CheckCircle,
   Check,
+  Plus,
+  Archive,
+  Trash2,
+  Bell,
+  BellOff,
+  UserPlus,
+  Tag,
 } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useMessages } from "@/contexts/MessageContext"
@@ -36,6 +43,15 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useToast } from "@/hooks/use-toast"
 
 export default function ConversationsPage() {
   const router = useRouter()
@@ -49,6 +65,7 @@ export default function ConversationsPage() {
     setCurrentContact,
   } = useMessages()
   const { templates } = useTemplates()
+  const { toast } = useToast()
 
   const [newMessage, setNewMessage] = useState("")
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
@@ -58,6 +75,14 @@ export default function ConversationsPage() {
   const [selectedContacts, setSelectedContacts] = useState<string[]>([])
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // New state for search and filters
+  const [searchQuery, setSearchQuery] = useState("")
+  const [activeTab, setActiveTab] = useState("all")
+  const [filteredConversations, setFilteredConversations] = useState(conversations)
+  const [newChatDialogOpen, setNewChatDialogOpen] = useState(false)
+  const [newChatPhone, setNewChatPhone] = useState("")
+  const [newChatMessage, setNewChatMessage] = useState("")
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -86,6 +111,31 @@ export default function ConversationsPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [contactMessages])
 
+  // Filter conversations based on search and active tab
+  useEffect(() => {
+    let result = [...conversations]
+
+    // Filter by tab
+    if (activeTab === "unread") {
+      result = result.filter((conversation) => conversation.unread > 0)
+    } else if (activeTab === "archived") {
+      result = result.filter((conversation) => conversation.archived)
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter(
+        (conversation) =>
+          conversation.name.toLowerCase().includes(query) ||
+          conversation.lastMessage.toLowerCase().includes(query) ||
+          conversation.phone.includes(query),
+      )
+    }
+
+    setFilteredConversations(result)
+  }, [searchQuery, activeTab])
+
   const handleContactSelect = (contact: Contact) => {
     setSelectedContact(contact)
     setCurrentContact(contact)
@@ -101,13 +151,27 @@ export default function ConversationsPage() {
   const handleSendBulkMessage = async () => {
     if (!bulkMessage.trim() || selectedContacts.length === 0) return
 
-    // In a real app, you would call the API to send bulk messages
-    // For this demo, we'll just log it
-    console.log(`Sending "${bulkMessage}" to ${selectedContacts.length} contacts`)
+    try {
+      // In a real app, you would call the API to send bulk messages
+      for (const contactPhone of selectedContacts) {
+        await sendMessage(contactPhone, bulkMessage)
+      }
 
-    setBulkMessage("")
-    setSelectedContacts([])
-    setBulkMessageOpen(false)
+      toast({
+        title: "Bulk Message Sent",
+        description: `Message sent to ${selectedContacts.length} contacts`,
+      })
+
+      setBulkMessage("")
+      setSelectedContacts([])
+      setBulkMessageOpen(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send bulk message",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleSendTemplate = async (templateId: string) => {
@@ -116,14 +180,142 @@ export default function ConversationsPage() {
     const template = templates.find((t) => t.id === templateId)
     if (!template) return
 
-    // In a real app, you would call the API to send a template message
-    // For this demo, we'll just send the template content
-    await sendMessage(selectedContact.phone, `[Template: ${template.name}] ${template.content}`)
-    setTemplateDialogOpen(false)
+    try {
+      // In a real app, you would call the API to send a template message
+      await sendMessage(selectedContact.phone, `[Template: ${template.name}] ${template.content}`)
+      setTemplateDialogOpen(false)
+
+      toast({
+        title: "Template Sent",
+        description: `Template "${template.name}" sent successfully`,
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send template",
+        variant: "destructive",
+      })
+    }
   }
 
   const toggleContactSelection = (phone: string) => {
     setSelectedContacts((prev) => (prev.includes(phone) ? prev.filter((p) => p !== phone) : [...prev, phone]))
+  }
+
+  const handleStartNewChat = async () => {
+    if (!newChatPhone) {
+      toast({
+        title: "Error",
+        description: "Phone number is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      // Check if contact exists
+      const existingContact = conversations.find((c) => c.phone === newChatPhone)
+
+      if (existingContact) {
+        // If contact exists, select it
+        handleContactSelect(existingContact)
+      } else {
+        // Create a new contact
+        const newContact = {
+          id: Date.now(),
+          name: `New Contact (${newChatPhone})`,
+          initials: "NC",
+          avatar: "/placeholder.svg?height=40&width=40",
+          lastMessage: "",
+          time: "Just now",
+          unread: 0,
+          phone: newChatPhone,
+          email: "",
+          tags: ["New"],
+          status: "Active",
+          archived: false,
+        }
+
+        // Add to conversations (in a real app, this would be an API call)
+        conversations.push(newContact)
+
+        // Select the new contact
+        handleContactSelect(newContact)
+
+        // Send initial message if provided
+        if (newChatMessage) {
+          await sendMessage(newChatPhone, newChatMessage)
+        }
+      }
+
+      setNewChatDialogOpen(false)
+      setNewChatPhone("")
+      setNewChatMessage("")
+
+      toast({
+        title: "Chat Started",
+        description: "New conversation has been started",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start new chat",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleArchiveConversation = (contact) => {
+    // In a real app, this would be an API call
+    const index = conversations.findIndex((c) => c.id === contact.id)
+    if (index !== -1) {
+      conversations[index].archived = !conversations[index].archived
+
+      toast({
+        title: conversations[index].archived ? "Conversation Archived" : "Conversation Unarchived",
+        description: `Conversation with ${contact.name} has been ${conversations[index].archived ? "archived" : "unarchived"}`,
+      })
+
+      // Refresh filtered conversations
+      setFilteredConversations([...filteredConversations])
+    }
+  }
+
+  const handleDeleteConversation = (contact) => {
+    // In a real app, this would be an API call
+    const index = conversations.findIndex((c) => c.id === contact.id)
+    if (index !== -1) {
+      conversations.splice(index, 1)
+
+      toast({
+        title: "Conversation Deleted",
+        description: `Conversation with ${contact.name} has been deleted`,
+      })
+
+      // Refresh filtered conversations
+      setFilteredConversations([...filteredConversations.filter((c) => c.id !== contact.id)])
+
+      // If the deleted contact was selected, clear selection
+      if (selectedContact && selectedContact.id === contact.id) {
+        setSelectedContact(null)
+      }
+    }
+  }
+
+  const handleMuteConversation = (contact) => {
+    // In a real app, this would be an API call
+    const index = conversations.findIndex((c) => c.id === contact.id)
+    if (index !== -1) {
+      conversations[index].muted = !conversations[index].muted
+
+      toast({
+        title: conversations[index].muted ? "Conversation Muted" : "Conversation Unmuted",
+        description: `Notifications for ${contact.name} have been ${conversations[index].muted ? "muted" : "unmuted"}`,
+      })
+
+      // Refresh filtered conversations
+      setFilteredConversations([...filteredConversations])
+    }
   }
 
   if (authLoading) {
@@ -203,10 +395,16 @@ export default function ConversationsPage() {
         <div className="p-4">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="Search conversations..." className="w-full bg-background pl-8 pr-4" />
+            <Input
+              type="search"
+              placeholder="Search conversations..."
+              className="w-full bg-background pl-8 pr-4"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
-        <Tabs defaultValue="all" className="px-4">
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="px-4">
           <TabsList className="w-full">
             <TabsTrigger value="all" className="flex-1">
               All
@@ -218,18 +416,37 @@ export default function ConversationsPage() {
               Archived
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="all" className="mt-4 space-y-2">
-            {conversations.map((conversation) => (
-              <ConversationItem
-                key={conversation.id}
-                conversation={conversation}
-                isActive={selectedContact?.id === conversation.id}
-                onSelect={() => handleContactSelect(conversation)}
-                isSelected={selectedContacts.includes(conversation.phone)}
-                onToggleSelect={() => toggleContactSelection(conversation.phone)}
-                selectionMode={bulkMessageOpen}
-              />
-            ))}
+          <TabsContent value={activeTab} className="mt-4 space-y-2">
+            {filteredConversations.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center">
+                <div className="rounded-full bg-muted p-3 mb-4">
+                  <Search className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-medium">No conversations found</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {searchQuery ? "Try adjusting your search or filters" : "Start a new conversation to get started"}
+                </p>
+                <Button className="mt-4" onClick={() => setNewChatDialogOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Chat
+                </Button>
+              </div>
+            ) : (
+              filteredConversations.map((conversation) => (
+                <ConversationItem
+                  key={conversation.id}
+                  conversation={conversation}
+                  isActive={selectedContact?.id === conversation.id}
+                  onSelect={() => handleContactSelect(conversation)}
+                  isSelected={selectedContacts.includes(conversation.phone)}
+                  onToggleSelect={() => toggleContactSelection(conversation.phone)}
+                  selectionMode={bulkMessageOpen}
+                  onArchive={() => handleArchiveConversation(conversation)}
+                  onDelete={() => handleDeleteConversation(conversation)}
+                  onMute={() => handleMuteConversation(conversation)}
+                />
+              ))
+            )}
           </TabsContent>
         </Tabs>
       </div>
@@ -255,9 +472,50 @@ export default function ConversationsPage() {
                 <Button variant="ghost" size="icon">
                   <Search className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Conversation Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleMuteConversation(selectedContact)}>
+                      {selectedContact.muted ? (
+                        <>
+                          <Bell className="mr-2 h-4 w-4" />
+                          <span>Unmute Notifications</span>
+                        </>
+                      ) : (
+                        <>
+                          <BellOff className="mr-2 h-4 w-4" />
+                          <span>Mute Notifications</span>
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      <span>Add to Contacts</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Tag className="mr-2 h-4 w-4" />
+                      <span>Manage Tags</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleArchiveConversation(selectedContact)}>
+                      <Archive className="mr-2 h-4 w-4" />
+                      <span>{selectedContact.archived ? "Unarchive" : "Archive"}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={() => handleDeleteConversation(selectedContact)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      <span>Delete Conversation</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
@@ -387,15 +645,66 @@ export default function ConversationsPage() {
             <div className="text-center">
               <h3 className="text-lg font-medium">Select a conversation</h3>
               <p className="text-muted-foreground">Choose a contact to start messaging</p>
+              <Button className="mt-4" onClick={() => setNewChatDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                New Chat
+              </Button>
             </div>
           </div>
         )}
       </div>
+
+      {/* New Chat Dialog */}
+      <Dialog open={newChatDialogOpen} onOpenChange={setNewChatDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Start New Chat</DialogTitle>
+            <DialogDescription>Enter a phone number to start a new conversation</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                placeholder="Enter phone number with country code"
+                value={newChatPhone}
+                onChange={(e) => setNewChatPhone(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">Include country code, e.g., +1234567890</p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="initial-message">Initial Message (Optional)</Label>
+              <Textarea
+                id="initial-message"
+                placeholder="Type your first message..."
+                value={newChatMessage}
+                onChange={(e) => setNewChatMessage(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewChatDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleStartNewChat}>Start Chat</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
 
-function ConversationItem({ conversation, isActive, onSelect, isSelected, onToggleSelect, selectionMode }) {
+function ConversationItem({
+  conversation,
+  isActive,
+  onSelect,
+  isSelected,
+  onToggleSelect,
+  selectionMode,
+  onArchive,
+  onDelete,
+  onMute,
+}) {
   return (
     <div
       className={`flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors ${
@@ -426,6 +735,62 @@ function ConversationItem({ conversation, isActive, onSelect, isSelected, onTogg
       {conversation.unread > 0 && (
         <Badge className="ml-auto bg-primary text-primary-foreground">{conversation.unread}</Badge>
       )}
+      {!selectionMode && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 opacity-0 group-hover:opacity-100 hover:opacity-100"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation()
+                onMute()
+              }}
+            >
+              {conversation.muted ? (
+                <>
+                  <Bell className="mr-2 h-4 w-4" />
+                  <span>Unmute</span>
+                </>
+              ) : (
+                <>
+                  <BellOff className="mr-2 h-4 w-4" />
+                  <span>Mute</span>
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation()
+                onArchive()
+              }}
+            >
+              <Archive className="mr-2 h-4 w-4" />
+              <span>{conversation.archived ? "Unarchive" : "Archive"}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete()
+              }}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              <span>Delete</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   )
 }
@@ -444,6 +809,8 @@ const conversations = [
     email: "sarah.j@example.com",
     tags: ["Customer", "Premium"],
     status: "Active",
+    archived: false,
+    muted: false,
   },
   {
     id: 2,
@@ -457,6 +824,8 @@ const conversations = [
     email: "michael.c@example.com",
     tags: ["Customer", "Support"],
     status: "Active",
+    archived: false,
+    muted: false,
   },
   {
     id: 3,
@@ -470,6 +839,8 @@ const conversations = [
     email: "emily.r@example.com",
     tags: ["Lead", "Retail"],
     status: "Inactive",
+    archived: false,
+    muted: true,
   },
   {
     id: 4,
@@ -483,6 +854,8 @@ const conversations = [
     email: "david.k@example.com",
     tags: ["Customer", "Enterprise"],
     status: "Active",
+    archived: true,
+    muted: false,
   },
   {
     id: 5,
@@ -496,6 +869,8 @@ const conversations = [
     email: "lisa.w@example.com",
     tags: ["Lead", "E-commerce"],
     status: "Inactive",
+    archived: false,
+    muted: false,
   },
   {
     id: 6,
@@ -509,6 +884,8 @@ const conversations = [
     email: "james.w@example.com",
     tags: ["Lead", "Wholesale"],
     status: "Active",
+    archived: false,
+    muted: false,
   },
 ]
 

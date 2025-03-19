@@ -184,7 +184,7 @@ export default function DashboardPage() {
 function EngagementChart({ data = [] }) {
   // If no data, show sample data
   const chartData =
-    data.length > 0
+    data && data.length > 0
       ? data
       : Array.from({ length: 12 }).map((_, i) => ({
           date: `2023-${(i + 1).toString().padStart(2, "0")}-01`,
