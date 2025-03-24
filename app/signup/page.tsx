@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-import usePostData from "../../hooks/apis/usePostData"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -23,56 +22,30 @@ export default function SignupPage() {
   const [error, setError] = useState("")
 
   // Phase 1 form fields
+  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-
-  const [formData , setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
-    password: "", 
-  })
 
   // Phase 2 form fields (WhatsApp API credentials)
   const [phoneNumberId, setPhoneNumberId] = useState("")
   const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("")
   const [accessToken, setAccessToken] = useState("")
 
-  const { mutate,  isError,  data } = usePostData("http://localhost:5001/api/auth/signup");
-
-
-  const handleChange = (e) => {
-    console.log("e.target.name", e.target.name)
-    console.log("e.target.value", e.target.value)
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-
   const validatePhase1 = () => {
-    if (!formData.firstName) {
-      setError("first Name is required")
+    if (!username) {
+      setError("Username is required")
       return false
     }
-    if (!formData.lastName) {
-      setError("last Name is required")
-      return false
-    }
-    if (!formData.phone) {
-      setError("phone is required")
-      return false
-    }
-    if (!formData.email) {
+    if (!email) {
       setError("Email is required")
       return false
     }
-    if (!formData.password) {
+    if (!password) {
       setError("Password is required")
       return false
     }
-    if (formData.password !== confirmPassword) {
+    if (password !== confirmPassword) {
       setError("Passwords do not match")
       return false
     }
@@ -80,16 +53,6 @@ export default function SignupPage() {
   }
 
   const handleNextPhase = () => {
-    console.log("formData hhh", formData)
-    console.log("mutate function:", mutate);
-    mutate(formData, {
-      onSuccess: (data) => {
-        console.log("Success:", data);
-      },
-      onError: (error) => {
-        console.error("Error:", error.message);
-      },
-    });
     setError("")
     if (validatePhase1()) {
       setPhase(2)
@@ -194,42 +157,14 @@ export default function SignupPage() {
             {phase === 1 ? (
               // Phase 1: Basic user information
               <form className="space-y-4">
-                <div className="flex gap-x-4">
-                  <div className="w-1/2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      type="text"
-                      name="firstName"
-                      placeholder="Enter your First Name"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="w-1/2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      name="lastName"
-                      placeholder="Enter your Last Name"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-
                 <div className="space-y-2">
-                  <Label htmlFor="username">Phone</Label>
+                  <Label htmlFor="username">Username or Phone</Label>
                   <Input
-                    id="phone"
+                    id="username"
                     type="text"
-                    name="phone"
-                    placeholder="Enter your phone"
-                    value={formData.phone}
-                    onChange={handleChange}
+                    placeholder="Enter your username or phone"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </div>
 
@@ -238,10 +173,9 @@ export default function SignupPage() {
                   <Input
                     id="email"
                     type="email"
-                    name="email"
                     placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleChange}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
@@ -250,10 +184,9 @@ export default function SignupPage() {
                   <Input
                     id="password"
                     type="password"
-                    name="password"
                     placeholder="Create a password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
 

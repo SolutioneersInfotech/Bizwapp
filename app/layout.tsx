@@ -8,7 +8,6 @@ import { MessageProvider } from "@/contexts/MessageContext"
 import { TemplateProvider } from "@/contexts/TemplateContext"
 import { AnalyticsProvider } from "@/contexts/AnalyticsContext"
 import { Toaster } from "@/components/ui/toaster"
-import { Providers } from "../app/providers"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -31,9 +30,7 @@ export default function RootLayout({
             <MessageProvider>
               <TemplateProvider>
                 <AnalyticsProvider>
-                  <Providers >
                   {children}
-                  </ Providers>
                   <Toaster />
                 </AnalyticsProvider>
               </TemplateProvider>
