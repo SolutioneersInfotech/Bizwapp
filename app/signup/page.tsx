@@ -14,6 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, AlertCircle, Info, Github, Linkedin, Facebook, ArrowRight, ArrowLeft, Check } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
+import usePostData from "../../hooks/api/usePostData"
 
 export default function SignupPage() {
   const router = useRouter()
@@ -22,9 +23,13 @@ export default function SignupPage() {
   const [error, setError] = useState("")
 
   // Phase 1 form fields
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    password: "",
+  })
   const [confirmPassword, setConfirmPassword] = useState("")
 
   // Phase 2 form fields (WhatsApp API credentials)
@@ -32,20 +37,41 @@ export default function SignupPage() {
   const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("")
   const [accessToken, setAccessToken] = useState("")
 
+  const { mutate, isError, data } = usePostData("http://localhost:5001/api/auth/signup");
+
+
+  const handleChange = (e) => {
+    console.log("e.target.name", e.target.name)
+    console.log("e.target.value", e.target.value)
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+
   const validatePhase1 = () => {
-    if (!username) {
-      setError("Username is required")
+    if (!formData.firstName) {
+      setError("first Name is required")
       return false
     }
-    if (!email) {
+    if (!formData.lastName) {
+      setError("last Name is required")
+      return false
+    }
+    if (!formData.phone) {
+      setError("phone is required")
+      return false
+    }
+    if (!formData.email) {
       setError("Email is required")
       return false
     }
-    if (!password) {
+    if (!formData.password) {
       setError("Password is required")
       return false
     }
-    if (password !== confirmPassword) {
+    if (formData.password !== confirmPassword) {
       setError("Passwords do not match")
       return false
     }
@@ -53,6 +79,16 @@ export default function SignupPage() {
   }
 
   const handleNextPhase = () => {
+    console.log("formData hhh", formData)
+    console.log("mutate function:", mutate);
+    mutate(formData, {
+      onSuccess: (data) => {
+        console.log("Success:", data);
+      },
+      onError: (error) => {
+        console.error("Error:", error.message);
+      },
+    });
     setError("")
     if (validatePhase1()) {
       setPhase(2)
@@ -157,14 +193,39 @@ export default function SignupPage() {
             {phase === 1 ? (
               // Phase 1: Basic user information
               <form className="space-y-4">
+                <div className="flex gap-x-4">
+                  <div className="w-1/2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      name="firstName"
+                      placeholder="Enter your First Name"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="w-1/2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      name="lastName"
+                      placeholder="Enter your Last Name"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username or Phone</Label>
-                  <Input
-                    id="username"
+                  <Label htmlFor="username">Phone</Label>                  <Input
+                    id="phone"
                     type="text"
-                    placeholder="Enter your username or phone"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    name="phone"
+                    placeholder="Enter your phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                   />
                 </div>
 
@@ -173,9 +234,10 @@ export default function SignupPage() {
                   <Input
                     id="email"
                     type="email"
+                    name="email"
                     placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleChange}
                   />
                 </div>
 
@@ -184,9 +246,10 @@ export default function SignupPage() {
                   <Input
                     id="password"
                     type="password"
+                    name="password"
                     placeholder="Create a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleChange}
                   />
                 </div>
 

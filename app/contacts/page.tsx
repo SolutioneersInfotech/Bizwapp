@@ -388,7 +388,7 @@ export default function ContactsPage() {
                   <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 mb-4">
                     <FileUp className="h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-4">
-                      Click the button below to select a CSV or Excel file
+                      Click the button below to select a CSV or Excel file.Ensure that column names match with Name , Phone and Email.
                     </p>
                     <input
                       type="file"
