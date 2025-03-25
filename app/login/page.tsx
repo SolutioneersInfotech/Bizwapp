@@ -15,35 +15,70 @@ import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2, AlertCircle, Github, Linkedin, Facebook } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
+import { useMutation } from "@tanstack/react-query"
+import usePostData from "@/hooks/api/usePostData"
+import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
   const router = useRouter()
   const { login, isLoading } = useAuth()
-  const [identifier, setIdentifier] = useState("")
-  const [password, setPassword] = useState("")
+  const [ formData , setFormData] = useState({
+    identifier:"",
+    password:""
+  })
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState("")
 
+ const handleChange = (e)=>{
+  const { name , value }= e.target;
+  setFormData((prevdata)=>({
+    ...prevdata,
+    [name]:value
+  }))
+ }
+
+  const { mutate, isError, data } = usePostData("http://localhost:5001/api/auth/logIn");
+
+  const {toast} = useToast();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("mutate function:", mutate);
+    mutate(formData, {
+      onSuccess: (data) => {
+        toast({
+          title: "Success",
+          description: data.message,
+        })
+        router.push("/dashboard")
+        console.log("Success:", data);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message || "Something went wrong!", // ✅ Show error message
+        });
+        console.error("Error:", error.message);
+      },
+    });
     setError("")
 
-    if (!identifier || !password) {
+    if (!formData.identifier || !formData.password) {
       setError("Email/Phone and password are required")
       return
     }
 
-    try {
-      // For demo purposes, we'll use the demo credentials
-      await login({
-        phoneNumberId: "demo_phone_id",
-        whatsappBusinessAccountId: "demo_account_id",
-        accessToken: "demo_token",
-      })
-      router.push("/dashboard")
-    } catch (err) {
-      setError("Authentication failed. Please check your credentials.")
-    }
+    // try {
+    //   // For demo purposes, we'll use the demo credentials
+    //   await login({
+    //     phoneNumberId: "demo_phone_id",
+    //     whatsappBusinessAccountId: "demo_account_id",
+    //     accessToken: "demo_token",
+    //   })
+    //   router.push("/dashboard")
+    // } catch (err) {
+    //   setError("Authentication failed. Please check your credentials.")
+    // }
   }
 
   const handleSocialLogin = async (provider: string) => {
@@ -108,8 +143,9 @@ export default function LoginPage() {
                   id="identifier"
                   type="text"
                   placeholder="Enter your email or phone"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  name="identifier"
+                  value={formData.identifier}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -124,8 +160,9 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                 />
               </div>
 

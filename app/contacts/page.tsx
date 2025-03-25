@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState, useRef, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search,
   Filter,
@@ -17,9 +23,9 @@ import {
   Trash,
   Edit,
   FileUp,
-} from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,8 +33,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -37,13 +50,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
-import * as XLSX from "xlsx"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import * as XLSX from "xlsx";
+import usePostData from "@/hooks/api/usePostData";
+import useGetContacts from "../../hooks/api/useGetContacts";
 
 export default function ContactsPage() {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const [contacts, setContacts] = useState([
     {
       id: 1,
@@ -100,89 +115,105 @@ export default function ContactsPage() {
       lastContact: "2 weeks ago",
       status: "Inactive",
     },
-  ])
+  ]);
 
-  const [searchQuery, setSearchQuery] = useState("")
-  const [activeTab, setActiveTab] = useState("all")
-  const [filteredContacts, setFilteredContacts] = useState(contacts)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+  const [filteredContacts, setFilteredContacts] = useState(contacts);
 
   // Import dialog state
-  const [importDialogOpen, setImportDialogOpen] = useState(false)
-  const [importedContacts, setImportedContacts] = useState([])
-  const fileInputRef = useRef(null)
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importedContacts, setImportedContacts] = useState([]);
+  const fileInputRef = useRef(null);
 
   // Add contact dialog state
-  const [addContactDialogOpen, setAddContactDialogOpen] = useState(false)
+  const [addContactDialogOpen, setAddContactDialogOpen] = useState(false);
   const [newContact, setNewContact] = useState({
     name: "",
     phone: "",
     email: "",
-  })
+  });
+
+  const {
+    data: getContacts,
+    loading,
+    error,
+  } = useGetContacts("http://localhost:5001/api/auth/getContacts");
+
+  console.log("getContacts", getContacts);
 
   // Filter contacts based on search query and active tab
   const filterContacts = () => {
-    let result = [...contacts]
+    let result = [...contacts];
 
     // Filter by tab
     if (activeTab === "active") {
-      result = result.filter((contact) => contact.status === "Active")
+      result = result.filter((contact) => contact.status === "Active");
     } else if (activeTab === "blocked") {
-      result = result.filter((contact) => contact.status === "Blocked")
+      result = result.filter((contact) => contact.status === "Blocked");
     } else if (activeTab === "groups") {
       // In a real app, you would filter by groups
-      result = result.filter((contact) => contact.tags.includes("Group"))
+      result = result.filter((contact) => contact.tags.includes("Group"));
     }
 
     // Filter by search query
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       result = result.filter(
         (contact) =>
           contact.name.toLowerCase().includes(query) ||
           contact.email.toLowerCase().includes(query) ||
-          contact.phone.includes(query),
-      )
+          contact.phone.includes(query)
+      );
     }
 
-    setFilteredContacts(result)
-  }
+    setFilteredContacts(result);
+  };
 
   // Handle tab change
   const handleTabChange = (value) => {
-    setActiveTab(value)
-    filterContacts()
-  }
+    setActiveTab(value);
+    filterContacts();
+  };
 
   // Handle search
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value)
-    filterContacts()
-  }
+    setSearchQuery(e.target.value);
+    filterContacts();
+  };
 
   // Handle file upload for import
   const handleFileUpload = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
+    const file = e.target.files[0];
+    if (!file) return;
 
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const data = new Uint8Array(event.target.result)
-        const workbook = XLSX.read(data, { type: "array" })
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
 
         // Get the first worksheet
-        const worksheetName = workbook.SheetNames[0]
-        const worksheet = workbook.Sheets[worksheetName]
+        const worksheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[worksheetName];
 
         // Convert to JSON
-        const jsonData = XLSX.utils.sheet_to_json(worksheet)
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
         // Format the data
         const formattedContacts = jsonData.map((row, index) => {
-          const name = row.name || row.Name || row.NAME || `Contact ${index + 1}`
+          const name =
+            row.name || row.Name || row.NAME || `Contact ${index + 1}`;
           const phone =
-            row.phone || row.Phone || row.PHONE || row.phoneNumber || row.PhoneNumber || row.mobile || row.Mobile || ""
-          const email = row.email || row.Email || row.EMAIL || ""
+            row.phone ||
+            row.Phone ||
+            row.PHONE ||
+            row.phoneNumber ||
+            row.PhoneNumber ||
+            row.mobile ||
+            row.Mobile ||
+            "";
+          const email = row.email || row.Email || row.EMAIL || "";
 
           // Generate initials from name
           const initials = name
@@ -190,7 +221,7 @@ export default function ContactsPage() {
             .map((part) => part[0])
             .join("")
             .toUpperCase()
-            .substring(0, 2)
+            .substring(0, 2);
 
           return {
             id: Date.now() + index,
@@ -202,27 +233,32 @@ export default function ContactsPage() {
             tags: ["Imported"],
             lastContact: "Never",
             status: "Active",
-          }
-        })
+          };
+        });
 
-        setImportedContacts(formattedContacts)
+        setImportedContacts(formattedContacts);
 
         toast({
           title: "File Imported",
           description: `Successfully imported ${formattedContacts.length} contacts.`,
-        })
+        });
       } catch (error) {
-        console.error("Error parsing file:", error)
+        console.error("Error parsing file:", error);
         toast({
           title: "Import Failed",
-          description: "There was an error parsing the file. Please check the format and try again.",
+          description:
+            "There was an error parsing the file. Please check the format and try again.",
           variant: "destructive",
-        })
+        });
       }
-    }
+    };
 
-    reader.readAsArrayBuffer(file)
-  }
+    reader.readAsArrayBuffer(file);
+  };
+
+  const { mutate, isError, data } = usePostData(
+    "http://localhost:5001/api/auth/addContact"
+  );
 
   // Handle import confirmation
   const handleImportConfirm = () => {
@@ -231,24 +267,50 @@ export default function ContactsPage() {
         title: "No Contacts to Import",
         description: "Please upload a file with contacts first.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
+    setFilteredContacts((prevContacts) => [
+      ...prevContacts,
+      ...importedContacts,
+    ]);
+
     // Add imported contacts to the contacts list
-    setContacts((prevContacts) => [...prevContacts, ...importedContacts])
+    setContacts((prevContacts) => [...prevContacts, ...importedContacts]);
 
     // Reset imported contacts
-    setImportedContacts([])
+    setImportedContacts([]);
+
+    const contactsToSend = importedContacts.map(
+      ({ id, ...contact }) => contact
+    );
+    console.log("importedContacts. ", contactsToSend);
+    mutate(contactsToSend, {
+      onSuccess: (data) => {
+        toast({
+          title: "Success",
+          description: data.message,
+        });
+        console.log("Success:", data);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message || "Something went wrong!", // ✅ Show error message
+        });
+        console.error("Error:", error.message);
+      },
+    });
 
     // Close dialog
-    setImportDialogOpen(false)
+    setImportDialogOpen(false);
 
     toast({
       title: "Contacts Imported",
       description: `${importedContacts.length} contacts have been added to your list.`,
-    })
-  }
+    });
+  };
 
   // Handle export
   const handleExport = () => {
@@ -261,34 +323,34 @@ export default function ContactsPage() {
         Status: contact.status,
         Tags: contact.tags.join(", "),
         "Last Contact": contact.lastContact,
-      })),
-    )
+      }))
+    );
 
     // Create a workbook with the worksheet
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Contacts")
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Contacts");
 
     // Generate the file and trigger download
-    XLSX.writeFile(workbook, "contacts_export.xlsx")
+    XLSX.writeFile(workbook, "contacts_export.xlsx");
 
     toast({
       title: "Contacts Exported",
       description: `${contacts.length} contacts have been exported to Excel.`,
-    })
-  }
+    });
+  };
 
   // Handle add contact form change
   const handleAddContactChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setNewContact((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   // Handle add contact submission
   const handleAddContactSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // Validate required fields
     if (!newContact.name || !newContact.phone) {
@@ -296,8 +358,8 @@ export default function ContactsPage() {
         title: "Validation Error",
         description: "Name and Contact Number are required fields.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     // Generate initials from name
@@ -306,7 +368,7 @@ export default function ContactsPage() {
       .map((part) => part[0])
       .join("")
       .toUpperCase()
-      .substring(0, 2)
+      .substring(0, 2);
 
     // Create new contact object
     const contact = {
@@ -319,26 +381,26 @@ export default function ContactsPage() {
       tags: ["New"],
       lastContact: "Never",
       status: "Active",
-    }
+    };
 
     // Add to contacts list
-    setContacts((prev) => [...prev, contact])
+    setContacts((prev) => [...prev, contact]);
 
     // Reset form
     setNewContact({
       name: "",
       phone: "",
       email: "",
-    })
+    });
 
     // Close dialog
-    setAddContactDialogOpen(false)
+    setAddContactDialogOpen(false);
 
     toast({
       title: "Contact Added",
       description: `${contact.name} has been added to your contacts.`,
-    })
-  }
+    });
+  };
 
   return (
     <div className="flex flex-col">
@@ -356,11 +418,14 @@ export default function ContactsPage() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Export Contacts</DialogTitle>
-                  <DialogDescription>Export your contacts to a CSV or Excel file.</DialogDescription>
+                  <DialogDescription>
+                    Export your contacts to a CSV or Excel file.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
                   <p className="text-sm text-muted-foreground mb-4">
-                    You are about to export {contacts.length} contacts. Choose your preferred format:
+                    You are about to export {contacts.length} contacts. Choose
+                    your preferred format:
                   </p>
                   <div className="flex gap-4">
                     <Button onClick={handleExport} className="flex-1">
@@ -382,13 +447,17 @@ export default function ContactsPage() {
               <DialogContent className="sm:max-w-[525px]">
                 <DialogHeader>
                   <DialogTitle>Import Contacts</DialogTitle>
-                  <DialogDescription>Upload a CSV or Excel file to import contacts.</DialogDescription>
+                  <DialogDescription>
+                    Upload a CSV or Excel file to import contacts.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
                   <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 mb-4">
                     <FileUp className="h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-4">
-                      Click the button below to select a CSV or Excel file.Ensure that column names match with Name , Phone and Email.
+                      Click the button below to select a CSV or Excel
+                      file.Ensure that column names match with Name , Phone and
+                      Email.
                     </p>
                     <input
                       type="file"
@@ -397,12 +466,16 @@ export default function ContactsPage() {
                       ref={fileInputRef}
                       onChange={handleFileUpload}
                     />
-                    <Button onClick={() => fileInputRef.current.click()}>Click here to import CSV/XLSX file</Button>
+                    <Button onClick={() => fileInputRef.current.click()}>
+                      Click here to import CSV/XLSX file
+                    </Button>
                   </div>
 
                   {importedContacts.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-medium mb-2">Preview ({importedContacts.length} contacts)</h3>
+                      <h3 className="text-sm font-medium mb-2">
+                        Preview ({importedContacts.length} contacts)
+                      </h3>
                       <div className="border rounded-lg max-h-[200px] overflow-y-auto">
                         <Table>
                           <TableHeader>
@@ -422,8 +495,12 @@ export default function ContactsPage() {
                             ))}
                             {importedContacts.length > 5 && (
                               <TableRow>
-                                <TableCell colSpan={3} className="text-center text-sm text-muted-foreground">
-                                  And {importedContacts.length - 5} more contacts...
+                                <TableCell
+                                  colSpan={3}
+                                  className="text-center text-sm text-muted-foreground"
+                                >
+                                  And {importedContacts.length - 5} more
+                                  contacts...
                                 </TableCell>
                               </TableRow>
                             )}
@@ -434,17 +511,26 @@ export default function ContactsPage() {
                   )}
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setImportDialogOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setImportDialogOpen(false)}
+                  >
                     Cancel
                   </Button>
-                  <Button onClick={handleImportConfirm} disabled={importedContacts.length === 0}>
+                  <Button
+                    onClick={handleImportConfirm}
+                    disabled={importedContacts.length === 0}
+                  >
                     Import {importedContacts.length} Contacts
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
 
-            <Dialog open={addContactDialogOpen} onOpenChange={setAddContactDialogOpen}>
+            <Dialog
+              open={addContactDialogOpen}
+              onOpenChange={setAddContactDialogOpen}
+            >
               <DialogTrigger asChild>
                 <Button size="sm" className="h-8 gap-1">
                   <Plus className="h-3.5 w-3.5" />
@@ -454,7 +540,9 @@ export default function ContactsPage() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Contact</DialogTitle>
-                  <DialogDescription>Enter the details of the new contact.</DialogDescription>
+                  <DialogDescription>
+                    Enter the details of the new contact.
+                  </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleAddContactSubmit}>
                   <div className="grid gap-4 py-4">
@@ -483,7 +571,9 @@ export default function ContactsPage() {
                         onChange={handleAddContactChange}
                         required
                       />
-                      <p className="text-xs text-muted-foreground">Include country code, e.g., +1 (555) 123-4567</p>
+                      <p className="text-xs text-muted-foreground">
+                        Include country code, e.g., +1 (555) 123-4567
+                      </p>
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="email">Email</Label>
@@ -498,7 +588,11 @@ export default function ContactsPage() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" type="button" onClick={() => setAddContactDialogOpen(false)}>
+                    <Button
+                      variant="outline"
+                      type="button"
+                      onClick={() => setAddContactDialogOpen(false)}
+                    >
                       Cancel
                     </Button>
                     <Button type="submit">Save Contact</Button>
@@ -525,7 +619,12 @@ export default function ContactsPage() {
           </Button>
         </div>
 
-        <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+        <Tabs
+          defaultValue="all"
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="space-y-4"
+        >
           <TabsList>
             <TabsTrigger value="all">All Contacts</TabsTrigger>
             <TabsTrigger value="active">Active</TabsTrigger>
@@ -537,7 +636,9 @@ export default function ContactsPage() {
             <Card>
               <CardHeader className="p-4">
                 <CardTitle>Contact List</CardTitle>
-                <CardDescription>Manage your contacts and customer information</CardDescription>
+                <CardDescription>
+                  Manage your contacts and customer information
+                </CardDescription>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
@@ -552,24 +653,28 @@ export default function ContactsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredContacts.length === 0 ? (
+                    {getContacts?.contacts?.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={6} className="h-24 text-center">
                           No contacts found.
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredContacts.map((contact) => (
+                      getContacts?.contacts?.map((contact) => (
                         <TableRow key={contact.id}>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
                                 <AvatarImage src={contact.avatar} />
-                                <AvatarFallback>{contact.initials}</AvatarFallback>
+                                <AvatarFallback>
+                                  {contact.initials}
+                                </AvatarFallback>
                               </Avatar>
                               <div>
                                 <p>{contact.name}</p>
-                                <p className="text-xs text-muted-foreground">{contact.email}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {contact.email}
+                                </p>
                               </div>
                             </div>
                           </TableCell>
@@ -577,7 +682,11 @@ export default function ContactsPage() {
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
                               {contact.tags.map((tag) => (
-                                <Badge key={tag} variant="outline" className="text-xs">
+                                <Badge
+                                  key={tag}
+                                  variant="outline"
+                                  className="text-xs"
+                                >
                                   {tag}
                                 </Badge>
                               ))}
@@ -597,12 +706,20 @@ export default function ContactsPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
                                 <MessageSquare className="h-4 w-4" />
                               </Button>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                  >
                                     <MoreHorizontal className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
@@ -641,6 +758,5 @@ export default function ContactsPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
-

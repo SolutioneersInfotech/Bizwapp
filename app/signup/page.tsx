@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator"
 import { Loader2, AlertCircle, Info, Github, Linkedin, Facebook, ArrowRight, ArrowLeft, Check } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
 import usePostData from "../../hooks/api/usePostData"
+import { useToast } from "@/hooks/use-toast"
 
 export default function SignupPage() {
   const router = useRouter()
@@ -78,14 +79,25 @@ export default function SignupPage() {
     return true
   }
 
+  const {toast} = useToast()
+
   const handleNextPhase = () => {
     console.log("formData hhh", formData)
     console.log("mutate function:", mutate);
     mutate(formData, {
       onSuccess: (data) => {
+        toast({
+          title: "Success",
+          description: data.message
+        })
+        router.push("/dashboard")
         console.log("Success:", data);
       },
       onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message || "Something went wrong!", // ✅ Show error message
+        });
         console.error("Error:", error.message);
       },
     });

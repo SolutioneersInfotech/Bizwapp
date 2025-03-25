@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
  
  const usePostData = (url, headers = { "Content-Type": "application/json" }) => {
-   console.log("Inside usePostData Hook");
  
    return useMutation({
      mutationFn: async (formData) => {
