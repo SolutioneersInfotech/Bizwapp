@@ -55,7 +55,10 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
 import usePostData from "@/hooks/api/usePostData";
-import useGetContacts from "../../hooks/api/useGetContacts";
+import useGetContacts from "../../hooks/api/useGetContact";
+import useUpdateContact from "../../hooks/api/usePutData"
+import ContactForm from "@/components/ui/contactForm";
+import { DialogPortal } from "@radix-ui/react-dialog";
 
 export default function ContactsPage() {
   const { toast } = useToast();
@@ -124,7 +127,13 @@ export default function ContactsPage() {
   // Import dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importedContacts, setImportedContacts] = useState([]);
+  const [selectedContact, setSelectedContact] = useState({ name: "", phone: "", email: "" }); // State for selected contact
+  const [isEditing, setIsEditing] = useState(false); // State for edit mode
   const fileInputRef = useRef(null);
+  const [contactData, setContactData] = useState({ name: "", phone: "", email: "" });
+  const [ updatingContactId , setUpdatingContactId ] = useState("")
+
+  
 
   // Add contact dialog state
   const [addContactDialogOpen, setAddContactDialogOpen] = useState(false);
@@ -140,7 +149,8 @@ export default function ContactsPage() {
     error,
   } = useGetContacts("http://localhost:5001/api/auth/getContacts");
 
-  console.log("getContacts", getContacts);
+
+  const updateContactMutation  = useUpdateContact()
 
   // Filter contacts based on search query and active tab
   const filterContacts = () => {
@@ -312,6 +322,15 @@ export default function ContactsPage() {
     });
   };
 
+  const handleEdit = (contact) => {
+    console.log("contact", contact)
+    const { _id , name , phone , email } = contact;
+    setUpdatingContactId(_id)
+    const updateData = { name , phone , email }
+    setSelectedContact(updateData);
+    setIsDialogOpen(true); 
+  };
+
   // Handle export
   const handleExport = () => {
     // Create a worksheet from the contacts data
@@ -401,6 +420,56 @@ export default function ContactsPage() {
       description: `${contact.name} has been added to your contacts.`,
     });
   };
+
+  // const [newContact, setNewContact] = useState({ name: "", phone: "", email: "" });
+const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setNewContact({ ...newContact, [e.target.name]: e.target.value });
+};
+
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  
+};
+
+// Handle form submission
+const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  // Handle saving the contact data here
+  console.log("Saving contact:", contactData);
+  console.log("updatingContactId", updatingContactId)
+  console.log("contactData dddd", contactData)
+  updateContactMutation.mutate(
+    { 
+      id: updatingContactId, // Pass ID correctly
+      updatedData: selectedContact, // Pass updated data
+    },
+    {
+      onSuccess: () => {
+        console.log("Contact updated successfully!");
+      },
+      onError: (error) => {
+        console.error("Error updating contact:", error);
+      },
+    }
+  );
+  setIsDialogOpen(false); // Close dialog after saving
+};
+
+// Handle input change
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+  console.log("name", name)
+  console.log("value",value)
+  setContactData((prev) => ({ ...prev, [name]: value }));
+  setSelectedContact((prev) => ({ ...prev, [name]: value }));
+};
+
+// Handle closing the dialog
+const handleCloseDialog = () => {
+  setIsDialogOpen(false);
+};
 
   return (
     <div className="flex flex-col">
@@ -537,68 +606,14 @@ export default function ContactsPage() {
                   <span>Add Contact</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Contact</DialogTitle>
-                  <DialogDescription>
-                    Enter the details of the new contact.
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleAddContactSubmit}>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="name">
-                        Name <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        placeholder="Enter contact name"
-                        value={newContact.name}
-                        onChange={handleAddContactChange}
-                        required
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="phone">
-                        Contact Number <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        placeholder="Enter phone number with country code"
-                        value={newContact.phone}
-                        onChange={handleAddContactChange}
-                        required
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Include country code, e.g., +1 (555) 123-4567
-                      </p>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="Enter email address (optional)"
-                        value={newContact.email}
-                        onChange={handleAddContactChange}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={() => setAddContactDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Save Contact</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
+              <ContactForm
+              title="Create Contact"
+              description="Fill in the details below."
+              contactData={newContact}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              onClose={() => setIsDialogOpen(false)}
+              />
             </Dialog>
           </div>
         </div>
@@ -654,14 +669,14 @@ export default function ContactsPage() {
                   </TableHeader>
                   <TableBody>
                     {getContacts?.contacts?.length === 0 ? (
-                      <TableRow>
+                      <TableRow key={contact.id}>
                         <TableCell colSpan={6} className="h-24 text-center">
                           No contacts found.
                         </TableCell>
                       </TableRow>
                     ) : (
                       getContacts?.contacts?.map((contact) => (
-                        <TableRow key={contact.id}>
+                        <TableRow key={contact._id}>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
@@ -726,7 +741,7 @@ export default function ContactsPage() {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleEdit(contact)}>
                                     <Edit className="mr-2 h-4 w-4" />
                                     <span>Edit</span>
                                   </DropdownMenuItem>
@@ -752,6 +767,19 @@ export default function ContactsPage() {
                     )}
                   </TableBody>
                 </Table>
+
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogPortal>
+          <ContactForm
+            title="Edit Contact"
+            description="Update the contact details below."
+            contactData={selectedContact}
+            onChange={handleInputChange}
+            onSubmit={handleFormSubmit}
+            onClose={handleCloseDialog}
+          />
+        </DialogPortal>
+      </Dialog>
               </CardContent>
             </Card>
           </TabsContent>
