@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Search,
   Filter,
@@ -26,11 +26,11 @@ import {
   BellOff,
   UserPlus,
   Tag,
-} from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
-import { useMessages } from "@/contexts/MessageContext"
-import { useTemplates } from "@/contexts/TemplateContext"
-import type { Contact, Message } from "@/lib/types"
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useMessages } from "@/contexts/MessageContext";
+import { useTemplates } from "@/contexts/TemplateContext";
+import type { Contact, Message } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -39,10 +39,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { ScrollArea } from "@/components/ui/scroll-area"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,12 +50,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import useGetContacts from "@/hooks/api/useGetContact";
+import useSendWhatsAppMessage from '../../hooks/api/useSendWhatsAppMessage '; // Adjust path as needed
 
 export default function ConversationsPage() {
-  const router = useRouter()
-  const { isAuthenticated, isLoading: authLoading } = useAuth()
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const {
     messages,
     sendMessage,
@@ -63,144 +72,211 @@ export default function ConversationsPage() {
     isLoading: messageLoading,
     currentContact,
     setCurrentContact,
-  } = useMessages()
-  const { templates } = useTemplates()
-  const { toast } = useToast()
+  } = useMessages();
+  const { templates } = useTemplates();
+  const { toast } = useToast();
 
-  const [newMessage, setNewMessage] = useState("")
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
-  const [contactMessages, setContactMessages] = useState<Message[]>([])
-  const [bulkMessageOpen, setBulkMessageOpen] = useState(false)
-  const [bulkMessage, setBulkMessage] = useState("")
-  const [selectedContacts, setSelectedContacts] = useState<string[]>([])
-  const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [newMessage, setNewMessage] = useState("");
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [contactMessages, setContactMessages] = useState<Message[]>([]);
+  const [bulkMessageOpen, setBulkMessageOpen] = useState(false);
+  const [bulkMessage, setBulkMessage] = useState("");
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // New state for bulk message template
+  const [bulkMessageTab, setBulkMessageTab] = useState("text");
+  const [selectedBulkTemplate, setSelectedBulkTemplate] = useState("");
 
   // New state for search and filters
-  const [searchQuery, setSearchQuery] = useState("")
-  const [activeTab, setActiveTab] = useState("all")
-  const [filteredConversations, setFilteredConversations] = useState(conversations)
-  const [newChatDialogOpen, setNewChatDialogOpen] = useState(false)
-  const [newChatPhone, setNewChatPhone] = useState("")
-  const [newChatMessage, setNewChatMessage] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+  const [filteredConversations, setFilteredConversations] =
+    useState(conversations);
+  const [newChatDialogOpen, setNewChatDialogOpen] = useState(false);
+  const [newChatPhone, setNewChatPhone] = useState("");
+  const [newChatMessage, setNewChatMessage] = useState("");
+  const [contacts, setContact] = useState(null);
 
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [authLoading, isAuthenticated, router])
+  }, [authLoading, isAuthenticated, router]);
 
   // Set selected contact from context if available
   useEffect(() => {
     if (currentContact && !selectedContact) {
-      setSelectedContact(currentContact)
+      setSelectedContact(currentContact);
     }
-  }, [currentContact, selectedContact])
+  }, [currentContact, selectedContact]);
 
   // Update messages when selected contact changes
   useEffect(() => {
     if (selectedContact) {
-      const history = getMessageHistory(selectedContact.phone)
-      setContactMessages(history)
+      const history = getMessageHistory(selectedContact.phone);
+      setContactMessages(history);
     }
-  }, [selectedContact, messages, getMessageHistory])
+  }, [selectedContact, messages, getMessageHistory]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [contactMessages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [contactMessages]);
 
   // Filter conversations based on search and active tab
   useEffect(() => {
-    let result = [...conversations]
+    let result = [...conversations];
 
     // Filter by tab
     if (activeTab === "unread") {
-      result = result.filter((conversation) => conversation.unread > 0)
+      result = result.filter((conversation) => conversation.unread > 0);
     } else if (activeTab === "archived") {
-      result = result.filter((conversation) => conversation.archived)
+      result = result.filter((conversation) => conversation.archived);
     }
 
     // Filter by search query
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       result = result.filter(
         (conversation) =>
           conversation.name.toLowerCase().includes(query) ||
           conversation.lastMessage.toLowerCase().includes(query) ||
-          conversation.phone.includes(query),
-      )
+          conversation.phone.includes(query)
+      );
     }
 
-    setFilteredConversations(result)
-  }, [searchQuery, activeTab])
+    setFilteredConversations(result);
+  }, [searchQuery, activeTab]);
+
+  const {
+    data: getContacts,
+    loading,
+    error,
+  } = useGetContacts("http://localhost:5001/api/auth/getContacts");
+
+  useEffect(() => {
+    setContact(getContacts);
+  }, [getContacts]);
+
+
 
   const handleContactSelect = (contact: Contact) => {
-    setSelectedContact(contact)
-    setCurrentContact(contact)
-  }
+    setSelectedContact(contact);
+    setCurrentContact(contact);
+  };
 
   const handleSendMessage = async () => {
-    if (!selectedContact || !newMessage.trim()) return
+    if (!selectedContact || !newMessage.trim()) return;
 
-    await sendMessage(selectedContact.phone, newMessage)
-    setNewMessage("")
-  }
+    await sendMessage(selectedContact.phone, newMessage);
+    setNewMessage("");
+  };
+
+  const { mutate , isLoading, data } =  useSendWhatsAppMessage()
+
 
   const handleSendBulkMessage = async () => {
-    if (!bulkMessage.trim() || selectedContacts.length === 0) return
+    console.log("Checking.")
+    if (
+      bulkMessageTab === "text" &&
+      (!bulkMessage.trim() || selectedContacts.length === 0)
+    ) {
+      toast({
+        title: "Error",
+        description: "Please enter a message and select at least one contact",
+        variant: "destructive",
+      });
+      return;
+    }
 
+    if (
+      bulkMessageTab === "template" &&
+      (!selectedBulkTemplate || selectedContacts.length === 0)
+    ) {
+      toast({
+        title: "Error",
+        description: "Please select a template and at least one contact",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Attempting to send message' , selectedContacts ,bulkMessage );
+
+      mutate({ phoneNumbers: selectedContacts, message: bulkMessage });
+    
     try {
       // In a real app, you would call the API to send bulk messages
-      for (const contactPhone of selectedContacts) {
-        await sendMessage(contactPhone, bulkMessage)
+      if (bulkMessageTab === "text") {
+        for (const contactPhone of selectedContacts) {
+          await sendMessage(contactPhone, bulkMessage);
+        }
+      } else {
+        // Send template message
+        const template = templates.find((t) => t.id === selectedBulkTemplate);
+        if (template) {
+          for (const contactPhone of selectedContacts) {
+            await sendMessage(
+              contactPhone,
+              `[Template: ${template.name}] ${template.content}`
+            );
+          }
+        }
       }
 
       toast({
         title: "Bulk Message Sent",
         description: `Message sent to ${selectedContacts.length} contacts`,
-      })
+      });
 
-      setBulkMessage("")
-      setSelectedContacts([])
-      setBulkMessageOpen(false)
+      setBulkMessage("");
+      setSelectedBulkTemplate("");
+      setSelectedContacts([]);
+      setBulkMessageOpen(false);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to send bulk message",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleSendTemplate = async (templateId: string) => {
-    if (!selectedContact) return
+    if (!selectedContact) return;
 
-    const template = templates.find((t) => t.id === templateId)
-    if (!template) return
+    const template = templates.find((t) => t.id === templateId);
+    if (!template) return;
 
     try {
       // In a real app, you would call the API to send a template message
-      await sendMessage(selectedContact.phone, `[Template: ${template.name}] ${template.content}`)
-      setTemplateDialogOpen(false)
+      await sendMessage(
+        selectedContact.phone,
+        `[Template: ${template.name}] ${template.content}`
+      );
+      setTemplateDialogOpen(false);
 
       toast({
         title: "Template Sent",
         description: `Template "${template.name}" sent successfully`,
-      })
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to send template",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const toggleContactSelection = (phone: string) => {
-    setSelectedContacts((prev) => (prev.includes(phone) ? prev.filter((p) => p !== phone) : [...prev, phone]))
-  }
+    setSelectedContacts((prev) =>
+      prev.includes(phone) ? prev.filter((p) => p !== phone) : [...prev, phone]
+    );
+  };
 
   const handleStartNewChat = async () => {
     if (!newChatPhone) {
@@ -208,17 +284,19 @@ export default function ConversationsPage() {
         title: "Error",
         description: "Phone number is required",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     try {
       // Check if contact exists
-      const existingContact = conversations.find((c) => c.phone === newChatPhone)
+      const existingContact = conversations.find(
+        (c) => c.phone === newChatPhone
+      );
 
       if (existingContact) {
         // If contact exists, select it
-        handleContactSelect(existingContact)
+        handleContactSelect(existingContact);
       } else {
         // Create a new contact
         const newContact = {
@@ -234,92 +312,106 @@ export default function ConversationsPage() {
           tags: ["New"],
           status: "Active",
           archived: false,
-        }
+        };
 
         // Add to conversations (in a real app, this would be an API call)
-        conversations.push(newContact)
+        conversations.push(newContact);
 
         // Select the new contact
-        handleContactSelect(newContact)
+        handleContactSelect(newContact);
 
         // Send initial message if provided
         if (newChatMessage) {
-          await sendMessage(newChatPhone, newChatMessage)
+          await sendMessage(newChatPhone, newChatMessage);
         }
       }
 
-      setNewChatDialogOpen(false)
-      setNewChatPhone("")
-      setNewChatMessage("")
+      setNewChatDialogOpen(false);
+      setNewChatPhone("");
+      setNewChatMessage("");
 
       toast({
         title: "Chat Started",
         description: "New conversation has been started",
-      })
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to start new chat",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleArchiveConversation = (contact) => {
     // In a real app, this would be an API call
-    const index = conversations.findIndex((c) => c.id === contact.id)
+    const index = conversations.findIndex((c) => c.id === contact.id);
     if (index !== -1) {
-      conversations[index].archived = !conversations[index].archived
+      conversations[index].archived = !conversations[index].archived;
 
       toast({
-        title: conversations[index].archived ? "Conversation Archived" : "Conversation Unarchived",
-        description: `Conversation with ${contact.name} has been ${conversations[index].archived ? "archived" : "unarchived"}`,
-      })
+        title: conversations[index].archived
+          ? "Conversation Archived"
+          : "Conversation Unarchived",
+        description: `Conversation with ${contact.name} has been ${
+          conversations[index].archived ? "archived" : "unarchived"
+        }`,
+      });
 
       // Refresh filtered conversations
-      setFilteredConversations([...filteredConversations])
+      setFilteredConversations([...filteredConversations]);
     }
-  }
+  };
 
   const handleDeleteConversation = (contact) => {
     // In a real app, this would be an API call
-    const index = conversations.findIndex((c) => c.id === contact.id)
+    const index = conversations.findIndex((c) => c.id === contact.id);
     if (index !== -1) {
-      conversations.splice(index, 1)
+      conversations.splice(index, 1);
 
       toast({
         title: "Conversation Deleted",
         description: `Conversation with ${contact.name} has been deleted`,
-      })
+      });
 
       // Refresh filtered conversations
-      setFilteredConversations([...filteredConversations.filter((c) => c.id !== contact.id)])
+      setFilteredConversations([
+        ...filteredConversations.filter((c) => c.id !== contact.id),
+      ]);
 
       // If the deleted contact was selected, clear selection
       if (selectedContact && selectedContact.id === contact.id) {
-        setSelectedContact(null)
+        setSelectedContact(null);
       }
     }
-  }
+  };
 
   const handleMuteConversation = (contact) => {
     // In a real app, this would be an API call
-    const index = conversations.findIndex((c) => c.id === contact.id)
+    const index = conversations.findIndex((c) => c.id === contact.id);
     if (index !== -1) {
-      conversations[index].muted = !conversations[index].muted
+      conversations[index].muted = !conversations[index].muted;
 
       toast({
-        title: conversations[index].muted ? "Conversation Muted" : "Conversation Unmuted",
-        description: `Notifications for ${contact.name} have been ${conversations[index].muted ? "muted" : "unmuted"}`,
-      })
+        title: conversations[index].muted
+          ? "Conversation Muted"
+          : "Conversation Unmuted",
+        description: `Notifications for ${contact.name} have been ${
+          conversations[index].muted ? "muted" : "unmuted"
+        }`,
+      });
 
       // Refresh filtered conversations
-      setFilteredConversations([...filteredConversations])
+      setFilteredConversations([...filteredConversations]);
     }
-  }
+  };
 
   if (authLoading) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -338,49 +430,120 @@ export default function ConversationsPage() {
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>Send Bulk Message</DialogTitle>
-                  <DialogDescription>Send a message to multiple contacts at once.</DialogDescription>
+                  <DialogDescription>
+                    Send a message to multiple contacts at once.
+                  </DialogDescription>
                 </DialogHeader>
+                <Tabs value={bulkMessageTab} onValueChange={setBulkMessageTab}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="text">Text Message</TabsTrigger>
+                    <TabsTrigger value="template">Template</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="text" className="mt-4">
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="bulk-message">Message</Label>
+                        <Textarea
+                          id="bulk-message"
+                          placeholder="Type your message here..."
+                          value={bulkMessage}
+                          onChange={(e) => setBulkMessage(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="template" className="mt-4">
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="template-select">Select Template</Label>
+                        <Select
+                          value={selectedBulkTemplate}
+                          onValueChange={setSelectedBulkTemplate}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose a template" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {templates
+                              .filter((t) => t.status === "Approved")
+                              .map((template) => (
+                                <SelectItem
+                                  key={template.id}
+                                  value={template.id}
+                                >
+                                  {template.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                        {selectedBulkTemplate && (
+                          <div className="mt-2 rounded-md border p-3 text-sm">
+                            {
+                              templates.find(
+                                (t) => t.id === selectedBulkTemplate
+                              )?.content
+                            }
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="bulk-message">Message</Label>
-                    <Textarea
-                      id="bulk-message"
-                      placeholder="Type your message here..."
-                      value={bulkMessage}
-                      onChange={(e) => setBulkMessage(e.target.value)}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>Select Contacts ({selectedContacts.length} selected)</Label>
+                    <Label>
+                      Select Contacts ({selectedContacts.length} selected)
+                    </Label>
                     <ScrollArea className="h-[200px] rounded-md border p-2">
-                      {conversations.map((contact) => (
-                        <div key={contact.id} className="flex items-center gap-2 py-2">
-                          <input
-                            type="checkbox"
-                            id={`contact-${contact.id}`}
-                            checked={selectedContacts.includes(contact.phone)}
-                            onChange={() => toggleContactSelection(contact.phone)}
-                            className="h-4 w-4 rounded border-gray-300"
-                          />
-                          <Label htmlFor={`contact-${contact.id}`} className="flex items-center gap-2 cursor-pointer">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={contact.avatar} />
-                              <AvatarFallback>{contact.initials}</AvatarFallback>
-                            </Avatar>
-                            <span>{contact.name}</span>
-                          </Label>
-                        </div>
-                      ))}
+                      {contacts?.contacts?.length > 0 ? (
+                        contacts.contacts.map((contact) => (
+                          <div
+                            key={contact._id}
+                            className="flex items-center gap-2 py-2"
+                          >
+                            <input
+                              type="checkbox"
+                              id={`contact-${contact._id}`}
+                              checked={selectedContacts.includes(contact.phone)}
+                              onChange={() =>
+                                toggleContactSelection(contact.phone)
+                              }
+                              className="h-4 w-4 rounded border-gray-300"
+                            />
+                            <Label
+                              htmlFor={`contact-${contact._id}`}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={contact.avatar} />
+                                <AvatarFallback>
+                                  {contact.initials}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span>{contact.name}</span>
+                            </Label>
+                          </div>
+                        ))
+                      ) : (
+                        <p>No contacts found</p>
+                      )}
                     </ScrollArea>
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setBulkMessageOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setBulkMessageOpen(false)}
+                  >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleSendBulkMessage}
-                    disabled={!bulkMessage.trim() || selectedContacts.length === 0}
+                    disabled={
+                       (
+
+                          selectedContacts.length === 0)
+                    }
                   >
                     Send to {selectedContacts.length} contacts
                   </Button>
@@ -404,7 +567,12 @@ export default function ConversationsPage() {
             />
           </div>
         </div>
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="px-4">
+        <Tabs
+          defaultValue="all"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="px-4"
+        >
           <TabsList className="w-full">
             <TabsTrigger value="all" className="flex-1">
               All
@@ -424,9 +592,14 @@ export default function ConversationsPage() {
                 </div>
                 <h3 className="text-lg font-medium">No conversations found</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {searchQuery ? "Try adjusting your search or filters" : "Start a new conversation to get started"}
+                  {searchQuery
+                    ? "Try adjusting your search or filters"
+                    : "Start a new conversation to get started"}
                 </p>
-                <Button className="mt-4" onClick={() => setNewChatDialogOpen(true)}>
+                <Button
+                  className="mt-4"
+                  onClick={() => setNewChatDialogOpen(true)}
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   New Chat
                 </Button>
@@ -439,7 +612,9 @@ export default function ConversationsPage() {
                   isActive={selectedContact?.id === conversation.id}
                   onSelect={() => handleContactSelect(conversation)}
                   isSelected={selectedContacts.includes(conversation.phone)}
-                  onToggleSelect={() => toggleContactSelection(conversation.phone)}
+                  onToggleSelect={() =>
+                    toggleContactSelection(conversation.phone)
+                  }
                   selectionMode={bulkMessageOpen}
                   onArchive={() => handleArchiveConversation(conversation)}
                   onDelete={() => handleDeleteConversation(conversation)}
@@ -481,7 +656,9 @@ export default function ConversationsPage() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Conversation Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => handleMuteConversation(selectedContact)}>
+                    <DropdownMenuItem
+                      onClick={() => handleMuteConversation(selectedContact)}
+                    >
                       {selectedContact.muted ? (
                         <>
                           <Bell className="mr-2 h-4 w-4" />
@@ -503,9 +680,13 @@ export default function ConversationsPage() {
                       <span>Manage Tags</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => handleArchiveConversation(selectedContact)}>
+                    <DropdownMenuItem
+                      onClick={() => handleArchiveConversation(selectedContact)}
+                    >
                       <Archive className="mr-2 h-4 w-4" />
-                      <span>{selectedContact.archived ? "Unarchive" : "Archive"}</span>
+                      <span>
+                        {selectedContact.archived ? "Unarchive" : "Archive"}
+                      </span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive"
@@ -529,23 +710,38 @@ export default function ConversationsPage() {
                   contactMessages.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.direction === "outbound" ? "justify-end" : "justify-start"}`}
+                      className={`flex ${
+                        message.direction === "outbound"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
                     >
                       <div
                         className={`max-w-[80%] rounded-lg p-3 ${
-                          message.direction === "outbound" ? "bg-primary text-primary-foreground" : "bg-muted"
+                          message.direction === "outbound"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
                         }`}
                       >
                         <p className="text-sm">{message.content}</p>
                         <div className="mt-1 flex items-center justify-end gap-1 text-xs opacity-70">
                           <span>
-                            {new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            {new Date(message.timestamp).toLocaleTimeString(
+                              [],
+                              { hour: "2-digit", minute: "2-digit" }
+                            )}
                           </span>
                           {message.direction === "outbound" && (
                             <span>
-                              {message.status === "sent" && <Check className="h-3 w-3" />}
-                              {message.status === "delivered" && <Check className="h-3 w-3" />}
-                              {message.status === "read" && <CheckCircle className="h-3 w-3" />}
+                              {message.status === "sent" && (
+                                <Check className="h-3 w-3" />
+                              )}
+                              {message.status === "delivered" && (
+                                <Check className="h-3 w-3" />
+                              )}
+                              {message.status === "read" && (
+                                <CheckCircle className="h-3 w-3" />
+                              )}
                             </span>
                           )}
                         </div>
@@ -570,8 +766,8 @@ export default function ConversationsPage() {
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault()
-                        handleSendMessage()
+                        e.preventDefault();
+                        handleSendMessage();
                       }
                     }}
                   />
@@ -593,14 +789,21 @@ export default function ConversationsPage() {
                   onClick={handleSendMessage}
                   disabled={messageLoading || !newMessage.trim()}
                 >
-                  {messageLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {messageLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
               <div className="mt-2 flex items-center gap-2">
                 <Button variant="outline" size="sm" className="h-8 text-xs">
                   Quick Reply
                 </Button>
-                <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
+                <Dialog
+                  open={templateDialogOpen}
+                  onOpenChange={setTemplateDialogOpen}
+                >
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm" className="h-8 text-xs">
                       Templates
@@ -609,7 +812,9 @@ export default function ConversationsPage() {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Select a Template</DialogTitle>
-                      <DialogDescription>Choose a template to send to {selectedContact.name}</DialogDescription>
+                      <DialogDescription>
+                        Choose a template to send to {selectedContact.name}
+                      </DialogDescription>
                     </DialogHeader>
                     <ScrollArea className="h-[300px] rounded-md border p-4">
                       <div className="grid gap-4">
@@ -622,13 +827,18 @@ export default function ConversationsPage() {
                               onClick={() => handleSendTemplate(template.id)}
                             >
                               <h4 className="font-medium">{template.name}</h4>
-                              <p className="text-sm text-muted-foreground">{template.content}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {template.content}
+                              </p>
                             </div>
                           ))}
                       </div>
                     </ScrollArea>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setTemplateDialogOpen(false)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setTemplateDialogOpen(false)}
+                      >
                         Cancel
                       </Button>
                     </DialogFooter>
@@ -644,8 +854,13 @@ export default function ConversationsPage() {
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
               <h3 className="text-lg font-medium">Select a conversation</h3>
-              <p className="text-muted-foreground">Choose a contact to start messaging</p>
-              <Button className="mt-4" onClick={() => setNewChatDialogOpen(true)}>
+              <p className="text-muted-foreground">
+                Choose a contact to start messaging
+              </p>
+              <Button
+                className="mt-4"
+                onClick={() => setNewChatDialogOpen(true)}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 New Chat
               </Button>
@@ -659,7 +874,9 @@ export default function ConversationsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Start New Chat</DialogTitle>
-            <DialogDescription>Enter a phone number to start a new conversation</DialogDescription>
+            <DialogDescription>
+              Enter a phone number to start a new conversation
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -670,10 +887,14 @@ export default function ConversationsPage() {
                 value={newChatPhone}
                 onChange={(e) => setNewChatPhone(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">Include country code, e.g., +1234567890</p>
+              <p className="text-xs text-muted-foreground">
+                Include country code, e.g., +1234567890
+              </p>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="initial-message">Initial Message (Optional)</Label>
+              <Label htmlFor="initial-message">
+                Initial Message (Optional)
+              </Label>
               <Textarea
                 id="initial-message"
                 placeholder="Type your first message..."
@@ -683,7 +904,10 @@ export default function ConversationsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setNewChatDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setNewChatDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleStartNewChat}>Start Chat</Button>
@@ -691,7 +915,7 @@ export default function ConversationsPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
 
 function ConversationItem({
@@ -708,7 +932,9 @@ function ConversationItem({
   return (
     <div
       className={`flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors ${
-        isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-muted/50"
+        isActive
+          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          : "hover:bg-muted/50"
       }`}
       onClick={selectionMode ? onToggleSelect : onSelect}
     >
@@ -730,10 +956,14 @@ function ConversationItem({
           <p className="font-medium truncate">{conversation.name}</p>
           <p className="text-xs text-muted-foreground">{conversation.time}</p>
         </div>
-        <p className="text-xs text-muted-foreground truncate">{conversation.lastMessage}</p>
+        <p className="text-xs text-muted-foreground truncate">
+          {conversation.lastMessage}
+        </p>
       </div>
       {conversation.unread > 0 && (
-        <Badge className="ml-auto bg-primary text-primary-foreground">{conversation.unread}</Badge>
+        <Badge className="ml-auto bg-primary text-primary-foreground">
+          {conversation.unread}
+        </Badge>
       )}
       {!selectionMode && (
         <DropdownMenu>
@@ -752,8 +982,8 @@ function ConversationItem({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={(e) => {
-                e.stopPropagation()
-                onMute()
+                e.stopPropagation();
+                onMute();
               }}
             >
               {conversation.muted ? (
@@ -770,8 +1000,8 @@ function ConversationItem({
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={(e) => {
-                e.stopPropagation()
-                onArchive()
+                e.stopPropagation();
+                onArchive();
               }}
             >
               <Archive className="mr-2 h-4 w-4" />
@@ -781,8 +1011,8 @@ function ConversationItem({
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"
               onClick={(e) => {
-                e.stopPropagation()
-                onDelete()
+                e.stopPropagation();
+                onDelete();
               }}
             >
               <Trash2 className="mr-2 h-4 w-4" />
@@ -792,7 +1022,7 @@ function ConversationItem({
         </DropdownMenu>
       )}
     </div>
-  )
+  );
 }
 
 // Mock data for conversations
@@ -832,7 +1062,8 @@ const conversations = [
     name: "Emily Rodriguez",
     initials: "ER",
     avatar: "/placeholder.svg?height=40&width=40",
-    lastMessage: "Do you have this item in blue? I only see red on the website.",
+    lastMessage:
+      "Do you have this item in blue? I only see red on the website.",
     time: "1h",
     unread: 0,
     phone: "+1122334455",
@@ -887,5 +1118,4 @@ const conversations = [
     archived: false,
     muted: false,
   },
-]
-
+];

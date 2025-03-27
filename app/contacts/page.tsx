@@ -669,7 +669,7 @@ const handleCloseDialog = () => {
                   </TableHeader>
                   <TableBody>
                     {getContacts?.contacts?.length === 0 ? (
-                      <TableRow key={contact.id}>
+                      <TableRow >
                         <TableCell colSpan={6} className="h-24 text-center">
                           No contacts found.
                         </TableCell>

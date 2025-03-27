@@ -90,7 +90,7 @@ export default function SignupPage() {
           title: "Success",
           description: data.message
         })
-        router.push("/dashboard")
+        // router.push("/dashboard")
         console.log("Success:", data);
       },
       onError: (error) => {
@@ -119,9 +119,9 @@ export default function SignupPage() {
       // In a real app, you would register the user here
       // For demo purposes, we'll just log in with demo credentials
       await login({
-        phoneNumberId: "demo_phone_id",
-        whatsappBusinessAccountId: "demo_account_id",
-        accessToken: "demo_token",
+        phoneNumberId: "606836342508871",
+        whatsappBusinessAccountId: "28995967470047562",
+        accessToken: "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6",
       })
       router.push("/dashboard")
     } catch (err) {
