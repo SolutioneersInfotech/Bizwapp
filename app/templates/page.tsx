@@ -29,6 +29,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import  CreateTemplateModal  from "../templates/create-template-modal"
 
 export default function TemplatesPage() {
   const { templates, createTemplate, updateTemplate, deleteTemplate, isLoading } = useTemplates()
@@ -37,6 +38,8 @@ export default function TemplatesPage() {
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredTemplates, setFilteredTemplates] = useState(templates)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
 
   // New template dialog state
   const [newTemplateOpen, setNewTemplateOpen] = useState(false)
@@ -215,69 +218,18 @@ export default function TemplatesPage() {
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight">Message Templates</h2>
-          <Dialog open={newTemplateOpen} onOpenChange={setNewTemplateOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-1">
+          
+              <Button className="gap-1" onClick={() => setIsCreateModalOpen(true)}>
                 <Plus className="h-4 w-4" />
                 <span>New Template</span>
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Template</DialogTitle>
-                <DialogDescription>Create a new message template for your WhatsApp Business account</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Template Name</Label>
-                  <Input
-                    id="name"
-                    value={templateName}
-                    onChange={(e) => setTemplateName(e.target.value)}
-                    placeholder="e.g., Welcome Message"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select value={templateCategory} onValueChange={setTemplateCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Onboarding">Onboarding</SelectItem>
-                      <SelectItem value="Transactional">Transactional</SelectItem>
-                      <SelectItem value="Marketing">Marketing</SelectItem>
-                      <SelectItem value="Customer Support">Customer Support</SelectItem>
-                      <SelectItem value="Engagement">Engagement</SelectItem>
-                      <SelectItem value="Scheduling">Scheduling</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="content">Template Content</Label>
-                  <Textarea
-                    id="content"
-                    value={templateContent}
-                    onChange={(e) => setTemplateContent(e.target.value)}
-                    placeholder="Enter your template content. Use {{1}}, {{2}}, etc. for variables."
-                    rows={5}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Variables like &#123;&#123;1&#125;&#125; will be replaced with actual values when sending the
-                    template.
-                  </p>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setNewTemplateOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateTemplate} disabled={isLoading}>
-                  {isLoading ? "Creating..." : "Create Template"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+            
+              <CreateTemplateModal
+              open={isCreateModalOpen}
+              onOpenChange={setIsCreateModalOpen}
+              onSubmit={handleCreateTemplate}
+            />
+          
         </div>
 
         <div className="flex items-center gap-2">
