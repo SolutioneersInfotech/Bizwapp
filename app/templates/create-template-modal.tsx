@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { useSendTemplateMutation } from '../../hooks/api/templateApproaval.ts';
-import { ToastContainer , toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 
 
@@ -45,25 +45,38 @@ interface TemplateData {
 }
 
 const defaultTemplate: TemplateData = {
-  name: "",
-  category: "UTILITY",
-  language: "en",
-  components: [
+  "name": "orderdate",
+  "category": "UTILITY",
+  "language": "en",
+  "components": [
     {
-      type: "HEADER",
-      format: "TEXT",
-      text: "",
+      "type": "HEADER",
+      "format": "TEXT",
+      "text": "Order Update"
     },
     {
-      type: "BODY",
-      text: "",
+      "type": "BODY",
+      "text": "Hello Abhi, your order macbook has been shipped! 🚚"
     },
     {
-      type: "FOOTER",
-      text: "",
+      "type": "FOOTER",
+      "text": "Thank you for shopping with us!"
     },
-  ],
-};
+    {
+      "type": "BUTTONS",
+      "buttons": [
+        {
+          "type": "QUICK_REPLY",
+          "text": "Track Order"
+        },
+        {
+          "type": "QUICK_REPLY",
+          "text": "Contact Support"
+        }
+      ]
+    }
+  ]
+}
 
 interface CreateTemplateModalProps {
   open: boolean;
@@ -102,15 +115,12 @@ export default function CreateTemplateModal({
     }
   };
 
-  const { mutate, isLoading, isError, data, error } = useSendTemplateMutation();
-
-
   const handleSubmit = (jsonInput) => {
     console.log("jsonInput", jsonInput)
     mutate(jsonInput, {
-        onSuccess: (response) => {
-          console.log(`Your submitted Template is ${response.status}`);
-          toast.success('Your submitted Template is ${response.status}', {
+      onSuccess: (response) => {
+        if (response.status === "APPROVED") {
+          toast.success(`✅ Your submitted Template is ${response.status}`, {
             position: "bottom-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -119,23 +129,47 @@ export default function CreateTemplateModal({
             draggable: true,
             progress: undefined,
             theme: "colored",
-            });
-            console.log("after toast.")
-
-          
-        },
-        onError: (err) => {
-          console.error("Error submitting template:", err);
-          toast.error('This is an error message!', {
-            position: toast.POSITION.TOP_RIGHT, // Change position as needed
-            autoClose: 5000, // Auto close after 5 seconds
-            hideProgressBar: false, // Show progress bar
-            closeOnClick: true, // Close on click
-            pauseOnHover: true, // Pause when hovered
           });
-          console.log("after toast.")
-        },
-      });
+        }
+        else {
+          toast.error(`ℹ️ Template status: ${response.status}`, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+        }
+
+
+      },
+      onError: (err) => {
+        console.error("Error submitting template:", err);
+    
+        // Extract error message from the response
+        const errorTitle = err?.response?.data?.error?.error_user_title || "Error";
+    const errorMessage =
+      err?.response?.data?.error?.error_user_msg ||
+      err?.response?.data?.error?.message ||
+      err?.message ||
+      "Something went wrong!";
+
+    // Show error toast with both title and message
+    toast.error(`❌ ${errorTitle}: ${errorMessage}`, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+      },
+    });
     onSubmit(template);
     onOpenChange(false);
   };
@@ -143,16 +177,16 @@ export default function CreateTemplateModal({
   const addButton = (componentIndex: number) => {
     const updatedTemplate = { ...template };
     const component = updatedTemplate.components[componentIndex];
-    
+
     if (!component.buttons) {
       component.buttons = [];
     }
-    
+
     component.buttons.push({
       type: "QUICK_REPLY",
       text: "",
     });
-    
+
     updateTemplate(updatedTemplate);
   };
 
@@ -192,10 +226,7 @@ export default function CreateTemplateModal({
       updateTemplate(updatedTemplate);
     }
   };
-
   return (
-
-
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -311,26 +342,26 @@ export default function CreateTemplateModal({
                   {(component.type === "HEADER" ||
                     component.type === "BODY" ||
                     component.type === "FOOTER") && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Text</label>
-                      <Textarea
-                        value={component.text || ""}
-                        onChange={(e) => {
-                          const updatedTemplate = { ...template };
-                          updatedTemplate.components[index].text = e.target.value;
-                          updateTemplate(updatedTemplate);
-                        }}
-                        placeholder={`Enter ${component.type.toLowerCase()} text`}
-                        rows={component.type === "BODY" ? 4 : 2}
-                      />
-                      {component.type === "BODY" && (
-                        <p className="text-xs text-muted-foreground">
-                          Use &#123;&#123;1&#125;&#125;, &#123;&#123;2&#125;&#125; for variables
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  <ToastContainer
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Text</label>
+                        <Textarea
+                          value={component.text || ""}
+                          onChange={(e) => {
+                            const updatedTemplate = { ...template };
+                            updatedTemplate.components[index].text = e.target.value;
+                            updateTemplate(updatedTemplate);
+                          }}
+                          placeholder={`Enter ${component.type.toLowerCase()} text`}
+                          rows={component.type === "BODY" ? 4 : 2}
+                        />
+                        {component.type === "BODY" && (
+                          <p className="text-xs text-muted-foreground">
+                            Use &#123;&#123;1&#125;&#125;, &#123;&#123;2&#125;&#125; for variables
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  {/* <ToastContainer
                   position="bottom-right"
                   autoClose={5000}
                   hideProgressBar={false}
@@ -341,7 +372,7 @@ export default function CreateTemplateModal({
                   draggable
                   pauseOnHover
                   theme="colored"
-                   />
+                   /> */}
                   {component.type === "BUTTONS" && (
                     <div className="space-y-3">
                       <label className="text-sm font-medium">Buttons</label>
@@ -412,7 +443,7 @@ export default function CreateTemplateModal({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={()=>handleSubmit(jsonInput)}>Create Template</Button>
+          <Button onClick={() => handleSubmit(jsonInput)}>Create Template</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

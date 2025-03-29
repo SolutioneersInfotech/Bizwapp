@@ -30,6 +30,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import  CreateTemplateModal  from "../templates/create-template-modal"
+import { useWhatsAppTemplates} from '../../hooks/api/getTemplate.js';
+
 
 export default function TemplatesPage() {
   const { templates, createTemplate, updateTemplate, deleteTemplate, isLoading } = useTemplates()
@@ -77,6 +79,10 @@ export default function TemplatesPage() {
 
     setFilteredTemplates(result)
   }, [templates, activeTab, searchQuery])
+
+
+  const { data: whatsappTemplates } = useWhatsAppTemplates();
+
 
   const handleCreateTemplate = async () => {
   

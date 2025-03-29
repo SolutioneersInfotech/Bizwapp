@@ -16,7 +16,6 @@ interface TemplateData {
 
 
   const useSendTemplateMutation = () => {
-    console.log("useSendTemplateMutation api is called.")
     return useMutation({
       mutationFn: async (jsonInput: TemplateData) => {
       const response = await fetch(API_URL, {
