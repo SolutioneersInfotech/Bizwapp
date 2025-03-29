@@ -11,7 +11,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,6 +22,10 @@ import {
 } from "@/components/ui/select";
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { useSendTemplateMutation } from '../../hooks/api/templateApproaval.ts';
+import { ToastContainer , toast } from 'react-toastify';
+
+
+
 
 interface TemplateComponent {
   type: string;
@@ -85,6 +88,9 @@ export default function CreateTemplateModal({
     setJsonInput(JSON.stringify(updatedTemplate, null, 2));
   };
 
+
+
+
   const handleJsonChange = (value: string) => {
     setJsonInput(value);
     try {
@@ -103,29 +109,35 @@ export default function CreateTemplateModal({
     console.log("jsonInput", jsonInput)
     mutate(jsonInput, {
         onSuccess: (response) => {
-          console.log("Template submitted successfully!", response);
-          onSubmit(); // Call the parent function if needed
+          console.log(`Your submitted Template is ${response.status}`);
+          toast.success('Your submitted Template is ${response.status}', {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            });
+            console.log("after toast.")
+
+          
         },
         onError: (err) => {
           console.error("Error submitting template:", err);
+          toast.error('This is an error message!', {
+            position: toast.POSITION.TOP_RIGHT, // Change position as needed
+            autoClose: 5000, // Auto close after 5 seconds
+            hideProgressBar: false, // Show progress bar
+            closeOnClick: true, // Close on click
+            pauseOnHover: true, // Pause when hovered
+          });
+          console.log("after toast.")
         },
       });
-    
-    if (activeTab === "json" && jsonError) {
-      toast({
-        title: "Error",
-        description: "Please fix the JSON errors before submitting",
-        variant: "destructive",
-      });
-      return;
-    }
-
     onSubmit(template);
     onOpenChange(false);
-    toast({
-      title: "Success",
-      description: "Template created successfully",
-    });
   };
 
   const addButton = (componentIndex: number) => {
@@ -182,6 +194,8 @@ export default function CreateTemplateModal({
   };
 
   return (
+
+
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -316,7 +330,18 @@ export default function CreateTemplateModal({
                       )}
                     </div>
                   )}
-
+                  <ToastContainer
+                  position="bottom-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick={false}
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="colored"
+                   />
                   {component.type === "BUTTONS" && (
                     <div className="space-y-3">
                       <label className="text-sm font-medium">Buttons</label>

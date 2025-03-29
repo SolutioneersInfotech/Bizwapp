@@ -79,14 +79,7 @@ export default function TemplatesPage() {
   }, [templates, activeTab, searchQuery])
 
   const handleCreateTemplate = async () => {
-    if (!templateName || !templateCategory || !templateContent) {
-      toast({
-        title: "Validation Error",
-        description: "All fields are required",
-        variant: "destructive",
-      })
-      return
-    }
+  
 
     try {
       await createTemplate({
@@ -98,10 +91,7 @@ export default function TemplatesPage() {
         usageCount: 0,
       })
 
-      toast({
-        title: "Template Created",
-        description: "Your template has been created successfully",
-      })
+      
 
       // Reset form
       setTemplateName("")
@@ -120,14 +110,7 @@ export default function TemplatesPage() {
   const handleEditTemplate = async () => {
     if (!editingTemplate) return
 
-    if (!templateName || !templateCategory || !templateContent) {
-      toast({
-        title: "Validation Error",
-        description: "All fields are required",
-        variant: "destructive",
-      })
-      return
-    }
+    
 
     try {
       await updateTemplate(editingTemplate.id, {
@@ -382,7 +365,7 @@ export default function TemplatesPage() {
             <Button variant="outline" onClick={() => setEditTemplateOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleEditTemplate} disabled={isLoading}>
+            <Button disabled={isLoading}>
               {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>

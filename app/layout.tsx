@@ -9,8 +9,9 @@ import { TemplateProvider } from "@/contexts/TemplateContext"
 import { AnalyticsProvider } from "@/contexts/AnalyticsContext"
 import { Toaster } from "@/components/ui/toaster"
 import { Providers } from "../app/providers"
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -33,9 +34,9 @@ export default function RootLayout({
             <MessageProvider>
               <TemplateProvider>
                 <AnalyticsProvider>
-                <ToastContainer />
                 <Providers >
                   {children}
+                  <ToastContainer />
                   </ Providers>
                   <Toaster />
                 </AnalyticsProvider>

@@ -91,11 +91,6 @@ export const TemplateProvider = ({ children }: { children: React.ReactNode }) =>
       }
 
       setTemplates((prev) => [...prev, newTemplate])
-
-      toast({
-        title: "Template created",
-        description: `Your template "${template.name}" has been created successfully.`,
-      })
     } catch (error) {
       console.error("Error creating template:", error)
       toast({
