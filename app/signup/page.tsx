@@ -92,9 +92,9 @@ export default function SignupPage() {
         })
         // router.push("/dashboard")
         console.log("Success:", data);
-        console.log("Success now print user data");
-        console.log("data.user", data.user)
-        localStorage.setItem("user",JSON.stringify(data.user))
+        const user = { ...data.user, token : data.token}
+        localStorage.setItem("user", JSON.stringify(user));
+        router.push("/dashboard")
       },
       onError: (error) => {
         toast({

@@ -39,7 +39,7 @@ export default function TemplatesPage() {
 
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
-  const [filteredTemplates, setFilteredTemplates] = useState(templates)
+  // const [filteredTemplates, setFilteredTemplates] = useState([])  
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
 
@@ -57,32 +57,43 @@ export default function TemplatesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [templateToDelete, setTemplateToDelete] = useState(null)
 
-  // Filter and search templates when dependencies change
-  useEffect(() => {
-    let result = [...templates]
-
-    // Filter by status
-    if (activeTab !== "all") {
-      result = result.filter((template) => template.status.toLowerCase() === activeTab)
-    }
-
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(
-        (template) =>
-          template.name.toLowerCase().includes(query) ||
-          template.category.toLowerCase().includes(query) ||
-          template.content.toLowerCase().includes(query),
-      )
-    }
-
-    setFilteredTemplates(result)
-  }, [templates, activeTab, searchQuery])
-
-
   const { data: whatsappTemplates } = useWhatsAppTemplates();
+const [filteredTemplates, setFilteredTemplates] = useState([]);
 
+useEffect(() => {
+  if (whatsappTemplates) {
+    setFilteredTemplates(whatsappTemplates.data); 
+  }
+}, [whatsappTemplates]);
+
+useEffect(() => {
+  if (!whatsappTemplates?.data) return;
+
+  let results = [...whatsappTemplates.data]; 
+  let result = results;
+
+  if (activeTab !== "all") {
+    console.log("Active Tab:", activeTab);
+    result = result.filter((template) => template?.status?.toLowerCase() === activeTab);
+    console.log("Filtered by Status:", result);
+  }
+
+  // Filter by search query
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+    console.log("Search Query:", query);
+    result = result.filter(
+      (template) =>
+        template.components[0].text.toLowerCase().includes(query) 
+      // ||
+        // template.category.toLowerCase().includes(query) ||
+        // template.content.toLowerCase().includes(query)
+    );
+    console.log("Filtered by Search:", result);
+  }
+
+  setFilteredTemplates(result);
+}, [whatsappTemplates, activeTab, searchQuery]);
 
   const handleCreateTemplate = async () => {
   
@@ -202,6 +213,8 @@ export default function TemplatesPage() {
     setDeleteDialogOpen(true)
   }
 
+  console.log("Filtered Templates:", filteredTemplates)
+
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -268,7 +281,7 @@ export default function TemplatesPage() {
                       <div className="flex items-center justify-between">
                         <Badge
                           className={
-                            template.status === "Approved"
+                            template.status === "APPROVED"
                               ? "bg-green-500 hover:bg-green-600"
                               : template.status === "Pending"
                                 ? "bg-amber-500 hover:bg-amber-600"
@@ -305,8 +318,8 @@ export default function TemplatesPage() {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                      <CardTitle className="mt-2">{template.name}</CardTitle>
-                      <CardDescription>{template.category}</CardDescription>
+                      <CardTitle className="mt-2">{template.components[0].text}</CardTitle>
+                      <CardDescription>{template.components[1].text}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
                       <div className="mb-4 rounded-md border p-3 text-sm">{template.content}</div>

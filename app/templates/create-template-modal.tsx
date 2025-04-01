@@ -21,7 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlusCircle, Trash2 } from 'lucide-react';
-import { useSendTemplateMutation } from '../../hooks/api/templateApproaval.ts';
 import { toast } from 'react-toastify';
 
 

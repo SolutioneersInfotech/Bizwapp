@@ -14,7 +14,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
-  useSidebar,
 } from "@/components/ui/sidebar"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -58,11 +57,11 @@ const mainMenuItems = [
 ]
 
 export function AppSidebar() {
-  const { state } = useSidebar()
+  // const { state } = useSidebar()
 
   return (
     <Sidebar variant="floating" collapsible="icon">
-      <SidebarHeader className="flex flex-col gap-4 px-4 py-4">
+      <SidebarHeader className="flex flex-col gap-4 px-4 ">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
             <svg
