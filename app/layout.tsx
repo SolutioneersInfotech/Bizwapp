@@ -12,6 +12,7 @@ import { Providers } from "../app/providers";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
@@ -41,17 +43,7 @@ export default function RootLayout({
                   <Providers>
                     <TooltipProvider>
                       <SidebarProvider>
-                        <div className="flex min-h-screen">
-                          <div className="w-72 h-screen text-white ">
-                            {" "}
-                            <AppSidebar />
-                          </div>
-                          <main className="flex-1  overflow-auto">
-                            {" "}
-                            {/* Content takes remaining space */}
-                            {children}
-                          </main>
-                        </div>
+                            <ClientLayout>{children}</ClientLayout>
                       </SidebarProvider>
                     </TooltipProvider>
                     <ToastContainer />
@@ -73,3 +65,5 @@ import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "./SidebarContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import ClientLayout from "@/components/ClientLayout";
+
