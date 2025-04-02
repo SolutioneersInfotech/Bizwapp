@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-
+import { useSendTemplateMutation } from "../../hooks/api/templateApproaval.ts";
 
 
 
@@ -113,6 +113,9 @@ export default function CreateTemplateModal({
       setJsonError("Invalid JSON format");
     }
   };
+
+  const { mutate, isLoading, isError, error } = useSendTemplateMutation();
+
 
   const handleSubmit = (jsonInput) => {
     console.log("jsonInput", jsonInput)
