@@ -19,13 +19,14 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 // Menu items
 const mainMenuItems = [
   {
     title: "Dashboard",
     icon: Home,
-    url: "/",
+    url: "/dashboard",
     isActive: true,
   },
   {
@@ -58,6 +59,8 @@ const mainMenuItems = [
 
 export function AppSidebar() {
   // const { state } = useSidebar()
+  const pathname = usePathname(); // Get current route
+
 
   return (
     <Sidebar variant="floating" collapsible="icon">
@@ -91,21 +94,31 @@ export function AppSidebar() {
           <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.title}>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  {item.badge && (
-                    <Badge className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground">
-                      {item.badge}
-                    </Badge>
-                  )}
-                </SidebarMenuItem>
-              ))}
+            {mainMenuItems.map((item) => {
+                const isActive = pathname === item.url; // Check if the route is active
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      className={`flex items-center gap-2 rounded-md px-3 py-2 ${
+                        isActive ? "bg-gray-200 dark:bg-gray-700 text-green-600" : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      <Link href={item.url} className="flex items-center gap-2">
+                        <item.icon className="h-5 w-5" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                    {item.badge && (
+                      <Badge className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground">
+                        {item.badge}
+                      </Badge>
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

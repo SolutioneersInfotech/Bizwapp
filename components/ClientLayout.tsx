@@ -8,8 +8,8 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname(); // Get current route
-  const showSidebar = pathname !== "/"; // Hide sidebar on home page
+  const pathname = usePathname(); 
+  const showSidebar = pathname !== "/"; 
 
   return (
     <div className="flex min-h-screen">

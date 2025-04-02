@@ -36,7 +36,6 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full overflow-hidden">
-        <AppSidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
           <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:px-6">
             <SidebarTrigger />
