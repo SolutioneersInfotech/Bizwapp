@@ -37,12 +37,11 @@ export default function RootLayout({
                 <Providers >
                   <TooltipProvider>
                 <SidebarProvider> 
-                <AppSidebar /> 
-                <div className="flex h-screen">
-                          <div className="w-64 bg-gray-800 text-white"> {/* Sidebar width fixed */}
+                <div className="flex min-h-screen">
+                          <div className="w-72 h-screen text-white "> {/* Sidebar width fixed */}
                             <AppSidebar />
                           </div>
-                          <main className="flex-1 p-4 overflow-auto"> {/* Content takes remaining space */}
+                          <main className="flex-1  overflow-auto"> {/* Content takes remaining space */}
                             {children}
                           </main>
                         </div>

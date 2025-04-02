@@ -61,7 +61,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar variant="floating" collapsible="icon">
-      <SidebarHeader className="flex flex-col gap-4 px-4 ">
+      <SidebarHeader className="flex flex-col gap-4  ">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
             <svg
