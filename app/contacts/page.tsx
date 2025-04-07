@@ -147,7 +147,7 @@ export default function ContactsPage() {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts("http://localhost:5001/api/auth/getContacts");
+  } = useGetContacts("https://bizwapp-back-prsx8m5d1-aryanrathour066-gmailcoms-projects.vercel.app/api/auth/getContacts");
 
 
   const updateContactMutation  = useUpdateContact()

@@ -9,7 +9,7 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname(); 
-  const showSidebar = pathname !== "/"; 
+  const showSidebar = !["/", "/signup", "/login"].includes(pathname);
 
   return (
     <div className="flex min-h-screen">

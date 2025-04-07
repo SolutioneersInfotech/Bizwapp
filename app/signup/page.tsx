@@ -180,7 +180,7 @@ export default function SignupPage() {
               {phase === 1 ? "Enter your details to create an account" : "Connect your WhatsApp Business API"}
             </CardDescription>
             <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <div
                   className={`flex items-center justify-center w-8 h-8 rounded-full ${phase >= 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
                 >
@@ -192,8 +192,8 @@ export default function SignupPage() {
                 >
                   2
                 </div>
-              </div>
-              <div className="text-sm text-muted-foreground">Step {phase} of 2</div>
+              </div> */}
+              {/* <div className="text-sm text-muted-foreground">Step {phase} of 2</div> */}
             </div>
           </CardHeader>
           <CardContent>
