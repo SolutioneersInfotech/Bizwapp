@@ -223,8 +223,9 @@ export default function ContactsPage() {
             row.mobile ||
             row.Mobile ||
             "";
-          const email = row.email || row.Email || row.EMAIL || "";
-
+            const emailRaw = row.email || row.Email || row.EMAIL || "";
+            const email = emailRaw.trim() !== "" ? emailRaw.trim() : null;
+            
           // Generate initials from name
           const initials = name
             .split(" ")

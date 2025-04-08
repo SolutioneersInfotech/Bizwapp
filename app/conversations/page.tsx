@@ -60,7 +60,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useGetContacts from "@/hooks/api/useGetContact";
-import useSendWhatsAppMessage from '../../hooks/api/useSendWhatsAppMessage '; // Adjust path as needed
+import useSendWhatsAppMessage from "../../hooks/api/useSendWhatsAppMessage "; // Adjust path as needed
+import { useWhatsAppTemplates } from "@/hooks/api/getTemplate";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -105,6 +106,8 @@ export default function ConversationsPage() {
       router.push("/login");
     }
   }, [authLoading, isAuthenticated, router]);
+
+  const { data: whatsappTemplates } = useWhatsAppTemplates();
 
   // Set selected contact from context if available
   useEffect(() => {
@@ -161,7 +164,23 @@ export default function ConversationsPage() {
     setContact(getContacts);
   }, [getContacts]);
 
+  // const allTemplates = [/* your template objects */];
 
+  console.log("type of whatsappTemplates. ", typeof whatsappTemplates);
+
+  const separatedTexts = Array.isArray(whatsappTemplates?.data)
+    ? whatsappTemplates.data.map((template) => {
+        return {
+          templateName: template.name,
+          texts: template.components
+            .filter((component) => component.text)
+            .map((component) => component.text),
+        };
+      })
+    : [];
+
+  console.log("separatedTexts. ", separatedTexts);
+  console.log("type of separatedTexts. ", typeof separatedTexts);
 
   const handleContactSelect = (contact: Contact) => {
     setSelectedContact(contact);
@@ -175,11 +194,12 @@ export default function ConversationsPage() {
     setNewMessage("");
   };
 
-  const { mutate , isLoading, data } =  useSendWhatsAppMessage()
+  const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
+  console.log("type of templates. ", typeof templates);
 
   const handleSendBulkMessage = async () => {
-    console.log("Checking.")
+    console.log("Checking.");
     if (
       bulkMessageTab === "text" &&
       (!bulkMessage.trim() || selectedContacts.length === 0)
@@ -204,27 +224,39 @@ export default function ConversationsPage() {
       return;
     }
 
-    console.log('Attempting to send message' , selectedContacts ,bulkMessage );
+    console.log("Attempting to send message", selectedContacts, bulkMessage);
 
-      mutate({ phoneNumbers: selectedContacts, message: bulkMessage });
-    
+    mutate({ phoneNumbers: selectedContacts, message: bulkMessage });
+
     try {
       // In a real app, you would call the API to send bulk messages
       if (bulkMessageTab === "text") {
-        for (const contactPhone of selectedContacts) {
-          await sendMessage(contactPhone, bulkMessage);
-        }
+        console.log("Sending text message to backend:", {
+          phoneNumbers: selectedContacts,
+          message: bulkMessage,
+        });
+
+        mutate({
+          phoneNumbers: selectedContacts,
+          message: bulkMessage,
+        });
       } else {
-        // Send template message
-        const template = templates.find((t) => t.id === selectedBulkTemplate);
-        if (template) {
-          for (const contactPhone of selectedContacts) {
-            await sendMessage(
-              contactPhone,
-              `[Template: ${template.name}] ${template.content}`
-            );
-          }
-        }
+        const template = separatedTexts.find(
+          (t) => t.templateName === selectedBulkTemplate
+        );
+        if (!template) return;
+      
+        const templateMessage = template.texts.join("\n"); // or ". " if preferred
+      
+        console.log("Sending template message to backend:", {
+          phoneNumbers: selectedContacts,
+          message: templateMessage,
+        });
+      
+        mutate({
+          phoneNumbers: selectedContacts,
+          message: templateMessage,
+        });
       }
 
       toast({
@@ -414,6 +446,8 @@ export default function ConversationsPage() {
     );
   }
 
+  console.log("whatsappTemplates", whatsappTemplates);
+
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
       {/* Conversations List */}
@@ -464,17 +498,27 @@ export default function ConversationsPage() {
                             <SelectValue placeholder="Choose a template" />
                           </SelectTrigger>
                           <SelectContent>
-                            {templates
-                              .filter((t) => t.status === "Approved")
-                              .map((template) => (
-                                <SelectItem
-                                  key={template.id}
-                                  value={template.id}
-                                >
-                                  {template.name}
-                                </SelectItem>
-                              ))}
+                            {separatedTexts.map((template) => (
+                              <SelectItem
+                                key={template.templateName}
+                                value={template.templateName}
+                              >
+                                {template.templateName}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
+
+                          {selectedBulkTemplate && (
+                            <div className="mt-2 rounded-md border p-3 text-sm space-y-1">
+                              {separatedTexts
+                                .find(
+                                  (t) => t.templateName === selectedBulkTemplate
+                                )
+                                ?.texts.map((text, index) => (
+                                  <div key={index}> {text}</div>
+                                ))}
+                            </div>
+                          )}
                         </Select>
                         {selectedBulkTemplate && (
                           <div className="mt-2 rounded-md border p-3 text-sm">
@@ -539,11 +583,7 @@ export default function ConversationsPage() {
                   </Button>
                   <Button
                     onClick={handleSendBulkMessage}
-                    disabled={
-                       (
-
-                          selectedContacts.length === 0)
-                    }
+                    disabled={selectedContacts.length === 0}
                   >
                     Send to {selectedContacts.length} contacts
                   </Button>
