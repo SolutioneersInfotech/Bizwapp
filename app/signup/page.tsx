@@ -16,6 +16,7 @@ import { Loader2, AlertCircle, Info, Github, Linkedin, Facebook, ArrowRight, Arr
 import { FcGoogle } from "react-icons/fc"
 import usePostData from "../../hooks/api/usePostData"
 import { useToast } from "@/hooks/use-toast"
+import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const router = useRouter()
@@ -132,7 +133,10 @@ export default function SignupPage() {
     }
   }
 
-  const handleSocialSignup = async (provider: string) => {
+
+  const handleSocialSignup = async (provider) => {
+    console.log("Clicked provider:", provider); // should match e.g., "google"
+    signIn(provider.toLowerCase()); // like "google", "facebook", etc.
     try {
       // In a real app, this would redirect to the OAuth flow
       console.log(`Signing up with ${provider}`)
@@ -147,7 +151,7 @@ export default function SignupPage() {
     } catch (err) {
       setError(`${provider} signup failed. Please try again.`)
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted p-4">
