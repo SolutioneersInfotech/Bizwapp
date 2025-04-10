@@ -93,8 +93,7 @@ export default function ConversationsPage() {
   // New state for search and filters
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-  const [filteredConversations, setFilteredConversations] =
-    useState(conversations);
+  const [filteredConversations, setFilteredConversations] = useState([]);
   const [newChatDialogOpen, setNewChatDialogOpen] = useState(false);
   const [newChatPhone, setNewChatPhone] = useState("");
   const [newChatMessage, setNewChatMessage] = useState("");
@@ -108,6 +107,11 @@ export default function ConversationsPage() {
   }, [authLoading, isAuthenticated, router]);
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
+
+
+  // const {
+    // data: getContact,
+  // } = useGetContacts("https://bizwapp-back-prsx8m5d1-aryanrathour066-gmailcoms-projects.vercel.app/api/auth/getContacts");
 
   // Set selected contact from context if available
   useEffect(() => {
@@ -141,17 +145,17 @@ export default function ConversationsPage() {
     }
 
     // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (conversation) =>
-          conversation.name.toLowerCase().includes(query) ||
-          conversation.lastMessage.toLowerCase().includes(query) ||
-          conversation.phone.includes(query)
-      );
-    }
+    // if (searchQuery) {
+    //   const query = searchQuery.toLowerCase();
+    //   result = result.filter(
+    //     (conversation) =>
+    //       conversation.name.toLowerCase().includes(query) ||
+    //       conversation.lastMessage.toLowerCase().includes(query) ||
+    //       conversation.phone.includes(query)
+    //   );
+    // }
 
-    setFilteredConversations(result);
+    // setFilteredConversations(result);
   }, [searchQuery, activeTab]);
 
   const {
@@ -164,10 +168,15 @@ export default function ConversationsPage() {
     setContact(getContacts);
   }, [getContacts]);
 
+  useEffect(()=>{
+    if(contacts && contacts.contacts){
+      setFilteredConversations(contacts.contacts)
+    }
+  })
+
+  
+
   // const allTemplates = [/* your template objects */];
-
-  console.log("type of whatsappTemplates. ", typeof whatsappTemplates);
-
   const separatedTexts = Array.isArray(whatsappTemplates?.data)
     ? whatsappTemplates.data.map((template) => {
         return {
@@ -178,9 +187,6 @@ export default function ConversationsPage() {
         };
       })
     : [];
-
-  console.log("separatedTexts. ", separatedTexts);
-  console.log("type of separatedTexts. ", typeof separatedTexts);
 
   const handleContactSelect = (contact: Contact) => {
     setSelectedContact(contact);
@@ -196,10 +202,7 @@ export default function ConversationsPage() {
 
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
-  console.log("type of templates. ", typeof templates);
-
   const handleSendBulkMessage = async () => {
-    console.log("Checking.");
     if (
       bulkMessageTab === "text" &&
       (!bulkMessage.trim() || selectedContacts.length === 0)
@@ -375,25 +378,25 @@ export default function ConversationsPage() {
     }
   };
 
-  const handleArchiveConversation = (contact) => {
-    // In a real app, this would be an API call
-    const index = conversations.findIndex((c) => c.id === contact.id);
-    if (index !== -1) {
-      conversations[index].archived = !conversations[index].archived;
+  // const handleArchiveConversation = (contact) => {
+  //   // In a real app, this would be an API call
+  //   const index = conversations.findIndex((c) => c.id === contact.id);
+  //   if (index !== -1) {
+  //     conversations[index].archived = !conversations[index].archived;
 
-      toast({
-        title: conversations[index].archived
-          ? "Conversation Archived"
-          : "Conversation Unarchived",
-        description: `Conversation with ${contact.name} has been ${
-          conversations[index].archived ? "archived" : "unarchived"
-        }`,
-      });
+  //     toast({
+  //       title: conversations[index].archived
+  //         ? "Conversation Archived"
+  //         : "Conversation Unarchived",
+  //       description: `Conversation with ${contact.name} has been ${
+  //         conversations[index].archived ? "archived" : "unarchived"
+  //       }`,
+  //     });
 
-      // Refresh filtered conversations
-      setFilteredConversations([...filteredConversations]);
-    }
-  };
+  //     // Refresh filtered conversations
+  //     setFilteredConversations([...filteredConversations]);
+  //   }
+  // };
 
   const handleDeleteConversation = (contact) => {
     // In a real app, this would be an API call
@@ -407,9 +410,9 @@ export default function ConversationsPage() {
       });
 
       // Refresh filtered conversations
-      setFilteredConversations([
-        ...filteredConversations.filter((c) => c.id !== contact.id),
-      ]);
+      // setFilteredConversations([
+      //   ...filteredConversations.filter((c) => c.id !== contact.id),
+      // ]);
 
       // If the deleted contact was selected, clear selection
       if (selectedContact && selectedContact.id === contact.id) {
@@ -434,7 +437,7 @@ export default function ConversationsPage() {
       });
 
       // Refresh filtered conversations
-      setFilteredConversations([...filteredConversations]);
+      // setFilteredConversations([...filteredConversations]);
     }
   };
 
@@ -446,7 +449,9 @@ export default function ConversationsPage() {
     );
   }
 
-  console.log("whatsappTemplates", whatsappTemplates);
+  console.log("contacts. ", contacts)
+
+  console.log("filteredConversations", filteredConversations)
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -624,7 +629,7 @@ export default function ConversationsPage() {
               Archived
             </TabsTrigger>
           </TabsList>
-          <TabsContent value={activeTab} className="mt-4 space-y-2">
+          <TabsContent value={activeTab} className="mt-4 space-y-2 max-h-[500px] overflow-y-auto pr-2">
             {filteredConversations.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <div className="rounded-full bg-muted p-3 mb-4">
@@ -647,9 +652,9 @@ export default function ConversationsPage() {
             ) : (
               filteredConversations.map((conversation) => (
                 <ConversationItem
-                  key={conversation.id}
+                  key={conversation._id}
                   conversation={conversation}
-                  isActive={selectedContact?.id === conversation.id}
+                  isActive={selectedContact?._id === conversation._id}
                   onSelect={() => handleContactSelect(conversation)}
                   isSelected={selectedContacts.includes(conversation.phone)}
                   onToggleSelect={() =>
