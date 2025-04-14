@@ -62,6 +62,7 @@ import {
 import useGetContacts from "@/hooks/api/useGetContact";
 import useSendWhatsAppMessage from "../../hooks/api/useSendWhatsAppMessage "; // Adjust path as needed
 import { useWhatsAppTemplates } from "@/hooks/api/getTemplate";
+import  useMessageHistory  from '../../hooks/api/getMessageHistory'
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -98,6 +99,15 @@ export default function ConversationsPage() {
   const [newChatPhone, setNewChatPhone] = useState("");
   const [newChatMessage, setNewChatMessage] = useState("");
   const [contacts, setContact] = useState(null);
+  const [selectedPhone, setSelectedPhone] = useState(null);
+
+  const { data: messageHistory } = useMessageHistory(selectedPhone);
+
+  const message = messageHistory?.data || [];
+
+  console.log("message", message)
+
+
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -107,6 +117,8 @@ export default function ConversationsPage() {
   }, [authLoading, isAuthenticated, router]);
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
+
+
 
 
   // const {
@@ -188,9 +200,10 @@ export default function ConversationsPage() {
       })
     : [];
 
-  const handleContactSelect = (contact: Contact) => {
+  const handleContactSelect = (contact: Contact , phone) => {
     setSelectedContact(contact);
     setCurrentContact(contact);
+    setSelectedPhone(phone);
   };
 
   const handleSendMessage = async () => {
@@ -226,8 +239,6 @@ export default function ConversationsPage() {
       });
       return;
     }
-
-    console.log("Attempting to send message", selectedContacts, bulkMessage);
 
     mutate({ phoneNumbers: selectedContacts, message: bulkMessage });
 
@@ -449,9 +460,12 @@ export default function ConversationsPage() {
     );
   }
 
-  console.log("contacts. ", contacts)
+  console.log("hekoo")
+  console.log("message. ", message)
 
-  console.log("filteredConversations", filteredConversations)
+  console.log("filteredConversations", filteredConversations);
+
+  console.log("messageHistory", messageHistory)
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -655,7 +669,7 @@ export default function ConversationsPage() {
                   key={conversation._id}
                   conversation={conversation}
                   isActive={selectedContact?._id === conversation._id}
-                  onSelect={() => handleContactSelect(conversation)}
+                  onSelect={() => handleContactSelect(conversation , conversation.phone)}
                   isSelected={selectedContacts.includes(conversation.phone)}
                   onToggleSelect={() =>
                     toggleContactSelection(conversation.phone)
@@ -752,39 +766,39 @@ export default function ConversationsPage() {
                     <p>No messages yet. Start a conversation!</p>
                   </div>
                 ) : (
-                  contactMessages.map((message) => (
+                  message.map((messages) => (
                     <div
-                      key={message.id}
+                      key={messages._id}
                       className={`flex ${
-                        message.direction === "outbound"
+                        messages.direction === "outbound"
                           ? "justify-end"
                           : "justify-start"
                       }`}
                     >
                       <div
                         className={`max-w-[80%] rounded-lg p-3 ${
-                          message.direction === "outbound"
+                          messages.direction === "outbound"
                             ? "bg-primary text-primary-foreground"
                             : "bg-muted"
                         }`}
                       >
-                        <p className="text-sm">{message.content}</p>
+                        <p className="text-sm">{messages.message}</p>
                         <div className="mt-1 flex items-center justify-end gap-1 text-xs opacity-70">
                           <span>
-                            {new Date(message.timestamp).toLocaleTimeString(
+                            {new Date(messages.timestamp).toLocaleTimeString(
                               [],
-                              { hour: "2-digit", minute: "2-digit" }
+                              { hour: "2-digit", minute: "2-digit" , hour12: true }
                             )}
                           </span>
-                          {message.direction === "outbound" && (
+                          {messages.direction === "outbound" && (
                             <span>
-                              {message.status === "sent" && (
+                              {messages.status === "sent" && (
                                 <Check className="h-3 w-3" />
                               )}
-                              {message.status === "delivered" && (
+                              {messages.status === "delivered" && (
                                 <Check className="h-3 w-3" />
                               )}
-                              {message.status === "read" && (
+                              {messages.status === "read" && (
                                 <CheckCircle className="h-3 w-3" />
                               )}
                             </span>
