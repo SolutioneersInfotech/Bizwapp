@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 const getAllConversation = async()=>{
-    const response = await fetch('http://localhost:5001/api/auth/conversationHistory')
+    const response = await fetch('https://bizwapp-back-end-khaki.vercel.app/api/auth/conversationHistory')
     if(!response.ok){
         throw new Error('Failed to get Conversation.')
     }

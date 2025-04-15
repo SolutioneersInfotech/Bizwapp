@@ -39,7 +39,7 @@ export default function SignupPage() {
   const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("")
   const [accessToken, setAccessToken] = useState("")
 
-  const { mutate, isError, data } = usePostData("http://localhost:5001/api/auth/signup");
+  const { mutate, isError, data } = usePostData("https://bizwapp-back-end-khaki.vercel.app/api/auth/signup");
 
 
   const handleChange = (e) => {

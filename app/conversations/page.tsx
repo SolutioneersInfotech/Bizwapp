@@ -176,7 +176,7 @@ export default function ConversationsPage() {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts("http://localhost:5001/api/auth/getContacts");
+  } = useGetContacts("https://bizwapp-back-end-khaki.vercel.app/api/auth/getContacts");
 
   useEffect(() => {
     setContact(getContacts);

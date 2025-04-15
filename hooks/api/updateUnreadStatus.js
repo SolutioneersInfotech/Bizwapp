@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 
 const updateUnreadByPhoneNumber = async (phoneNumber)=>{
     console.log("phoneNumber. ", phoneNumber)
-    const response = await fetch('http://localhost:5001/api/auth/changeUnreadStatus',
+    const response = await fetch('https://bizwapp-back-end-khaki.vercel.app/api/auth/changeUnreadStatus',
         {
             method:"PUT",
             headers:{
