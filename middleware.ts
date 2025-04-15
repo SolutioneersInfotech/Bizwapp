@@ -16,9 +16,9 @@ export function middleware (request : NextRequest){
         return NextResponse.redirect( new URL ('/', request.url))
     }
 
-    if (!isAuthenticated && pathname.startsWith('/dashboard')){
-        return NextResponse.redirect( new URL('/login', request.url))
-    }
+    // if (!isAuthenticated && pathname.startsWith('/dashboard')){
+    //     return NextResponse.redirect( new URL('/login', request.url))
+    // }
 
     return NextResponse.next();
 }

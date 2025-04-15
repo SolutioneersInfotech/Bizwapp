@@ -17,14 +17,14 @@ export default function DashboardPage() {
   const { isAuthenticated, isLoading } = useAuth()
   const { analytics, refreshAnalytics } = useAnalytics()
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login")
-    }
+  // useEffect(() => {
+  //   if (!isLoading && !isAuthenticated) {
+  //     router.push("/login")
+  //   }
 
     // Only refresh analytics on initial mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isAuthenticated, router])
+  // }, [isLoading, isAuthenticated, router])
 
   // Add a separate effect for refreshing analytics only once
   useEffect(() => {

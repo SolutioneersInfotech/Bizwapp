@@ -62,7 +62,9 @@ import {
 import useGetContacts from "@/hooks/api/useGetContact";
 import useSendWhatsAppMessage from "../../hooks/api/useSendWhatsAppMessage "; // Adjust path as needed
 import { useWhatsAppTemplates } from "@/hooks/api/getTemplate";
-import  useMessageHistory  from '../../hooks/api/getMessageHistory'
+import useMessageHistory from "../../hooks/api/getMessageHistory";
+import useUpdateUnread from "../../hooks/api/updateUnreadStatus";
+import useGetAllConversation from "../../hooks/api/getAllConversation";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -100,14 +102,17 @@ export default function ConversationsPage() {
   const [newChatMessage, setNewChatMessage] = useState("");
   const [contacts, setContact] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
+  const [conversation, setConversation] = useState([]);
 
   const { data: messageHistory } = useMessageHistory(selectedPhone);
 
   const message = messageHistory?.data || [];
 
-  console.log("message", message)
+  const { data: getAllConversation } = useGetAllConversation();
 
-
+  // useEffect(()=>{
+  //   setConversation(getAllConversation)
+  // },[getAllConversation]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -118,11 +123,8 @@ export default function ConversationsPage() {
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
 
-
-
-
   // const {
-    // data: getContact,
+  // data: getContact,
   // } = useGetContacts("https://bizwapp-back-prsx8m5d1-aryanrathour066-gmailcoms-projects.vercel.app/api/auth/getContacts");
 
   // Set selected contact from context if available
@@ -135,7 +137,7 @@ export default function ConversationsPage() {
   // Update messages when selected contact changes
   useEffect(() => {
     if (selectedContact) {
-      const history = getMessageHistory(selectedContact.phone);
+      const history = getMessageHistory(selectedContact.phoneNumber);
       setContactMessages(history);
     }
   }, [selectedContact, messages, getMessageHistory]);
@@ -180,13 +182,11 @@ export default function ConversationsPage() {
     setContact(getContacts);
   }, [getContacts]);
 
-  useEffect(()=>{
-    if(contacts && contacts.contacts){
-      setFilteredConversations(contacts.contacts)
+  useEffect(() => {
+    if (contacts && contacts.contacts) {
+      setFilteredConversations(contacts.contacts);
     }
-  })
-
-  
+  });
 
   // const allTemplates = [/* your template objects */];
   const separatedTexts = Array.isArray(whatsappTemplates?.data)
@@ -200,7 +200,10 @@ export default function ConversationsPage() {
       })
     : [];
 
-  const handleContactSelect = (contact: Contact , phone) => {
+  const { mutate: unreadStatus } = useUpdateUnread();
+
+  const handleContactSelect = (contact: Contact, phone) => {
+    unreadStatus(phone);
     setSelectedContact(contact);
     setCurrentContact(contact);
     setSelectedPhone(phone);
@@ -239,34 +242,35 @@ export default function ConversationsPage() {
       });
       return;
     }
-
-    mutate({ phoneNumbers: selectedContacts, message: bulkMessage });
-
     try {
       // In a real app, you would call the API to send bulk messages
       if (bulkMessageTab === "text") {
-        console.log("Sending text message to backend:", {
-          phoneNumbers: selectedContacts,
-          message: bulkMessage,
-        });
+        const contactsToSend = contacts?.contacts
+          .filter((contact) => selectedContacts.includes(contact.phone))
+          .map((contact) => ({
+            phoneNumber: contact.phone,
+            name: contact.name,
+          }));
+
+        let messageToSend = bulkMessage;
 
         mutate({
-          phoneNumbers: selectedContacts,
-          message: bulkMessage,
+          contacts: contactsToSend,
+          message: messageToSend,
         });
       } else {
         const template = separatedTexts.find(
           (t) => t.templateName === selectedBulkTemplate
         );
         if (!template) return;
-      
+
         const templateMessage = template.texts.join("\n"); // or ". " if preferred
-      
+
         console.log("Sending template message to backend:", {
           phoneNumbers: selectedContacts,
           message: templateMessage,
         });
-      
+
         mutate({
           phoneNumbers: selectedContacts,
           message: templateMessage,
@@ -460,12 +464,27 @@ export default function ConversationsPage() {
     );
   }
 
-  console.log("hekoo")
-  console.log("message. ", message)
-
   console.log("filteredConversations", filteredConversations);
 
-  console.log("messageHistory", messageHistory)
+  console.log("messageHistory", messageHistory);
+
+  console.log("contacts", contacts?.contacts);
+
+  console.log("getAllConversation", getAllConversation);
+
+  console.log(
+    "getAllConversation.conversations.",
+    getAllConversation?.conversations
+  );
+
+  const uniqueConversations = Array.from(
+    new Map(
+      getAllConversation?.conversations.map((convo) => [
+        convo.phoneNumber,
+        convo,
+      ])
+    ).values()
+  );
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -643,8 +662,11 @@ export default function ConversationsPage() {
               Archived
             </TabsTrigger>
           </TabsList>
-          <TabsContent value={activeTab} className="mt-4 space-y-2 max-h-[500px] overflow-y-auto pr-2">
-            {filteredConversations.length === 0 ? (
+          <TabsContent
+            value={activeTab}
+            className="mt-4 space-y-2 max-h-[500px] overflow-y-auto pr-2"
+          >
+            {(getAllConversation?.conversations?.length ?? 0) === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <div className="rounded-full bg-muted p-3 mb-4">
                   <Search className="h-6 w-6 text-muted-foreground" />
@@ -664,21 +686,32 @@ export default function ConversationsPage() {
                 </Button>
               </div>
             ) : (
-              filteredConversations.map((conversation) => (
-                <ConversationItem
-                  key={conversation._id}
-                  conversation={conversation}
-                  isActive={selectedContact?._id === conversation._id}
-                  onSelect={() => handleContactSelect(conversation , conversation.phone)}
-                  isSelected={selectedContacts.includes(conversation.phone)}
-                  onToggleSelect={() =>
-                    toggleContactSelection(conversation.phone)
-                  }
-                  selectionMode={bulkMessageOpen}
-                  onArchive={() => handleArchiveConversation(conversation)}
-                  onDelete={() => handleDeleteConversation(conversation)}
-                  onMute={() => handleMuteConversation(conversation)}
-                />
+              uniqueConversations.map((conversation) => (
+                <div
+                  className={conversation.unread ? "font-bold" : "font-light"}
+                >
+                  <ConversationItem
+                    key={conversation._id}
+                    conversation={conversation}
+                    isActive={selectedContact?._id === conversation._id}
+                    onSelect={() =>
+                      handleContactSelect(
+                        conversation,
+                        conversation.phoneNumber
+                      )
+                    }
+                    isSelected={selectedContacts.includes(
+                      conversation.phoneNumber
+                    )}
+                    onToggleSelect={() =>
+                      toggleContactSelection(conversation.phoneNumber)
+                    }
+                    selectionMode={bulkMessageOpen}
+                    onArchive={() => handleArchiveConversation(conversation)}
+                    onDelete={() => handleDeleteConversation(conversation)}
+                    onMute={() => handleMuteConversation(conversation)}
+                  />
+                </div>
               ))
             )}
           </TabsContent>
@@ -786,8 +819,12 @@ export default function ConversationsPage() {
                         <div className="mt-1 flex items-center justify-end gap-1 text-xs opacity-70">
                           <span>
                             {new Date(messages.timestamp).toLocaleTimeString(
-                              [],
-                              { hour: "2-digit", minute: "2-digit" , hour12: true }
+                              "en-US",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
                             )}
                           </span>
                           {messages.direction === "outbound" && (

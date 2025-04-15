@@ -1,20 +1,23 @@
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 
-interface SendMessageParams {
-  phoneNumbers: string[];  // phoneNumbers as an array of strings
+type SendMessageParams = {
+  contacts: {
+    phoneNumber: string;
+    name: string;
+  }[];
   message: string;
-}
+};
 
 const useSendWhatsAppMessage = () => {
   return useMutation<any, Error, SendMessageParams>({
-    mutationFn:async ({ phoneNumbers, message }: SendMessageParams) => {
-      console.log('Sending message...', { phoneNumbers, message });
+    mutationFn:async ({ contacts, message }: SendMessageParams) => {
+      console.log('Sending message...', { contacts, message });
       const response = await fetch('http://localhost:5001/api/auth/SendingBulkContacts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phoneNumbers, message }),
+        body: JSON.stringify({ contacts, message }),
       });
 
       if (!response.ok) {
