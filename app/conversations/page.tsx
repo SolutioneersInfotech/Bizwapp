@@ -65,6 +65,7 @@ import { useWhatsAppTemplates } from "@/hooks/api/getTemplate";
 import useMessageHistory from "../../hooks/api/getMessageHistory";
 import useUpdateUnread from "../../hooks/api/updateUnreadStatus";
 import useGetAllConversation from "../../hooks/api/getAllConversation";
+import { io, Socket } from "socket.io-client";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -100,15 +101,59 @@ export default function ConversationsPage() {
   const [newChatDialogOpen, setNewChatDialogOpen] = useState(false);
   const [newChatPhone, setNewChatPhone] = useState("");
   const [newChatMessage, setNewChatMessage] = useState("");
-  const [contacts, setContact] = useState(null);
+  const [contacts, setContact] = useState<Contact[] | null>(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [conversation, setConversation] = useState([]);
+  const [webhookMessages, setWebhookMessages] = useState([]);
 
   const { data: messageHistory } = useMessageHistory(selectedPhone);
 
   const message = messageHistory?.data || [];
 
   const { data: getAllConversation } = useGetAllConversation();
+
+  const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
+    null
+  );
+
+  useEffect(() => {
+    socketRef.current = io(
+      "https://3ecb-2405-201-601e-b036-f896-3ff3-ecf5-871f.ngrok-free.app",
+      {
+        transports: ["websocket"],
+      }
+    );
+
+    socketRef.current.on("newMessage", (msg) => {
+      console.log(
+        "✅ Connected to server via Socket.IO:",
+        socketRef.current?.id
+      );
+      setContactMessages((prev) => [...prev, msg]);
+    });
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   const socket = io("https://your-ngrok-url.ngrok-free.app", {
+  //     transports: ["websocket"], // force WebSocket protocol
+  //   });
+
+  //   socket.on("connect", () => {
+  //     console.log("✅ Connected to backend via Socket.IO", socket.id);
+  //   });
+
+  //   socket.on("disconnect", () => {
+  //     console.log("❌ Disconnected from Socket.IO server");
+  //   });
+
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
 
   // useEffect(()=>{
   //   setConversation(getAllConversation)
@@ -127,31 +172,26 @@ export default function ConversationsPage() {
   // data: getContact,
   // } = useGetContacts("https://bizwapp-back-prsx8m5d1-aryanrathour066-gmailcoms-projects.vercel.app/api/auth/getContacts");
 
-  // Set selected contact from context if available
   useEffect(() => {
     if (currentContact && !selectedContact) {
       setSelectedContact(currentContact);
     }
   }, [currentContact, selectedContact]);
 
-  // Update messages when selected contact changes
-  useEffect(() => {
-    if (selectedContact) {
-      const history = getMessageHistory(selectedContact.phoneNumber);
-      setContactMessages(history);
-    }
-  }, [selectedContact, messages, getMessageHistory]);
+  // useEffect(() => {
+  //   if (selectedContact) {
+  //     const history = getMessageHistory(selectedContact.phoneNumber);
+  //     setContactMessages(history);
+  //   }
+  // }, [selectedContact, messages, getMessageHistory]);
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [contactMessages]);
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [contactMessages]);
 
-  // Filter conversations based on search and active tab
   useEffect(() => {
     let result = [...conversations];
 
-    // Filter by tab
     if (activeTab === "unread") {
       result = result.filter((conversation) => conversation.unread > 0);
     } else if (activeTab === "archived") {
@@ -176,7 +216,9 @@ export default function ConversationsPage() {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts("https://bizwapp-back-end-khaki.vercel.app/api/auth/getContacts");
+  } = useGetContacts(
+    "https://bizwapp-back-end-khaki.vercel.app/api/auth/getContacts"
+  );
 
   useEffect(() => {
     setContact(getContacts);
@@ -203,20 +245,32 @@ export default function ConversationsPage() {
   const { mutate: unreadStatus } = useUpdateUnread();
 
   const handleContactSelect = (contact: Contact, phone) => {
+    // console.log("checking.");
+    // console.log("contact", "phone", contact, phone);
     unreadStatus(phone);
     setSelectedContact(contact);
     setCurrentContact(contact);
-    setSelectedPhone(phone);
+    setSelectedPhone(phone); 
   };
+
+  const { mutate, isLoading, data } = useSendWhatsAppMessage();
+
 
   const handleSendMessage = async () => {
     if (!selectedContact || !newMessage.trim()) return;
 
+    console.log("selectedPhone, newMessage" , selectedPhone , newMessage);
+
+  
+
+mutate({
+  contacts: selectedPhone,
+  message: newMessage,
+});
     await sendMessage(selectedContact.phone, newMessage);
     setNewMessage("");
   };
 
-  const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
   const handleSendBulkMessage = async () => {
     if (
@@ -464,18 +518,9 @@ export default function ConversationsPage() {
     );
   }
 
-  console.log("filteredConversations", filteredConversations);
 
-  console.log("messageHistory", messageHistory);
 
-  console.log("contacts", contacts?.contacts);
 
-  console.log("getAllConversation", getAllConversation);
-
-  console.log(
-    "getAllConversation.conversations.",
-    getAllConversation?.conversations
-  );
 
   const uniqueConversations = Array.from(
     new Map(
@@ -485,6 +530,13 @@ export default function ConversationsPage() {
       ])
     ).values()
   );
+
+//   const phoneToNameMap = new Map(contacts?.map(contact => [contact.phone, contact.name]));
+
+// console.log(phoneToNameMap);
+
+
+  console.log("contacts",contacts)
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -792,7 +844,7 @@ export default function ConversationsPage() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto p-4">
+            {/* <div className="flex-1 overflow-auto p-4">
               <div className="space-y-4">
                 {contactMessages.length === 0 ? (
                   <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -836,6 +888,63 @@ export default function ConversationsPage() {
                                 <Check className="h-3 w-3" />
                               )}
                               {messages.status === "read" && (
+                                <CheckCircle className="h-3 w-3" />
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            </div> */}
+
+            <div className="flex-1 overflow-auto p-4">
+              <div className="space-y-4">
+                {message.length === 0 ? (
+                  <div className="flex h-full items-center justify-center text-muted-foreground">
+                    <p>No messages yet. Start a conversation!</p>
+                  </div>
+                ) : (
+                  message.map((message) => (
+                    <div
+                      key={message._id}
+                      className={`flex ${
+                        message.direction === "outbound"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-lg p-3 ${
+                          message.direction === "outbound"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
+                        }`}
+                      >
+                        <p className="text-sm">{message.message}</p>
+                        <div className="mt-1 flex items-center justify-end gap-1 text-xs opacity-70">
+                          <span>
+                            {new Date(message.timestamp).toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )}
+                          </span>
+                          {message.direction === "outbound" && (
+                            <span>
+                              {message.status === "sent" && (
+                                <Check className="h-3 w-3" />
+                              )}
+                              {message.status === "delivered" && (
+                                <Check className="h-3 w-3" />
+                              )}
+                              {message.status === "read" && (
                                 <CheckCircle className="h-3 w-3" />
                               )}
                             </span>
@@ -1049,7 +1158,7 @@ function ConversationItem({
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <p className="font-medium truncate">{conversation.name}</p>
+          <p className="font-medium truncate">{conversation.phoneNumber}</p>
           <p className="text-xs text-muted-foreground">{conversation.time}</p>
         </div>
         <p className="text-xs text-muted-foreground truncate">
