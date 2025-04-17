@@ -105,6 +105,7 @@ export default function ConversationsPage() {
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [conversation, setConversation] = useState([]);
   const [webhookMessages, setWebhookMessages] = useState([]);
+  const [selectedName , setSelectedName]= useState<String | null>(null)
 
   const { data: messageHistory } = useMessageHistory(selectedPhone);
 
@@ -118,7 +119,7 @@ export default function ConversationsPage() {
 
   useEffect(() => {
     socketRef.current = io(
-      "https://3ecb-2405-201-601e-b036-f896-3ff3-ecf5-871f.ngrok-free.app",
+      "https://74f9-2409-40e3-5002-c98f-dab-9343-9baf-66d9.ngrok-free.app",
       {
         transports: ["websocket"],
       }
@@ -244,10 +245,12 @@ export default function ConversationsPage() {
 
   const { mutate: unreadStatus } = useUpdateUnread();
 
-  const handleContactSelect = (contact: Contact, phone) => {
+  const handleContactSelect = (contact: Contact, phone , name) => {
     // console.log("checking.");
     // console.log("contact", "phone", contact, phone);
+
     unreadStatus(phone);
+    setSelectedName(name)
     setSelectedContact(contact);
     setCurrentContact(contact);
     setSelectedPhone(phone); 
@@ -258,20 +261,22 @@ export default function ConversationsPage() {
 
   const handleSendMessage = async () => {
     if (!selectedContact || !newMessage.trim()) return;
-
-    console.log("selectedPhone, newMessage" , selectedPhone , newMessage);
-
   
-
-mutate({
-  contacts: selectedPhone,
-  message: newMessage,
-});
+  console.log("we are inside handleSendMessage")
+    mutate({
+      contacts: [
+        {
+          phoneNumber: selectedPhone,
+          name: selectedName,
+        },
+      ],
+      message: newMessage,
+    });
+  
     await sendMessage(selectedContact.phone, newMessage);
     setNewMessage("");
   };
-
-
+  
   const handleSendBulkMessage = async () => {
     if (
       bulkMessageTab === "text" &&
@@ -522,21 +527,31 @@ mutate({
 
 
 
-  const uniqueConversations = Array.from(
-    new Map(
-      getAllConversation?.conversations.map((convo) => [
-        convo.phoneNumber,
-        convo,
-      ])
-    ).values()
-  );
+  const uniqueConversations = getAllConversation?.conversations
+  ? Array.from(
+      new Map(
+        getAllConversation.conversations.map((convo) => [
+          convo.phoneNumber,
+          convo,
+        ])
+      ).values()
+    )
+  : [];
+
+console.log("getAllConversation?.conversations", getAllConversation?.conversations);
+console.log("uniqueConversations", uniqueConversations);
+
+  
 
 //   const phoneToNameMap = new Map(contacts?.map(contact => [contact.phone, contact.name]));
 
 // console.log(phoneToNameMap);
 
 
-  console.log("contacts",contacts)
+
+  console.log("conversations", conversations)
+
+  
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -749,7 +764,8 @@ mutate({
                     onSelect={() =>
                       handleContactSelect(
                         conversation,
-                        conversation.phoneNumber
+                        conversation.phoneNumber,
+                        conversation.name
                       )
                     }
                     isSelected={selectedContacts.includes(
