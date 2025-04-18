@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,6 +106,10 @@ export default function ConversationsPage() {
   const [conversation, setConversation] = useState([]);
   const [webhookMessages, setWebhookMessages] = useState([]);
   const [selectedName , setSelectedName]= useState<String | null>(null)
+  const [conversationHistory, setConversationHistory] = useState<any[]>([]);
+  const conversationRef = useRef<any[]>([]); // store latest conversation list
+  const socketRef = useRef<Socket | null>(null);
+
 
   const { data: messageHistory } = useMessageHistory(selectedPhone);
 
@@ -113,52 +117,79 @@ export default function ConversationsPage() {
 
   const { data: getAllConversation } = useGetAllConversation();
 
-  const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
-    null
-  );
+  useEffect(()=>{
+    setConversationHistory(getAllConversation?.conversations)
+  })
 
   useEffect(() => {
-    socketRef.current = io(
-      "https://74f9-2409-40e3-5002-c98f-dab-9343-9baf-66d9.ngrok-free.app",
-      {
-        transports: ["websocket"],
+    if (getAllConversation?.conversations) {
+      setConversationHistory(getAllConversation.conversations);
+      conversationRef.current = getAllConversation.conversations;
+    }
+  }, [getAllConversation]);
+
+  // Setup socket
+  // Update your socket effect to properly handle new messages
+useEffect(() => {
+  socketRef.current = io("https://c8af-2405-201-601e-b036-d5c2-a462-1436-1af9.ngrok-free.app", {
+    transports: ["websocket"],
+  });
+
+  socketRef.current.on("newMessage", (msg) => {
+    console.log("📩 New message received:", msg);
+
+    // Check if this message belongs to the currently selected conversation
+    if (selectedPhone && msg.phoneNumber === selectedPhone) {
+      // Update the message history for the current conversation
+      setConversationHistory(prevMessages => [...prevMessages, msg]);
+    }
+
+    // Update the conversation list to show new message preview
+    setConversationHistory(prev => {
+      // Find if this conversation already exists
+      const existingIndex = prev.findIndex(c => c.phoneNumber === msg.phoneNumber);
+      
+      if (existingIndex >= 0) {
+        // Update existing conversation
+        const updated = [...prev];
+        updated[existingIndex] = {
+          ...updated[existingIndex],
+          lastMessage: msg.text || msg.body,
+          timestamp: msg.timestamp,
+          unread: selectedPhone !== msg.phoneNumber ? 
+            (updated[existingIndex].unread || 0) + 1 : 
+            updated[existingIndex].unread
+        };
+        return updated;
+      } else {
+        // Add new conversation
+        return [{
+          phoneNumber: msg.phoneNumber,
+          name: msg.name || msg.phoneNumber,
+          lastMessage: msg.text || msg.body,
+          timestamp: msg.timestamp,
+          unread: 1
+        }, ...prev];
       }
-    );
-
-    socketRef.current.on("newMessage", (msg) => {
-      console.log(
-        "✅ Connected to server via Socket.IO:",
-        socketRef.current?.id
-      );
-      setContactMessages((prev) => [...prev, msg]);
     });
+  });
 
-    return () => {
-      socketRef.current?.disconnect();
-    };
-  }, []);
+  return () => {
+    socketRef.current?.disconnect();
+  };
+}, [conversationHistory]); // Add selectedPhone as dependency
 
-  // useEffect(() => {
-  //   const socket = io("https://your-ngrok-url.ngrok-free.app", {
-  //     transports: ["websocket"], // force WebSocket protocol
-  //   });
+const sortedMessages = useMemo(() => {
+  return [...message].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+}, [message]);
 
-  //   socket.on("connect", () => {
-  //     console.log("✅ Connected to backend via Socket.IO", socket.id);
-  //   });
 
-  //   socket.on("disconnect", () => {
-  //     console.log("❌ Disconnected from Socket.IO server");
-  //   });
-
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
-
-  // useEffect(()=>{
-  //   setConversation(getAllConversation)
-  // },[getAllConversation]);
+// Auto-scroll effect
+useEffect(() => {
+  if (messagesEndRef.current) {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  }
+}, [sortedMessages]); // Trigger when sortedMessages changes
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -169,26 +200,13 @@ export default function ConversationsPage() {
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
 
-  // const {
-  // data: getContact,
-  // } = useGetContacts("https://bizwapp-back-prsx8m5d1-aryanrathour066-gmailcoms-projects.vercel.app/api/auth/getContacts");
-
+ 
   useEffect(() => {
     if (currentContact && !selectedContact) {
       setSelectedContact(currentContact);
     }
   }, [currentContact, selectedContact]);
 
-  // useEffect(() => {
-  //   if (selectedContact) {
-  //     const history = getMessageHistory(selectedContact.phoneNumber);
-  //     setContactMessages(history);
-  //   }
-  // }, [selectedContact, messages, getMessageHistory]);
-
-  // useEffect(() => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // }, [contactMessages]);
 
   useEffect(() => {
     let result = [...conversations];
@@ -523,14 +541,10 @@ export default function ConversationsPage() {
     );
   }
 
-
-
-
-
-  const uniqueConversations = getAllConversation?.conversations
+  const uniqueConversations = conversationHistory
   ? Array.from(
       new Map(
-        getAllConversation.conversations.map((convo) => [
+        conversationHistory.map((convo) => [
           convo.phoneNumber,
           convo,
         ])
@@ -538,20 +552,12 @@ export default function ConversationsPage() {
     )
   : [];
 
-console.log("getAllConversation?.conversations", getAllConversation?.conversations);
-console.log("uniqueConversations", uniqueConversations);
-
+  // const sortedMessages = [...message].sort(
+  //   (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+  // );
   
 
-//   const phoneToNameMap = new Map(contacts?.map(contact => [contact.phone, contact.name]));
-
-// console.log(phoneToNameMap);
-
-
-
-  console.log("conversations", conversations)
-
-  
+console.log("conversationHistory", conversationHistory);
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -733,7 +739,7 @@ console.log("uniqueConversations", uniqueConversations);
             value={activeTab}
             className="mt-4 space-y-2 max-h-[500px] overflow-y-auto pr-2"
           >
-            {(getAllConversation?.conversations?.length ?? 0) === 0 ? (
+            {(conversationHistory?.length ?? 0) === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <div className="rounded-full bg-muted p-3 mb-4">
                   <Search className="h-6 w-6 text-muted-foreground" />
@@ -924,7 +930,7 @@ console.log("uniqueConversations", uniqueConversations);
                     <p>No messages yet. Start a conversation!</p>
                   </div>
                 ) : (
-                  message.map((message) => (
+                  sortedMessages.map((message) => (
                     <div
                       key={message._id}
                       className={`flex ${
