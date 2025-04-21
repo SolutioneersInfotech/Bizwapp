@@ -9,12 +9,12 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Loader2, AlertCircle, CheckCircle, Info } from "lucide-react"
-// import { useAuth } from "@/contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ApiSettingsPage() {
   const router = useRouter()
-  // const { isAuthenticated, isLoading: authLoading, authConfig, updateConfig, logout } = useAuth()
+  const { isAuthenticated, isLoading: authLoading, authConfig, updateConfig, logout } = useAuth()
   const { toast } = useToast()
 
   const [phoneNumberId, setPhoneNumberId] = useState("")
