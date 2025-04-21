@@ -176,7 +176,7 @@ export default function SettingsPage() {
   };
 
   const handleLogout = async () => {
-    await fetch("http://localhost:5001/api/auth/logout", {
+    await fetch("https://bizwapp-back-end-khaki.vercel.app/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });

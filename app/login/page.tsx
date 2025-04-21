@@ -37,12 +37,29 @@ export default function LoginPage() {
   }))
  }
 
-  const { mutate, isError, data } = usePostData("http://localhost:5001/api/auth/logIn");
+  const { mutate, isError, data } = usePostData("https://bizwapp-back-end-khaki.vercel.app/api/auth/logIn");
 
   const {toast} = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    const { identifier, password } = formData
+
+  // Basic validation
+  if (!identifier || !password) {
+    setError("Email/Phone and password are required")
+    return
+  }
+
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)
+  const isPhone = /^[0-9]{10}$/.test(identifier)
+
+  if (!isEmail && !isPhone) {
+    setError("Please enter a valid email or 10-digit phone number")
+    return
+  }
+
+  setError("");
     console.log("mutate function:", mutate);
     mutate(formData, {
       onSuccess: (data) => {

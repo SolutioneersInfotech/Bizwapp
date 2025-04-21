@@ -39,8 +39,10 @@ export default function SignupPage() {
   const [phoneNumberId, setPhoneNumberId] = useState("")
   const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("")
   const [accessToken, setAccessToken] = useState("")
+  const [isLoading, setIsLoading] = useState(false); // <-- ADD THIS LINE
 
-  const { mutate, isError, data } = usePostData("http://localhost:5001/api/auth/signup");
+
+  const { mutate, isError, data } = usePostData("https://bizwapp-back-end-khaki.vercel.app/api/auth/signup");
 
 
   const handleChange = (e) => {
@@ -66,14 +68,28 @@ export default function SignupPage() {
       setError("phone is required")
       return false
     }
+    if (!/^\d{10}$/.test(formData.phone)) {
+    setError("Phone number must be 10 digits");
+    return false;
+  }
     if (!formData.email) {
       setError("Email is required")
       return false
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return false;
     }
     if (!formData.password) {
       setError("Password is required")
       return false
     }
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
+
+if (!strongPasswordRegex.test(formData.password)) {
+  setError("Password must be at least 8 characters long and include Alpha Numeric and special character.");
+  return false;
+}
     if (formData.password !== confirmPassword) {
       setError("Passwords do not match")
       return false
@@ -84,15 +100,17 @@ export default function SignupPage() {
   const {toast} = useToast()
 
   const handleNextPhase = () => {
-    console.log("formData hhh", formData)
-    console.log("mutate function:", mutate);
+    setError("");
+
+    if (!validatePhase1()) {
+      return; // 🛑 Stop execution if validation fails
+    }
     mutate(formData, {
       onSuccess: (data) => {
         toast({
           title: "Success",
           description: data.message
         })
-        // router.push("/dashboard")
         console.log("Success:", data);
         const user = { ...data.user, token : data.token}
         localStorage.setItem("user", JSON.stringify(user));
@@ -107,9 +125,9 @@ export default function SignupPage() {
       },
     });
     setError("")
-    if (validatePhase1()) {
-      setPhase(2)
-    }
+    // if (validatePhase1()) {
+    //   setPhase(2)
+    // }
   }
 
   const handlePreviousPhase = () => {
