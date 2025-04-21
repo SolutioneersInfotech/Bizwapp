@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useCallback } from "react"
 import type { MessageAnalytics, DailyStats } from "@/lib/types"
-import { useAuth } from "./AuthContext"
+// import { useAuth } from "./AuthContext"
 import { useMessages } from "./MessageContext"
 
 interface AnalyticsContextType {
@@ -26,7 +26,7 @@ export const AnalyticsProvider = ({ children }: { children: React.ReactNode }) =
     dailyStats: [],
   })
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { authConfig } = useAuth()
+  // const { authConfig } = useAuth()
   const { messages } = useMessages()
 
   // Calculate analytics based on messages

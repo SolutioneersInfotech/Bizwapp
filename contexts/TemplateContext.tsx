@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { Template } from "@/lib/types"
-import { useAuth } from "./AuthContext"
+// import { useAuth } from "./AuthContext"
 import { useToast } from "@/hooks/use-toast"
 
 interface TemplateContextType {
@@ -20,7 +20,7 @@ const TemplateContext = createContext<TemplateContextType | undefined>(undefined
 export const TemplateProvider = ({ children }: { children: React.ReactNode }) => {
   const [templates, setTemplates] = useState<Template[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { authConfig } = useAuth()
+  // const { authConfig } = useAuth()
   const { toast } = useToast()
 
   // Load templates from localStorage on mount

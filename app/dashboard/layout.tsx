@@ -16,22 +16,22 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const router = useRouter()
+  // const router = useRouter()
   const { isAuthenticated, isLoading, authConfig } = useAuth()
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login")
-    }
-  }, [isLoading, isAuthenticated, router])
+  // useEffect(() => {
+  //   if (!isLoading && !isAuthenticated) {
+  //     router.push("/login")
+  //   }
+  // }, [isLoading, isAuthenticated, router])
 
-  if (isLoading) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>
-  }
+  // if (isLoading) {
+  //   return <div className="flex h-screen items-center justify-center">Loading...</div>
+  // }
 
-  if (!isAuthenticated) {
-    return null
-  }
+  // if (!isAuthenticated) {
+  //   return null
+  // }
 
   return (
     <SidebarProvider>

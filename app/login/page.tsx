@@ -37,7 +37,7 @@ export default function LoginPage() {
   }))
  }
 
-  const { mutate, isError, data } = usePostData("https://bizwapp-back-end-khaki.vercel.app/api/auth/logIn");
+  const { mutate, isError, data } = usePostData("http://localhost:5001/api/auth/logIn");
 
   const {toast} = useToast();
 

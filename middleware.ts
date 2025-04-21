@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
+  const token = request.cookies.get('token');
+
+  console.log("request.cookies", request.cookies)
 
   console.log('Token:', token)
 
@@ -27,6 +29,7 @@ export function middleware(request: NextRequest) {
   )
 
   if (!isPublicPath && !token) {
+    console.log("checking", isPublicPath , token)
     const loginUrl = new URL('/login', request.url)
     return NextResponse.redirect(loginUrl)
   }
@@ -36,10 +39,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for:
-     * - static files (/_next/, /favicon.ico, etc.)
-     */
+    
     '/((?!_next/static|_next/image|favicon.ico|robots.txt|.*\\.svg|.*\\.png).*)',
   ],
 }

@@ -6,7 +6,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image";
-import { useAuth } from "@/contexts/AuthContext"
+// import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -21,7 +21,7 @@ import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const router = useRouter()
-  const { login, isLoading } = useAuth()
+  // const { login, isLoading } = useAuth()
   const [phase, setPhase] = useState(1)
   const [error, setError] = useState("")
 
@@ -40,7 +40,7 @@ export default function SignupPage() {
   const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("")
   const [accessToken, setAccessToken] = useState("")
 
-  const { mutate, isError, data } = usePostData("https://bizwapp-back-end-khaki.vercel.app/api/auth/signup");
+  const { mutate, isError, data } = usePostData("http://localhost:5001/api/auth/signup");
 
 
   const handleChange = (e) => {

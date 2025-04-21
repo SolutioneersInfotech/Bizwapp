@@ -26,7 +26,7 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [isLoading, isAuthenticated, router])
 
-  // Add a separate effect for refreshing analytics only once
+  //Add a separate effect for refreshing analytics only once
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       refreshAnalytics()

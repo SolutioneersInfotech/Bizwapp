@@ -13,8 +13,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { LogOut, Settings, User } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export function UserNav() {
+  const [user, setUser]= useState({
+    firstName:"",
+    lastName:"",
+    email:""
+  })
   const { logout } = useAuth()
   const router = useRouter()
 
@@ -23,13 +29,25 @@ export function UserNav() {
     router.push("/login")
   }
 
+
+  useEffect(()=>{
+    const user = localStorage.getItem("user");
+    if(user){
+      const parsedUser = JSON.parse(user)
+      setUser(parsedUser);
+    }
+  },[])
+  
+  const initials = `${user.firstName[0]}${user.lastName[0]}`
+
+  console.log("initials",initials)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <div className="relative h-8 w-8 rounded-full bg-primary/10">
             <span className="absolute inset-0 flex items-center justify-center text-sm font-medium text-primary">
-              JD
+              {initials}
             </span>
           </div>
         </Button>
@@ -37,8 +55,8 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
-            <p className="text-xs leading-none text-muted-foreground">john.doe@example.com</p>
+            <p className="text-sm font-medium leading-none">{`${user.firstName}  ${user.lastName}`}</p>
+            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

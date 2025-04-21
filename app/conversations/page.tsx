@@ -192,11 +192,11 @@ useEffect(() => {
 }, [sortedMessages]); // Trigger when sortedMessages changes
 
   // Redirect if not authenticated
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [authLoading, isAuthenticated, router]);
+  // useEffect(() => {
+  //   if (!authLoading && !isAuthenticated) {
+  //     router.push("/login");
+  //   }
+  // }, [authLoading, isAuthenticated, router]);
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
 

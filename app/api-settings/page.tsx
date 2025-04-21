@@ -9,12 +9,12 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Loader2, AlertCircle, CheckCircle, Info } from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
+// import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ApiSettingsPage() {
   const router = useRouter()
-  const { isAuthenticated, isLoading: authLoading, authConfig, updateConfig, logout } = useAuth()
+  // const { isAuthenticated, isLoading: authLoading, authConfig, updateConfig, logout } = useAuth()
   const { toast } = useToast()
 
   const [phoneNumberId, setPhoneNumberId] = useState("")
@@ -24,11 +24,11 @@ export default function ApiSettingsPage() {
   const [testStatus, setTestStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
 
   // Redirect if not authenticated
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/login")
-    }
-  }, [authLoading, isAuthenticated, router])
+  // useEffect(() => {
+  //   if (!authLoading && !isAuthenticated) {
+  //     router.push("/login")
+  //   }
+  // }, [authLoading, isAuthenticated, router])
 
   // Load current config
   useEffect(() => {
@@ -108,9 +108,14 @@ export default function ApiSettingsPage() {
     }
   }
 
-  const handleLogout = () => {
-    logout()
-    router.push("/login")
+  const handleLogout = async () => {
+    await fetch("http://localhost:5001/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+  
+    // Then redirect
+    window.location.href = "/login";
   }
 
   if (authLoading) {

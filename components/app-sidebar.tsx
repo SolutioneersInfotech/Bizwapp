@@ -61,6 +61,10 @@ export function AppSidebar() {
   // const { state } = useSidebar()
   const pathname = usePathname(); // Get current route
 
+  const addContactClick=()=>{
+    
+  }
+
 
   return (
     <Sidebar variant="floating" collapsible="icon">
@@ -135,7 +139,7 @@ export function AppSidebar() {
                 <Plus className="h-4 w-4" />
                 <span>New Template</span>
               </Button>
-              <Button className="justify-start gap-2" variant="outline">
+              <Button className="justify-start gap-2" variant="outline" onClick={addContactClick}>
                 <Plus className="h-4 w-4" />
                 <span>Add Contact</span>
               </Button>

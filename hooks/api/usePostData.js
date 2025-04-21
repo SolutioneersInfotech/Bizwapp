@@ -10,6 +10,7 @@ import { useMutation } from "@tanstack/react-query";
          method: "POST",
          headers,
          body: JSON.stringify(formData),
+         credentials: "include",
        });
  
        if (!response.ok) {

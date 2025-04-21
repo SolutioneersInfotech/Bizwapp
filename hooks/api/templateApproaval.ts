@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
 const API_URL = "https://graph.facebook.com/v18.0/28995967470047562/message_templates";
-const ACCESS_TOKEN = "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6"
 
 interface TemplateData {
     name: string;
@@ -21,7 +20,7 @@ interface TemplateData {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${ACCESS_TOKEN}`,
+          "Authorization": `Bearer ${process.env.ACCESS_TOKEN}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify(JSON.parse(jsonInput))

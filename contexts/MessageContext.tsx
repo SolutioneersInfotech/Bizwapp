@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { Message, Contact } from "@/lib/types"
-import { useAuth } from "./AuthContext"
+// import { useAuth } from "./AuthContext"
 import { useToast } from "@/hooks/use-toast"
 
 interface MessageContextType {
@@ -23,7 +23,7 @@ export const MessageProvider = ({ children }: { children: React.ReactNode }) => 
   const [messages, setMessages] = useState<Record<string, Message[]>>({})
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [currentContact, setCurrentContact] = useState<Contact | null>(null)
-  const { authConfig } = useAuth()
+  // const { authConfig } = useAuth()
   const { toast } = useToast()
 
   // Load messages from localStorage on mount

@@ -7,6 +7,7 @@ const usePutData= async ({id , updatedData  })=>{
         headers:{
             "Content-Type" :'application/json'
             },
+            credentials: "include",
         body: JSON.stringify(updatedData)
         });
         
