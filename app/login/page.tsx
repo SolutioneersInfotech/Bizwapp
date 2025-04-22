@@ -37,7 +37,7 @@ export default function LoginPage() {
   }))
  }
 
-  const { mutate, isError, data } = usePostData("https://api.bizwapp.com/api/auth/logIn");
+  const { mutate, isError, data } = usePostData("https://api.bizwapp.com/api/auth/login");
 
   const {toast} = useToast();
 
