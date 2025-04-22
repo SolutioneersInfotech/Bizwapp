@@ -67,8 +67,10 @@ export default function LoginPage() {
           title: "Success",
           description: data.message,
         })
-        router.push("/dashboard")
-        console.log("Success:", data);
+        setTimeout(() => {
+          router.push("/dashboard"); // or wherever
+        }, 500);
+        console.log("Login Success:", data);
       },
       onError: (error) => {
         toast({
