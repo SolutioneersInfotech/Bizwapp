@@ -12,7 +12,7 @@ const useSendWhatsAppMessage = () => {
   return useMutation<any, Error, SendMessageParams>({
     mutationFn:async ({ contacts, message }: SendMessageParams) => {
       console.log('Sending message...', { contacts, message });
-      const response = await fetch('https://bizwapp-back-end-khaki.vercel.app/api/auth/SendingBulkContacts', {
+      const response = await fetch('https://api.bizwapp.com/api/auth/SendingBulkContacts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

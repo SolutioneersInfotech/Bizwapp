@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const usePutData= async ({id , updatedData  })=>{
     console.log("Sending PUT request to update contact:", id, updatedData);
-    const response = await fetch(`https://bizwapp-back-end-khaki.vercel.app/api/auth/updateContact/${id}`,{
+    const response = await fetch(`https://api.bizwapp.com/api/auth/updateContact/${id}`,{
         method:'PUT',
         headers:{
             "Content-Type" :'application/json'

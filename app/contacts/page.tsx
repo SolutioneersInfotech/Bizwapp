@@ -147,7 +147,7 @@ export default function ContactsPage() {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts("https://bizwapp-back-end-khaki.vercel.app/api/auth/getContacts");
+  } = useGetContacts("https://api.bizwapp.com/api/auth/getContacts");
 
 
   const updateContactMutation  = useUpdateContact()
@@ -268,7 +268,7 @@ export default function ContactsPage() {
   };
 
   const { mutate, isError, data } = usePostData(
-    "https://bizwapp-back-end-khaki.vercel.app/api/auth/addContact"
+    "https://api.bizwapp.com/api/auth/addContact"
   );
 
   // Handle import confirmation

@@ -236,7 +236,7 @@ useEffect(() => {
     loading,
     error,
   } = useGetContacts(
-    "https://bizwapp-back-end-khaki.vercel.app/api/auth/getContacts"
+    "https://api.bizwapp.com/api/auth/getContacts"
   );
 
   useEffect(() => {

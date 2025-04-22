@@ -91,7 +91,7 @@ export function AppSidebar() {
     }));
   };
 
-  const mutation = usePostData("https://bizwapp-back-end-khaki.vercel.app/api/auth/addContact");
+  const mutation = usePostData("https://api.bizwapp.com/api/auth/addContact");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

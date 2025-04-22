@@ -42,7 +42,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false); // <-- ADD THIS LINE
 
 
-  const { mutate, isError, data } = usePostData("https://bizwapp-back-end-khaki.vercel.app/api/auth/signup");
+  const { mutate, isError, data } = usePostData("https://api.bizwapp.com/api/auth/signup");
 
 
   const handleChange = (e) => {
