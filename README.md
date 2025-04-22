@@ -1,2 +1,2 @@
-dummy commit
+empty commit
  
