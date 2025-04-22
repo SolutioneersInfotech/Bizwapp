@@ -109,7 +109,7 @@ export default function ApiSettingsPage() {
   }
 
   const handleLogout = async () => {
-    await fetch("https://bizwapp-back-end-khaki.vercel.app/api/auth/logout", {
+    await fetch("process.env.REACT_APP_BACKEND_URL/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });
