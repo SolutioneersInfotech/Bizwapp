@@ -3,13 +3,15 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token');
+  const cookieHeader = request.headers.get("cookie");
+  console.log("Raw cookie header:", cookieHeader);
 
-  console.log("request.cookies", request.cookies)
+  const token = request.cookies.get("token");
+  console.log("Parsed cookie:", token);
 
-  console.log('Token:', token)
 
   const publicPaths = [
+    '/',
     '/login',
     '/signup',
     '/api',
