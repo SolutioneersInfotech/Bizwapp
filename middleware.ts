@@ -9,12 +9,12 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("token");
   console.log("Parsed cookie:", token);
 
+  console.log("request", request);
+
 
   const publicPaths = [
-    '/',
     '/login',
     '/signup',
-    '/api',
     '/_next',
     '/favicon.ico',
     '/robots.txt',
@@ -26,12 +26,16 @@ export function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
+  console.log("path", path)
+
   const isPublicPath = publicPaths.some((publicPath) =>
     path.startsWith(publicPath)
   )
 
+  console.log("checking", isPublicPath , token)
+
   if (!isPublicPath && !token) {
-    console.log("checking", isPublicPath , token)
+    
     const loginUrl = new URL('/login', request.url)
     return NextResponse.redirect(loginUrl)
   }

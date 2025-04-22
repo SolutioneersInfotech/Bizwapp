@@ -24,9 +24,12 @@ export function UserNav() {
   const { logout } = useAuth()
   const router = useRouter()
 
-  const handleLogout = () => {
-    logout()
-    router.push("/login")
+  const handleLogout = async() => {
+    await fetch("https://api.bizwapp.com/api/auth/logout", {
+      method: "POST", // or GET if you make it that
+      credentials: "include"
+    });
+    
   }
 
 
