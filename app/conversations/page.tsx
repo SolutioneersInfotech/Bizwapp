@@ -105,11 +105,11 @@ export default function ConversationsPage() {
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [conversation, setConversation] = useState([]);
   const [webhookMessages, setWebhookMessages] = useState([]);
-  const [selectedName , setSelectedName]= useState<String | null>(null)
+  const [selectedName, setSelectedName] = useState<String | null>(null);
   const [conversationHistory, setConversationHistory] = useState<any[]>([]);
   const conversationRef = useRef<any[]>([]); // store latest conversation list
   const socketRef = useRef<Socket | null>(null);
-
+  const [isMobile, setIsMobile] = useState(false);
 
   const { data: messageHistory } = useMessageHistory(selectedPhone);
 
@@ -117,9 +117,27 @@ export default function ConversationsPage() {
 
   const { data: getAllConversation } = useGetAllConversation();
 
-  useEffect(()=>{
-    setConversationHistory(getAllConversation?.conversations)
-  })
+  useEffect(() => {
+    setConversationHistory(getAllConversation?.conversations);
+  });
+
+  useEffect(() => {
+    // Function to check screen width
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768); // Adjust 768px as per your mobile breakpoint
+    };
+
+    // Initial check
+    checkScreenSize();
+
+    // Add event listener
+    window.addEventListener("resize", checkScreenSize);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+    };
+  }, []);
 
   useEffect(() => {
     if (getAllConversation?.conversations) {
@@ -130,66 +148,76 @@ export default function ConversationsPage() {
 
   // Setup socket
   // Update your socket effect to properly handle new messages
-useEffect(() => {
-  socketRef.current = io("https://c8af-2405-201-601e-b036-d5c2-a462-1436-1af9.ngrok-free.app", {
-    transports: ["websocket"],
-  });
-
-  socketRef.current.on("newMessage", (msg) => {
-    console.log("📩 New message received:", msg);
-
-    // Check if this message belongs to the currently selected conversation
-    if (selectedPhone && msg.phoneNumber === selectedPhone) {
-      // Update the message history for the current conversation
-      setConversationHistory(prevMessages => [...prevMessages, msg]);
-    }
-
-    // Update the conversation list to show new message preview
-    setConversationHistory(prev => {
-      // Find if this conversation already exists
-      const existingIndex = prev.findIndex(c => c.phoneNumber === msg.phoneNumber);
-      
-      if (existingIndex >= 0) {
-        // Update existing conversation
-        const updated = [...prev];
-        updated[existingIndex] = {
-          ...updated[existingIndex],
-          lastMessage: msg.text || msg.body,
-          timestamp: msg.timestamp,
-          unread: selectedPhone !== msg.phoneNumber ? 
-            (updated[existingIndex].unread || 0) + 1 : 
-            updated[existingIndex].unread
-        };
-        return updated;
-      } else {
-        // Add new conversation
-        return [{
-          phoneNumber: msg.phoneNumber,
-          name: msg.name || msg.phoneNumber,
-          lastMessage: msg.text || msg.body,
-          timestamp: msg.timestamp,
-          unread: 1
-        }, ...prev];
+  useEffect(() => {
+    socketRef.current = io(
+      "https://c8af-2405-201-601e-b036-d5c2-a462-1436-1af9.ngrok-free.app",
+      {
+        transports: ["websocket"],
       }
+    );
+
+    socketRef.current.on("newMessage", (msg) => {
+      console.log("📩 New message received:", msg);
+
+      // Check if this message belongs to the currently selected conversation
+      if (selectedPhone && msg.phoneNumber === selectedPhone) {
+        // Update the message history for the current conversation
+        setConversationHistory((prevMessages) => [...prevMessages, msg]);
+      }
+
+      // Update the conversation list to show new message preview
+      setConversationHistory((prev) => {
+        // Find if this conversation already exists
+        const existingIndex = prev.findIndex(
+          (c) => c.phoneNumber === msg.phoneNumber
+        );
+
+        if (existingIndex >= 0) {
+          // Update existing conversation
+          const updated = [...prev];
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            lastMessage: msg.text || msg.body,
+            timestamp: msg.timestamp,
+            unread:
+              selectedPhone !== msg.phoneNumber
+                ? (updated[existingIndex].unread || 0) + 1
+                : updated[existingIndex].unread,
+          };
+          return updated;
+        } else {
+          // Add new conversation
+          return [
+            {
+              phoneNumber: msg.phoneNumber,
+              name: msg.name || msg.phoneNumber,
+              lastMessage: msg.text || msg.body,
+              timestamp: msg.timestamp,
+              unread: 1,
+            },
+            ...prev,
+          ];
+        }
+      });
     });
-  });
 
-  return () => {
-    socketRef.current?.disconnect();
-  };
-}, [conversationHistory]); // Add selectedPhone as dependency
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, [conversationHistory]); // Add selectedPhone as dependency
 
-const sortedMessages = useMemo(() => {
-  return [...message].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-}, [message]);
+  const sortedMessages = useMemo(() => {
+    return [...message].sort(
+      (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+    );
+  }, [message]);
 
-
-// Auto-scroll effect
-useEffect(() => {
-  if (messagesEndRef.current) {
-    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-  }
-}, [sortedMessages]); // Trigger when sortedMessages changes
+  // Auto-scroll effect
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [sortedMessages]); // Trigger when sortedMessages changes
 
   // Redirect if not authenticated
   // useEffect(() => {
@@ -200,13 +228,11 @@ useEffect(() => {
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
 
- 
   useEffect(() => {
     if (currentContact && !selectedContact) {
       setSelectedContact(currentContact);
     }
   }, [currentContact, selectedContact]);
-
 
   useEffect(() => {
     let result = [...conversations];
@@ -235,9 +261,7 @@ useEffect(() => {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts(
-    "https://api.bizwapp.com/api/auth/getContacts"
-  );
+  } = useGetContacts("https://api.bizwapp.com/api/auth/getContacts");
 
   useEffect(() => {
     setContact(getContacts);
@@ -263,24 +287,23 @@ useEffect(() => {
 
   const { mutate: unreadStatus } = useUpdateUnread();
 
-  const handleContactSelect = (contact: Contact, phone , name) => {
+  const handleContactSelect = (contact: Contact, phone, name) => {
     // console.log("checking.");
     // console.log("contact", "phone", contact, phone);
 
     unreadStatus(phone);
-    setSelectedName(name)
+    setSelectedName(name);
     setSelectedContact(contact);
     setCurrentContact(contact);
-    setSelectedPhone(phone); 
+    setSelectedPhone(phone);
   };
 
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
-
   const handleSendMessage = async () => {
     if (!selectedContact || !newMessage.trim()) return;
-  
-  console.log("we are inside handleSendMessage")
+
+    console.log("we are inside handleSendMessage");
     mutate({
       contacts: [
         {
@@ -290,11 +313,11 @@ useEffect(() => {
       ],
       message: newMessage,
     });
-  
+
     await sendMessage(selectedContact.phone, newMessage);
     setNewMessage("");
   };
-  
+
   const handleSendBulkMessage = async () => {
     if (
       bulkMessageTab === "text" &&
@@ -542,22 +565,20 @@ useEffect(() => {
   }
 
   const uniqueConversations = conversationHistory
-  ? Array.from(
-      new Map(
-        conversationHistory.map((convo) => [
-          convo.phoneNumber,
-          convo,
-        ])
-      ).values()
-    )
-  : [];
+    ? Array.from(
+        new Map(
+          conversationHistory.map((convo) => [convo.phoneNumber, convo])
+        ).values()
+      )
+    : [];
 
   // const sortedMessages = [...message].sort(
   //   (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
   // );
-  
 
-console.log("conversationHistory", conversationHistory);
+  console.log("conversationHistory", conversationHistory);
+
+  console.log("isMobileisMobileisMobile",isMobile)
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -706,6 +727,7 @@ console.log("conversationHistory", conversationHistory);
             </Button>
           </div>
         </div>
+
         <div className="p-4">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -735,10 +757,11 @@ console.log("conversationHistory", conversationHistory);
               Archived
             </TabsTrigger>
           </TabsList>
+        
           <TabsContent
             value={activeTab}
             className="mt-4 space-y-2 max-h-[calc(100vh-130px)] overflow-y-auto pr-2 md:max-h-[500px]"
-            >
+          >
             {(conversationHistory?.length ?? 0) === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <div className="rounded-full bg-muted p-3 mb-4">
@@ -791,6 +814,7 @@ console.log("conversationHistory", conversationHistory);
           </TabsContent>
         </Tabs>
       </div>
+      
 
       {/* Chat Area */}
       <div className="flex flex-1 flex-col">
@@ -867,7 +891,6 @@ console.log("conversationHistory", conversationHistory);
             </div>
 
             <div className="flex-1 overflow-auto p-4 h-[calc(100vh-220px)] md:h-auto">
-
               <div className="space-y-4">
                 {message.length === 0 ? (
                   <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -923,6 +946,81 @@ console.log("conversationHistory", conversationHistory);
                 <div ref={messagesEndRef} />
               </div>
             </div>
+
+            {selectedContact && isMobile && (
+  <div className="flex flex-1 flex-col">
+    <div className="flex h-14 items-center justify-between border-b px-4">
+      <div className="flex items-center gap-2">
+        <Avatar>
+          <AvatarImage src={selectedContact.avatar} />
+          <AvatarFallback>{selectedContact.initials}</AvatarFallback>
+        </Avatar>
+        <div>
+          <h3 className="font-medium">{selectedContact.name}</h3>
+          <p className="text-xs text-muted-foreground">
+            {selectedContact.status === "Active" ? "Online" : "Offline"}
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="icon">
+          <Search className="h-4 w-4" />
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Conversation Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => handleMuteConversation(selectedContact)}
+            >
+              {selectedContact.muted ? (
+                <>
+                  <Bell className="mr-2 h-4 w-4" />
+                  <span>Unmute Notifications</span>
+                </>
+              ) : (
+                <>
+                  <BellOff className="mr-2 h-4 w-4" />
+                  <span>Mute Notifications</span>
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <UserPlus className="mr-2 h-4 w-4" />
+              <span>Add to Contacts</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Tag className="mr-2 h-4 w-4" />
+              <span>Manage Tags</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => handleArchiveConversation(selectedContact)}
+            >
+              <Archive className="mr-2 h-4 w-4" />
+              <span>
+                {selectedContact.archived ? "Unarchive" : "Archive"}
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={() => handleDeleteConversation(selectedContact)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              <span>Delete Conversation</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  </div>
+)}
+
 
             <div className="border-t p-4">
               <div className="flex items-center gap-2">

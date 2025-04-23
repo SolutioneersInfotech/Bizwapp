@@ -134,11 +134,11 @@ export default function ClientLayout({
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" >
+              <Button variant="ghost" size="icon" className="!p-1 !h-8 !w-8 mt-3 mt-[12px]" >
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="ml-2">
+            <SheetContent side="left" >
             {/* <Sidebar variant="floating" collapsible="icon"> */}
       <SidebarHeader className="flex flex-col gap-4  ">
         <div className="flex items-center gap-2">
