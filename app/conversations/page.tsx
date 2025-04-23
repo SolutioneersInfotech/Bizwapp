@@ -737,8 +737,8 @@ console.log("conversationHistory", conversationHistory);
           </TabsList>
           <TabsContent
             value={activeTab}
-            className="mt-4 space-y-2 max-h-[500px] overflow-y-auto pr-2"
-          >
+            className="mt-4 space-y-2 max-h-[calc(100vh-130px)] overflow-y-auto pr-2 md:max-h-[500px]"
+            >
             {(conversationHistory?.length ?? 0) === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <div className="rounded-full bg-muted p-3 mb-4">
@@ -866,64 +866,8 @@ console.log("conversationHistory", conversationHistory);
               </div>
             </div>
 
-            {/* <div className="flex-1 overflow-auto p-4">
-              <div className="space-y-4">
-                {contactMessages.length === 0 ? (
-                  <div className="flex h-full items-center justify-center text-muted-foreground">
-                    <p>No messages yet. Start a conversation!</p>
-                  </div>
-                ) : (
-                  message.map((messages) => (
-                    <div
-                      key={messages._id}
-                      className={`flex ${
-                        messages.direction === "outbound"
-                          ? "justify-end"
-                          : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg p-3 ${
-                          messages.direction === "outbound"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
-                        }`}
-                      >
-                        <p className="text-sm">{messages.message}</p>
-                        <div className="mt-1 flex items-center justify-end gap-1 text-xs opacity-70">
-                          <span>
-                            {new Date(messages.timestamp).toLocaleTimeString(
-                              "en-US",
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: true,
-                              }
-                            )}
-                          </span>
-                          {messages.direction === "outbound" && (
-                            <span>
-                              {messages.status === "sent" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                              {messages.status === "delivered" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                              {messages.status === "read" && (
-                                <CheckCircle className="h-3 w-3" />
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            </div> */}
+            <div className="flex-1 overflow-auto p-4 h-[calc(100vh-220px)] md:h-auto">
 
-            <div className="flex-1 overflow-auto p-4">
               <div className="space-y-4">
                 {message.length === 0 ? (
                   <div className="flex h-full items-center justify-center text-muted-foreground">

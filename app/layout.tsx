@@ -46,7 +46,11 @@ export default function RootLayout({
                   <Providers>
                     <TooltipProvider>
                       <SidebarProvider>
-                      <SidebarToggle>{children}</SidebarToggle>
+                        <ClientLayout>
+                      {/* <SidebarToggle> */}
+                        {children}
+                        {/* </SidebarToggle> */}
+                      </ClientLayout>
                       </SidebarProvider>
                     </TooltipProvider>
                     <ToastContainer />

@@ -44,8 +44,8 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <div className="flex items-center justify-between space-y-2">
+      <div className="flex-1 space-y-4 px-4 pt-4 sm:px-6 sm:pt-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
           <div className="flex items-center space-x-2">
             <Button onClick={Conversation}>
@@ -56,7 +56,7 @@ export default function DashboardPage() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
+          <TabsList className="flex flex-wrap gap-2 mb-12 md:mb-0">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -65,7 +65,7 @@ export default function DashboardPage() {
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-all hover:shadow-md">
+              <Card className="w-full overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-all hover:shadow-md">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Messages</CardTitle>
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -130,7 +130,7 @@ export default function DashboardPage() {
               </Card>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4 overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
                 <CardHeader>
                   <CardTitle>Message Analytics</CardTitle>
@@ -143,7 +143,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="col-span-3 overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
+              <Card className="col-span-3 overflow-hidden rounded-xl border bg-card text-card-foreground shadow mb-2">
                 <CardHeader>
                   <CardTitle>Recent Conversations</CardTitle>
                   <CardDescription>Your most recent customer interactions</CardDescription>
