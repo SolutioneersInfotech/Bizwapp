@@ -46,7 +46,7 @@ export default function RootLayout({
                   <Providers>
                     <TooltipProvider>
                       <SidebarProvider>
-                            <ClientLayout>{children}</ClientLayout>
+                      <SidebarToggle>{children}</SidebarToggle>
                       </SidebarProvider>
                     </TooltipProvider>
                     <ToastContainer />
@@ -69,4 +69,5 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "./SidebarContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ClientLayout from "@/components/ClientLayout";
+import { SidebarToggle } from "@/components/SidebarToggle";
 

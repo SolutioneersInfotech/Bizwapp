@@ -4,12 +4,12 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie");
-  console.log("Raw cookie header:", cookieHeader);
+  // console.log("Raw cookie header:", cookieHeader);
 
   const token = request.cookies.get("token");
   console.log("Parsed cookie:", token);
 
-  console.log("request", request);
+  // console.log("request", request);
 
 
   const publicPaths = [
@@ -26,19 +26,19 @@ export function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
-  console.log("path", path)
+  // console.log("path", path)
 
   const isPublicPath = publicPaths.some((publicPath) =>
     path.startsWith(publicPath)
   )
 
-  console.log("checking", isPublicPath , token)
+  // console.log("checking", isPublicPath , token)
 
-  if (!isPublicPath && !token) {
+  // if (!isPublicPath && !token) {
     
-    const loginUrl = new URL('/login', request.url)
-    return NextResponse.redirect(loginUrl)
-  }
+  //   const loginUrl = new URL('/login', request.url)
+  //   return NextResponse.redirect(loginUrl)
+  // }
 
   return NextResponse.next()
 }
