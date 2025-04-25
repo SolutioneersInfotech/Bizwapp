@@ -84,7 +84,6 @@ export function AppSidebar() {
   const [newChatMessage, setNewChatMessage] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-
   const [newContact, setNewContact] = useState({
     name: "",
     phone: "",
@@ -122,40 +121,33 @@ export function AppSidebar() {
     console.log("New chat with", newChatPhone, newChatMessage);
     setNewChatDialogOpen(false);
   };
-  
+
   const handleCreateTemplate = async () => {
-  
-
-  //   try {
-  //     await createTemplate({
-  //       name: templateName,
-  //       category: templateCategory,
-  //       content: templateContent,
-  //       status: "Pending",
-  //       updated: new Date().toISOString(),
-  //       usageCount: 0,
-  //     })
-
-      
-
-  //     // Reset form
-  //     setTemplateName("")
-  //     setTemplateCategory("")
-  //     setTemplateContent("")
-  //     setNewTemplateOpen(false)
-  //   } catch (error) {
-  //     toast({
-  //       title: "Error",
-  //       description: "Failed to create template",
-  //       variant: "destructive",
-  //     })
-  //   }
-  }
+    //   try {
+    //     await createTemplate({
+    //       name: templateName,
+    //       category: templateCategory,
+    //       content: templateContent,
+    //       status: "Pending",
+    //       updated: new Date().toISOString(),
+    //       usageCount: 0,
+    //     })
+    //     // Reset form
+    //     setTemplateName("")
+    //     setTemplateCategory("")
+    //     setTemplateContent("")
+    //     setNewTemplateOpen(false)
+    //   } catch (error) {
+    //     toast({
+    //       title: "Error",
+    //       description: "Failed to create template",
+    //       variant: "destructive",
+    //     })
+    //   }
+  };
 
   const handleEditTemplate = async () => {
-    if (!editingTemplate) return
-
-    
+    if (!editingTemplate) return;
 
     try {
       await updateTemplate(editingTemplate.id, {
@@ -163,24 +155,24 @@ export function AppSidebar() {
         category: templateCategory,
         content: templateContent,
         updated: new Date().toISOString(),
-      })
+      });
 
       toast({
         title: "Template Updated",
         description: "Your template has been updated successfully",
-      })
+      });
 
       // Reset form
-      setEditTemplateOpen(false)
-      setEditingTemplate(null)
+      setEditTemplateOpen(false);
+      setEditingTemplate(null);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to update template",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
   return (
     <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader className="flex flex-col gap-4  ">
@@ -252,29 +244,37 @@ export function AppSidebar() {
           <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
           <SidebarGroupContent>
             <div className="grid grid-cols-1 gap-2">
-              <Button className="justify-start gap-2" variant="outline" onClick={() => setNewChatDialogOpen(true)}>
+              <Button
+                className="justify-start gap-2"
+                variant="outline"
+                onClick={() => setNewChatDialogOpen(true)}
+              >
                 <Plus className="h-4 w-4" />
                 <span>New Chat</span>
               </Button>
               <NewChatDialog
-      open={newChatDialogOpen}
-      onOpenChange={setNewChatDialogOpen}
-      phone={newChatPhone}
-      onPhoneChange={setNewChatPhone}
-      message={newChatMessage}
-      onMessageChange={setNewChatMessage}
-      onSubmit={handleStartNewChat}
-    />
+                open={newChatDialogOpen}
+                onOpenChange={setNewChatDialogOpen}
+                phone={newChatPhone}
+                onPhoneChange={setNewChatPhone}
+                message={newChatMessage}
+                onMessageChange={setNewChatMessage}
+                onSubmit={handleStartNewChat}
+              />
 
-              <Button className="justify-start gap-2" variant="outline" onClick={() => setIsCreateModalOpen(true)}>
+              <Button
+                className="justify-start gap-2"
+                variant="outline"
+                onClick={() => setIsCreateModalOpen(true)}
+              >
                 <Plus className="h-4 w-4" />
                 <span>New Template</span>
               </Button>
               <CreateTemplateModal
-              open={isCreateModalOpen}
-              onOpenChange={setIsCreateModalOpen}
-              onSubmit={handleCreateTemplate}
-            />
+                open={isCreateModalOpen}
+                onOpenChange={setIsCreateModalOpen}
+                onSubmit={handleCreateTemplate}
+              />
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="justify-start gap-2" variant="outline">

@@ -31,10 +31,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import  CreateTemplateModal  from "../templates/create-template-modal"
 import { useWhatsAppTemplates} from '../../hooks/api/getTemplate.js';
+import { Spinner } from "../../../Bizwapp/components/ui/spinner";
+
 
 
 export default function TemplatesPage() {
-  const { templates, createTemplate, updateTemplate, deleteTemplate, isLoading } = useTemplates()
+  const { templates, createTemplate, updateTemplate, deleteTemplate } = useTemplates()
   const { toast } = useToast()
 
   const [activeTab, setActiveTab] = useState("all")
@@ -57,8 +59,9 @@ export default function TemplatesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [templateToDelete, setTemplateToDelete] = useState(null)
 
-  const { data: whatsappTemplates } = useWhatsAppTemplates();
+  const { data: whatsappTemplates , isLoading } = useWhatsAppTemplates();
 const [filteredTemplates, setFilteredTemplates] = useState([]);
+
 
 useEffect(() => {
   if (whatsappTemplates) {
@@ -214,6 +217,7 @@ useEffect(() => {
   }
 
   console.log("Filtered Templates:", filteredTemplates)
+  console.log("isLoading", isLoading)
 
   return (
     <div className="flex flex-col">
@@ -259,7 +263,11 @@ useEffect(() => {
           </TabsList>
 
           <TabsContent value={activeTab} className="space-y-4">
-            {filteredTemplates.length === 0 ? (
+            {isLoading ? (
+              <div className="flex justify-center items-center py-8">
+                <Spinner size={40} className="text-green-600" />
+              </div>
+            ) : filteredTemplates.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <div className="rounded-full bg-muted p-3 mb-4">
                   <Search className="h-6 w-6 text-muted-foreground" />

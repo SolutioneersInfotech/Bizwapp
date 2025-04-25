@@ -67,6 +67,7 @@ import useUpdateUnread from "../../hooks/api/updateUnreadStatus";
 import useGetAllConversation from "../../hooks/api/getAllConversation";
 import { io, Socket } from "socket.io-client";
 import NewChatDialog from "../../components/newChat";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -309,7 +310,7 @@ export default function ConversationsPage() {
       sender: "user", // or however you identify the sender
       timestamp: new Date().toISOString(),
     };
-  
+
     // Optimistically update UI
     setConversationHistory((prev) => [...prev, messageToSend]);
     setNewMessage("");
@@ -589,7 +590,7 @@ export default function ConversationsPage() {
 
   console.log("conversationHistory", conversationHistory);
 
-  console.log("isMobileisMobileisMobile",isMobile)
+  console.log("isMobileisMobileisMobile", isMobile);
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -768,12 +769,16 @@ export default function ConversationsPage() {
               Archived
             </TabsTrigger>
           </TabsList>
-        
+
           <TabsContent
             value={activeTab}
             className="mt-4 space-y-2 max-h-[calc(100vh-130px)] overflow-y-auto pr-2 md:max-h-[500px]"
           >
-            {(conversationHistory?.length ?? 0) === 0 ? (
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <Spinner size={40} className="text-green-600" />
+              </div>
+            ) : (conversationHistory?.length ?? 0) === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <div className="rounded-full bg-muted p-3 mb-4">
                   <Search className="h-6 w-6 text-muted-foreground" />
@@ -795,10 +800,10 @@ export default function ConversationsPage() {
             ) : (
               uniqueConversations.map((conversation) => (
                 <div
+                  key={conversation._id}
                   className={conversation.unread ? "font-bold" : "font-light"}
                 >
                   <ConversationItem
-                    key={conversation._id}
                     conversation={conversation}
                     isActive={selectedContact?._id === conversation._id}
                     onSelect={() =>
@@ -825,7 +830,6 @@ export default function ConversationsPage() {
           </TabsContent>
         </Tabs>
       </div>
-      
 
       {/* Chat Area */}
       <div className="flex flex-1 flex-col">
@@ -959,79 +963,90 @@ export default function ConversationsPage() {
             </div>
 
             {selectedContact && isMobile && (
-  <div className="flex flex-1 flex-col">
-    <div className="flex h-14 items-center justify-between border-b px-4">
-      <div className="flex items-center gap-2">
-        <Avatar>
-          <AvatarImage src={selectedContact.avatar} />
-          <AvatarFallback>{selectedContact.initials}</AvatarFallback>
-        </Avatar>
-        <div>
-          <h3 className="font-medium">{selectedContact.name}</h3>
-          <p className="text-xs text-muted-foreground">
-            {selectedContact.status === "Active" ? "Online" : "Offline"}
-          </p>
-        </div>
-      </div>
-      <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon">
-          <Search className="h-4 w-4" />
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Conversation Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => handleMuteConversation(selectedContact)}
-            >
-              {selectedContact.muted ? (
-                <>
-                  <Bell className="mr-2 h-4 w-4" />
-                  <span>Unmute Notifications</span>
-                </>
-              ) : (
-                <>
-                  <BellOff className="mr-2 h-4 w-4" />
-                  <span>Mute Notifications</span>
-                </>
-              )}
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <UserPlus className="mr-2 h-4 w-4" />
-              <span>Add to Contacts</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Tag className="mr-2 h-4 w-4" />
-              <span>Manage Tags</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => handleArchiveConversation(selectedContact)}
-            >
-              <Archive className="mr-2 h-4 w-4" />
-              <span>
-                {selectedContact.archived ? "Unarchive" : "Archive"}
-              </span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
-              onClick={() => handleDeleteConversation(selectedContact)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              <span>Delete Conversation</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
-  </div>
-)}
-
+              <div className="flex flex-1 flex-col">
+                <div className="flex h-14 items-center justify-between border-b px-4">
+                  <div className="flex items-center gap-2">
+                    <Avatar>
+                      <AvatarImage src={selectedContact.avatar} />
+                      <AvatarFallback>
+                        {selectedContact.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium">{selectedContact.name}</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {selectedContact.status === "Active"
+                          ? "Online"
+                          : "Offline"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon">
+                      <Search className="h-4 w-4" />
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>
+                          Conversation Actions
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleMuteConversation(selectedContact)
+                          }
+                        >
+                          {selectedContact.muted ? (
+                            <>
+                              <Bell className="mr-2 h-4 w-4" />
+                              <span>Unmute Notifications</span>
+                            </>
+                          ) : (
+                            <>
+                              <BellOff className="mr-2 h-4 w-4" />
+                              <span>Mute Notifications</span>
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          <span>Add to Contacts</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Tag className="mr-2 h-4 w-4" />
+                          <span>Manage Tags</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleArchiveConversation(selectedContact)
+                          }
+                        >
+                          <Archive className="mr-2 h-4 w-4" />
+                          <span>
+                            {selectedContact.archived ? "Unarchive" : "Archive"}
+                          </span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() =>
+                            handleDeleteConversation(selectedContact)
+                          }
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          <span>Delete Conversation</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="border-t p-4">
               <div className="flex items-center gap-2">
@@ -1151,15 +1166,14 @@ export default function ConversationsPage() {
 
       {/* New Chat Dialog */}
       <NewChatDialog
-  open={newChatDialogOpen}
-  onOpenChange={setNewChatDialogOpen}
-  phone={newChatPhone}
-  onPhoneChange={setNewChatPhone}
-  message={newChatMessage}
-  onMessageChange={setNewChatMessage}
-  onSubmit={handleStartNewChat}
-/>
-
+        open={newChatDialogOpen}
+        onOpenChange={setNewChatDialogOpen}
+        phone={newChatPhone}
+        onPhoneChange={setNewChatPhone}
+        message={newChatMessage}
+        onMessageChange={setNewChatMessage}
+        onSubmit={handleStartNewChat}
+      />
     </div>
   );
 }
