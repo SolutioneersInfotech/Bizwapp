@@ -1,72 +1,82 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
-import { useAuth } from "@/contexts/AuthContext"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Loader2, AlertCircle, Github, Linkedin, Facebook } from "lucide-react"
-import { FcGoogle } from "react-icons/fc"
-import usePostData from "@/hooks/api/usePostData"
-import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, AlertCircle, Github, Linkedin, Facebook } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import usePostData from "@/hooks/api/usePostData";
+import { useToast } from "@/hooks/use-toast";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { login, isLoading } = useAuth()
-  const [ formData , setFormData] = useState({
-    identifier:"",
-    password:""
-  })
-  const [rememberMe, setRememberMe] = useState(false)
-  const [error, setError] = useState("")
+  const router = useRouter();
+  const { login, isLoading } = useAuth();
+  const [formData, setFormData] = useState({
+    identifier: "",
+    password: "",
+  });
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
 
- const handleChange = (e)=>{
-  const { name , value }= e.target;
-  setFormData((prevdata)=>({
-    ...prevdata,
-    [name]:value
-  }))
- }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevdata) => ({
+      ...prevdata,
+      [name]: value,
+    }));
+  };
 
-  const { mutate, isError, data } = usePostData("https://api.bizwapp.com/api/auth/login");
+  const { mutate, isError, data } = usePostData(
+    "https://api.bizwapp.com/api/auth/login"
+  );
 
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const { identifier, password } = formData
+    e.preventDefault();
+    const { identifier, password } = formData;
 
-  // Basic validation
-  if (!identifier || !password) {
-    setError("Email/Phone and password are required")
-    return
-  }
+    // Basic validation
+    if (!identifier || !password) {
+      setError("Email/Phone and password are required");
+      return;
+    }
 
-  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)
-  const isPhone = /^[0-9]{10}$/.test(identifier)
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    const isPhone = /^[0-9]{10}$/.test(identifier);
 
-  if (!isEmail && !isPhone) {
-    setError("Please enter a valid email or 10-digit phone number")
-    return
-  }
+    if (!isEmail && !isPhone) {
+      setError("Please enter a valid email or 10-digit phone number");
+      return;
+    }
 
-  setError("");
+    setError("");
     console.log("mutate function:", mutate);
-    mutate(formData, {
+    mutate({...formData , rememberMe } , {
       onSuccess: (data) => {
         toast({
           title: "Success",
           description: data.message,
-        })
+        });
         setTimeout(() => {
           router.push("/dashboard"); // or wherever
         }, 500);
@@ -80,41 +90,49 @@ export default function LoginPage() {
         console.error("Error:", error.message);
       },
     });
-    setError("")
+    setError("");
 
     if (!formData.identifier || !formData.password) {
-      setError("Email/Phone and password are required")
-      return
+      setError("Email/Phone and password are required");
+      return;
     }
-  }
+  };
+
+  // const handleSocialLogin = async (provider: string) => {
+  //   try {
+  //     // In a real app, this would redirect to the OAuth flow
+  //     console.log(`Logging in with ${provider}`)
+
+  //     // For demo purposes, we'll just log in with demo credentials
+  //     await login({
+  //       phoneNumberId: "606836342508871",
+  //       whatsappBusinessAccountId: "28995967470047562",
+  //       accessToken: "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6",
+  //     })
+  //     router.push("/dashboard")
+  //   } catch (err) {
+  //     setError(`${provider} login failed. Please try again.`)
+  //   }
+  // }
 
   const handleSocialLogin = async (provider: string) => {
     try {
-      // In a real app, this would redirect to the OAuth flow
-      console.log(`Logging in with ${provider}`)
-
-      // For demo purposes, we'll just log in with demo credentials
-      await login({
-        phoneNumberId: "606836342508871",
-        whatsappBusinessAccountId: "28995967470047562",
-        accessToken: "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6",
-      })
-      router.push("/dashboard")
+      await signIn(provider.toLowerCase(), { callbackUrl: "/dashboard" });
     } catch (err) {
-      setError(`${provider} login failed. Please try again.`)
+      setError(`${provider} login failed. Please try again.`);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted p-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
-            <Image
-              src="/BIZWAPP.png"
-              alt="Biz Wapp Logo"
-              width={64}
-              height={64}
-            />
+          <Image
+            src="/BIZWAPP.png"
+            alt="Biz Wapp Logo"
+            width={64}
+            height={64}
+          />
           <h1 className="text-3xl font-bold">BizWApp Messaging</h1>
           <p className="text-muted-foreground mt-2">Sign in to your account</p>
         </div>
@@ -122,7 +140,9 @@ export default function LoginPage() {
         <Card>
           <CardHeader>
             <CardTitle>Login</CardTitle>
-            <CardDescription>Enter your credentials to access your account</CardDescription>
+            <CardDescription>
+              Enter your credentials to access your account
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
@@ -149,7 +169,10 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-primary hover:underline"
+                  >
                     Forgot password?
                   </Link>
                 </div>
@@ -167,7 +190,9 @@ export default function LoginPage() {
                 <Checkbox
                   id="remember-me"
                   checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setRememberMe(checked as boolean)
+                  }
                 />
                 <label
                   htmlFor="remember-me"
@@ -195,24 +220,42 @@ export default function LoginPage() {
                   <Separator className="w-full" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                  <span className="bg-card px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
                 </div>
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-3">
-                <Button variant="outline" onClick={() => handleSocialLogin("Google")} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={() => handleSocialLogin("google")}
+                  className="w-full"
+                >
                   <FcGoogle className="mr-2 h-4 w-4" />
                   Google
                 </Button>
-                <Button variant="outline" onClick={() => handleSocialLogin("Facebook")} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={() => handleSocialLogin("facebook")}
+                  className="w-full"
+                >
                   <Facebook className="mr-2 h-4 w-4 text-blue-600" />
                   Facebook
                 </Button>
-                <Button variant="outline" onClick={() => handleSocialLogin("GitHub")} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={() => handleSocialLogin("github")}
+                  className="w-full"
+                >
                   <Github className="mr-2 h-4 w-4" />
                   GitHub
                 </Button>
-                <Button variant="outline" onClick={() => handleSocialLogin("LinkedIn")} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={() => handleSocialLogin("linkedin")}
+                  className="w-full"
+                >
                   <Linkedin className="mr-2 h-4 w-4 text-blue-700" />
                   LinkedIn
                 </Button>
@@ -230,6 +273,5 @@ export default function LoginPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

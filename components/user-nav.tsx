@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { LogOut, Settings, User } from "lucide-react"
 import { useEffect, useState } from "react"
+import ProfileAvatar from "./profileAvatar"
 
 export function UserNav() {
   const [user, setUser]= useState({
@@ -48,11 +49,12 @@ export function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <div className="relative h-8 w-8 rounded-full bg-primary/10">
-            <span className="absolute inset-0 flex items-center justify-center text-sm font-medium text-primary">
+          {/* <div className="relative h-8 w-8 rounded-full bg-primary/10"> */}
+            {/* <span className="absolute inset-0 flex items-center justify-center text-sm font-medium text-primary">
               {initials}
-            </span>
-          </div>
+            </span> */}
+            <ProfileAvatar/>
+          {/* </div> */}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>

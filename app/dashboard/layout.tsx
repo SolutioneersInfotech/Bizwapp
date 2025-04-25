@@ -10,6 +10,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useAuth } from "@/contexts/AuthContext"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { UserNav } from "@/components/user-nav"
+import ProfileAvatar from "@/components/profileAvatar"
 
 export default function DashboardLayout({
   children,
@@ -53,6 +54,7 @@ export default function DashboardLayout({
                 </div>
                 <ThemeToggle />
                 <UserNav />
+                {/* <ProfileAvatar /> */}
               </div>
             </div>
           </header>

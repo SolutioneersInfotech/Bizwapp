@@ -83,7 +83,6 @@ export default function ClientLayout({
 }) {
   const pathname = usePathname(); 
   const showSidebar = !["/", "/signup", "/login"].includes(pathname);
-  console.log("check")
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
   
