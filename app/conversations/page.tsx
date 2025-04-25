@@ -303,6 +303,16 @@ export default function ConversationsPage() {
   const handleSendMessage = async () => {
     if (!selectedContact || !newMessage.trim()) return;
 
+    const messageToSend = {
+      text: newMessage,
+      sender: "user", // or however you identify the sender
+      timestamp: new Date().toISOString(),
+    };
+  
+    // Optimistically update UI
+    setConversationHistory((prev) => [...prev, messageToSend]);
+    setNewMessage("");
+
     console.log("we are inside handleSendMessage");
     mutate({
       contacts: [
