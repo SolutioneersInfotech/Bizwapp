@@ -66,6 +66,7 @@ import useMessageHistory from "../../hooks/api/getMessageHistory";
 import useUpdateUnread from "../../hooks/api/updateUnreadStatus";
 import useGetAllConversation from "../../hooks/api/getAllConversation";
 import { io, Socket } from "socket.io-client";
+import NewChatDialog from "../../components/newChat";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -1149,50 +1150,16 @@ export default function ConversationsPage() {
       </div>
 
       {/* New Chat Dialog */}
-      <Dialog open={newChatDialogOpen} onOpenChange={setNewChatDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Start New Chat</DialogTitle>
-            <DialogDescription>
-              Enter a phone number to start a new conversation
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                placeholder="Enter phone number with country code"
-                value={newChatPhone}
-                onChange={(e) => setNewChatPhone(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Include country code, e.g., +1234567890
-              </p>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="initial-message">
-                Initial Message (Optional)
-              </Label>
-              <Textarea
-                id="initial-message"
-                placeholder="Type your first message..."
-                value={newChatMessage}
-                onChange={(e) => setNewChatMessage(e.target.value)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setNewChatDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleStartNewChat}>Start Chat</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <NewChatDialog
+  open={newChatDialogOpen}
+  onOpenChange={setNewChatDialogOpen}
+  phone={newChatPhone}
+  onPhoneChange={setNewChatPhone}
+  message={newChatMessage}
+  onMessageChange={setNewChatMessage}
+  onSubmit={handleStartNewChat}
+/>
+
     </div>
   );
 }

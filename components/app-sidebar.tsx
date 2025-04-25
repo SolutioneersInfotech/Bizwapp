@@ -35,6 +35,9 @@ import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import ContactForm from "./ui/contactForm";
 import { useState } from "react";
 import usePostData from "@/hooks/api/usePostData";
+import NewChatDialog from "../components/newChat";
+import CreateTemplateModal from "@/app/templates/create-template-modal";
+import { toast } from "react-toastify";
 
 // Menu items
 const mainMenuItems = [
@@ -76,6 +79,11 @@ export function AppSidebar() {
   // const { state } = useSidebar()
   const pathname = usePathname(); // Get current route
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newChatDialogOpen, setNewChatDialogOpen] = useState(false);
+  const [newChatPhone, setNewChatPhone] = useState("");
+  const [newChatMessage, setNewChatMessage] = useState("");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
 
   const [newContact, setNewContact] = useState({
     name: "",
@@ -110,8 +118,69 @@ export function AppSidebar() {
     // You can add additional logic to save contact here
   };
 
-  const addContactClick = () => {};
+  const handleStartNewChat = () => {
+    console.log("New chat with", newChatPhone, newChatMessage);
+    setNewChatDialogOpen(false);
+  };
+  
+  const handleCreateTemplate = async () => {
+  
 
+  //   try {
+  //     await createTemplate({
+  //       name: templateName,
+  //       category: templateCategory,
+  //       content: templateContent,
+  //       status: "Pending",
+  //       updated: new Date().toISOString(),
+  //       usageCount: 0,
+  //     })
+
+      
+
+  //     // Reset form
+  //     setTemplateName("")
+  //     setTemplateCategory("")
+  //     setTemplateContent("")
+  //     setNewTemplateOpen(false)
+  //   } catch (error) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to create template",
+  //       variant: "destructive",
+  //     })
+  //   }
+  }
+
+  const handleEditTemplate = async () => {
+    if (!editingTemplate) return
+
+    
+
+    try {
+      await updateTemplate(editingTemplate.id, {
+        name: templateName,
+        category: templateCategory,
+        content: templateContent,
+        updated: new Date().toISOString(),
+      })
+
+      toast({
+        title: "Template Updated",
+        description: "Your template has been updated successfully",
+      })
+
+      // Reset form
+      setEditTemplateOpen(false)
+      setEditingTemplate(null)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update template",
+        variant: "destructive",
+      })
+    }
+  }
   return (
     <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader className="flex flex-col gap-4  ">
@@ -183,14 +252,29 @@ export function AppSidebar() {
           <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
           <SidebarGroupContent>
             <div className="grid grid-cols-1 gap-2">
-              <Button className="justify-start gap-2" variant="outline">
+              <Button className="justify-start gap-2" variant="outline" onClick={() => setNewChatDialogOpen(true)}>
                 <Plus className="h-4 w-4" />
                 <span>New Chat</span>
               </Button>
-              <Button className="justify-start gap-2" variant="outline">
+              <NewChatDialog
+      open={newChatDialogOpen}
+      onOpenChange={setNewChatDialogOpen}
+      phone={newChatPhone}
+      onPhoneChange={setNewChatPhone}
+      message={newChatMessage}
+      onMessageChange={setNewChatMessage}
+      onSubmit={handleStartNewChat}
+    />
+
+              <Button className="justify-start gap-2" variant="outline" onClick={() => setIsCreateModalOpen(true)}>
                 <Plus className="h-4 w-4" />
                 <span>New Template</span>
               </Button>
+              <CreateTemplateModal
+              open={isCreateModalOpen}
+              onOpenChange={setIsCreateModalOpen}
+              onSubmit={handleCreateTemplate}
+            />
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="justify-start gap-2" variant="outline">

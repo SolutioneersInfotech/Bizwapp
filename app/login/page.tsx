@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -36,6 +37,7 @@ export default function LoginPage() {
   });
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,25 +73,28 @@ export default function LoginPage() {
 
     setError("");
     console.log("mutate function:", mutate);
-    mutate({...formData , rememberMe } , {
-      onSuccess: (data) => {
-        toast({
-          title: "Success",
-          description: data.message,
-        });
-        setTimeout(() => {
-          router.push("/dashboard"); // or wherever
-        }, 500);
-        console.log("Login Success:", data);
-      },
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message || "Something went wrong!", // ✅ Show error message
-        });
-        console.error("Error:", error.message);
-      },
-    });
+    mutate(
+      { ...formData, rememberMe },
+      {
+        onSuccess: (data) => {
+          toast({
+            title: "Success",
+            description: data.message,
+          });
+          setTimeout(() => {
+            router.push("/dashboard"); // or wherever
+          }, 500);
+          console.log("Login Success:", data);
+        },
+        onError: (error) => {
+          toast({
+            title: "Error",
+            description: error.message || "Something went wrong!", // ✅ Show error message
+          });
+          console.error("Error:", error.message);
+        },
+      }
+    );
     setError("");
 
     if (!formData.identifier || !formData.password) {
@@ -97,23 +102,6 @@ export default function LoginPage() {
       return;
     }
   };
-
-  // const handleSocialLogin = async (provider: string) => {
-  //   try {
-  //     // In a real app, this would redirect to the OAuth flow
-  //     console.log(`Logging in with ${provider}`)
-
-  //     // For demo purposes, we'll just log in with demo credentials
-  //     await login({
-  //       phoneNumberId: "606836342508871",
-  //       whatsappBusinessAccountId: "28995967470047562",
-  //       accessToken: "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6",
-  //     })
-  //     router.push("/dashboard")
-  //   } catch (err) {
-  //     setError(`${provider} login failed. Please try again.`)
-  //   }
-  // }
 
   const handleSocialLogin = async (provider: string) => {
     try {
@@ -176,14 +164,29 @@ export default function LoginPage() {
                     Forgot password?
                   </Link>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center space-x-2">

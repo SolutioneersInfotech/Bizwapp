@@ -34,7 +34,6 @@ export default NextAuth({
         // Assuming the "rememberMe" value is passed from the login page
         const rememberMe = user?.rememberMe ?? false; // You may need to pass this when signing in
         token.maxAge = rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 days if rememberMe is true, else 1 day
-        console.log('JWT Token:', token);
       }
       return token;
     },
@@ -42,7 +41,6 @@ export default NextAuth({
       console.log('Session Callback Triggered');
       // Extend the session expiration based on JWT token's maxAge
       session.expires = new Date(Date.now() + (token.maxAge * 1000)); // Set the session expiration time
-      console.log('Session:', session);
       return session;
     },
   },

@@ -12,7 +12,7 @@ const fetchMessageHistory = async ({ queryKey }) => {
 
   if (!response.ok) {
     throw new Error("Failed to fetch message history");
-  }
+  } 
 
   return response.json();
 };

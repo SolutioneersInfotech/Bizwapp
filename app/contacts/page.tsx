@@ -56,9 +56,10 @@ import { useToast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
 import usePostData from "@/hooks/api/usePostData";
 import useGetContacts from "../../hooks/api/useGetContact";
-import useUpdateContact from "../../hooks/api/usePutData"
+import useUpdateContact from "../../hooks/api/usePutData";
 import ContactForm from "@/components/ui/contactForm";
 import { DialogPortal } from "@radix-ui/react-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ContactsPage() {
   const { toast } = useToast();
@@ -127,13 +128,19 @@ export default function ContactsPage() {
   // Import dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importedContacts, setImportedContacts] = useState([]);
-  const [selectedContact, setSelectedContact] = useState({ name: "", phone: "", email: "" }); // State for selected contact
+  const [selectedContact, setSelectedContact] = useState({
+    name: "",
+    phone: "",
+    email: "",
+  }); // State for selected contact
   const [isEditing, setIsEditing] = useState(false); // State for edit mode
   const fileInputRef = useRef(null);
-  const [contactData, setContactData] = useState({ name: "", phone: "", email: "" });
-  const [ updatingContactId , setUpdatingContactId ] = useState("")
-
-  
+  const [contactData, setContactData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+  });
+  const [updatingContactId, setUpdatingContactId] = useState("");
 
   // Add contact dialog state
   const [addContactDialogOpen, setAddContactDialogOpen] = useState(false);
@@ -149,8 +156,7 @@ export default function ContactsPage() {
     error,
   } = useGetContacts("https://api.bizwapp.com/api/auth/getContacts");
 
-
-  const updateContactMutation  = useUpdateContact()
+  const updateContactMutation = useUpdateContact();
 
   // Filter contacts based on search query and active tab
   const filterContacts = () => {
@@ -223,9 +229,9 @@ export default function ContactsPage() {
             row.mobile ||
             row.Mobile ||
             "";
-            const emailRaw = row.email || row.Email || row.EMAIL || "";
-            const email = emailRaw.trim() !== "" ? emailRaw.trim() : null;
-            
+          const emailRaw = row.email || row.Email || row.EMAIL || "";
+          const email = emailRaw.trim() !== "" ? emailRaw.trim() : null;
+
           // Generate initials from name
           const initials = name
             .split(" ")
@@ -324,12 +330,12 @@ export default function ContactsPage() {
   };
 
   const handleEdit = (contact) => {
-    console.log("contact", contact)
-    const { _id , name , phone , email } = contact;
-    setUpdatingContactId(_id)
-    const updateData = { name , phone , email }
+    console.log("contact", contact);
+    const { _id, name, phone, email } = contact;
+    setUpdatingContactId(_id);
+    const updateData = { name, phone, email };
     setSelectedContact(updateData);
-    setIsDialogOpen(true); 
+    setIsDialogOpen(true);
   };
 
   // Handle export
@@ -423,54 +429,57 @@ export default function ContactsPage() {
   };
 
   // const [newContact, setNewContact] = useState({ name: "", phone: "", email: "" });
-const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setNewContact({ ...newContact, [e.target.name]: e.target.value });
-};
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewContact({ ...newContact, [e.target.name]: e.target.value });
+  };
 
-const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  
-};
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  };
 
-// Handle form submission
-const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  // Handle saving the contact data here
-  console.log("Saving contact:", contactData);
-  console.log("updatingContactId", updatingContactId)
-  console.log("contactData dddd", contactData)
-  updateContactMutation.mutate(
-    { 
-      id: updatingContactId, // Pass ID correctly
-      updatedData: selectedContact, // Pass updated data
-    },
-    {
-      onSuccess: () => {
-        console.log("Contact updated successfully!");
+  // Handle form submission
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Handle saving the contact data here
+    console.log("Saving contact:", contactData);
+    console.log("updatingContactId", updatingContactId);
+    console.log("contactData dddd", contactData);
+    updateContactMutation.mutate(
+      {
+        id: updatingContactId, // Pass ID correctly
+        updatedData: selectedContact, // Pass updated data
       },
-      onError: (error) => {
-        console.error("Error updating contact:", error);
-      },
-    }
-  );
-  setIsDialogOpen(false); // Close dialog after saving
-};
+      {
+        onSuccess: () => {
+          console.log("Contact updated successfully!");
+        },
+        onError: (error) => {
+          console.error("Error updating contact:", error);
+        },
+      }
+    );
+    setIsDialogOpen(false); // Close dialog after saving
+  };
 
-// Handle input change
-const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = e.target;
-  console.log("name", name)
-  console.log("value",value)
-  setContactData((prev) => ({ ...prev, [name]: value }));
-  setSelectedContact((prev) => ({ ...prev, [name]: value }));
-};
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    console.log("name", name);
+    console.log("value", value);
+    setContactData((prev) => ({ ...prev, [name]: value }));
+    setSelectedContact((prev) => ({ ...prev, [name]: value }));
+  };
 
-// Handle closing the dialog
-const handleCloseDialog = () => {
-  setIsDialogOpen(false);
-};
+  // Handle closing the dialog
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  console.log("Loading:", loading);
+  console.log("Error:", error);
+  console.log("Data:", getContacts);
 
   return (
     <div className="flex flex-col">
@@ -608,12 +617,12 @@ const handleCloseDialog = () => {
                 </Button>
               </DialogTrigger>
               <ContactForm
-              title="Create Contact"
-              description="Fill in the details below."
-              contactData={newContact}
-              onChange={handleChange}
-              onSubmit={handleSubmit}
-              onClose={() => setIsDialogOpen(false)}
+                title="Create Contact"
+                description="Fill in the details below."
+                contactData={newContact}
+                onChange={handleChange}
+                onSubmit={handleSubmit}
+                onClose={() => setIsDialogOpen(false)}
               />
             </Dialog>
           </div>
@@ -669,8 +678,16 @@ const handleCloseDialog = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {getContacts?.contacts?.length === 0 ? (
-                      <TableRow >
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center">
+                          <div className="flex justify-center w-full">
+                            <Spinner size={40} className="text-green-600" />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ) : getContacts?.contacts?.length === 0 ? (
+                      <TableRow>
                         <TableCell colSpan={6} className="h-24 text-center">
                           No contacts found.
                         </TableCell>
@@ -742,7 +759,9 @@ const handleCloseDialog = () => {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem onClick={() => handleEdit(contact)}>
+                                  <DropdownMenuItem
+                                    onClick={() => handleEdit(contact)}
+                                  >
                                     <Edit className="mr-2 h-4 w-4" />
                                     <span>Edit</span>
                                   </DropdownMenuItem>
@@ -770,17 +789,17 @@ const handleCloseDialog = () => {
                 </Table>
 
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogPortal>
-          <ContactForm
-            title="Edit Contact"
-            description="Update the contact details below."
-            contactData={selectedContact}
-            onChange={handleInputChange}
-            onSubmit={handleFormSubmit}
-            onClose={handleCloseDialog}
-          />
-        </DialogPortal>
-      </Dialog>
+                  <DialogPortal>
+                    <ContactForm
+                      title="Edit Contact"
+                      description="Update the contact details below."
+                      contactData={selectedContact}
+                      onChange={handleInputChange}
+                      onSubmit={handleFormSubmit}
+                      onClose={handleCloseDialog}
+                    />
+                  </DialogPortal>
+                </Dialog>
               </CardContent>
             </Card>
           </TabsContent>

@@ -15,12 +15,14 @@ interface TemplateData {
 
 
   const useSendTemplateMutation = () => {
+    const accessToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN ?? "";
+
     return useMutation({
       mutationFn: async (jsonInput: TemplateData) => {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.ACCESS_TOKEN}`,
+          "Authorization": `Bearer ${accessToken}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify(JSON.parse(jsonInput))
