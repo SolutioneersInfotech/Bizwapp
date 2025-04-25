@@ -31,7 +31,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import  CreateTemplateModal  from "../templates/create-template-modal"
 import { useWhatsAppTemplates} from '../../hooks/api/getTemplate.js';
-import { Spinner } from "../../../Bizwapp/components/ui/spinner";
+import { Spinner } from "../../components/ui/spinner";
 
 
 
