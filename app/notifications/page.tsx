@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Search,
   Bell,
@@ -19,7 +25,7 @@ import {
   Trash2,
   Clock,
   Filter,
-} from "lucide-react"
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,8 +33,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -36,166 +42,182 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Define notification types
-type NotificationType = "message" | "system" | "alert" | "info"
+type NotificationType = "message" | "system" | "alert" | "info";
 
 interface Notification {
-  id: string
-  type: NotificationType
-  title: string
-  message: string
-  timestamp: string
-  read: boolean
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
   sender?: {
-    name: string
-    avatar: string
-    initials: string
-  }
-  actionUrl?: string
+    name: string;
+    avatar: string;
+    initials: string;
+  };
+  actionUrl?: string;
 }
 
 export default function NotificationsPage() {
-  const { toast } = useToast()
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [filteredNotifications, setFilteredNotifications] = useState<Notification[]>([])
-  const [activeTab, setActiveTab] = useState("all")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
-  const [notificationDetailsOpen, setNotificationDetailsOpen] = useState(false)
-  const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
+  const { toast } = useToast();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [filteredNotifications, setFilteredNotifications] = useState<
+    Notification[]
+  >([]);
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedNotification, setSelectedNotification] =
+    useState<Notification | null>(null);
+  const [notificationDetailsOpen, setNotificationDetailsOpen] = useState(false);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   // Load mock notifications on mount
   useEffect(() => {
-    setNotifications(mockNotifications)
-    setFilteredNotifications(mockNotifications)
-  }, [])
+    setNotifications(mockNotifications);
+    setFilteredNotifications(mockNotifications);
+  }, []);
 
   // Filter notifications based on active tab and search query
   useEffect(() => {
-    let filtered = [...notifications]
+    let filtered = [...notifications];
 
     // Filter by tab
     if (activeTab === "unread") {
-      filtered = filtered.filter((notification) => !notification.read)
+      filtered = filtered.filter((notification) => !notification.read);
     } else if (activeTab === "messages") {
-      filtered = filtered.filter((notification) => notification.type === "message")
+      filtered = filtered.filter(
+        (notification) => notification.type === "message"
+      );
     } else if (activeTab === "system") {
       filtered = filtered.filter(
         (notification) =>
-          notification.type === "system" || notification.type === "alert" || notification.type === "info",
-      )
+          notification.type === "system" ||
+          notification.type === "alert" ||
+          notification.type === "info"
+      );
     }
 
     // Filter by search query
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (notification) =>
-          notification.title.toLowerCase().includes(query) || notification.message.toLowerCase().includes(query),
-      )
+          notification.title.toLowerCase().includes(query) ||
+          notification.message.toLowerCase().includes(query)
+      );
     }
 
-    setFilteredNotifications(filtered)
-  }, [notifications, activeTab, searchQuery])
+    setFilteredNotifications(filtered);
+  }, [notifications, activeTab, searchQuery]);
 
   // Handle marking a notification as read
   const handleMarkAsRead = (id: string) => {
     setNotifications((prev) =>
-      prev.map((notification) => (notification.id === id ? { ...notification, read: true } : notification)),
-    )
+      prev.map((notification) =>
+        notification.id === id ? { ...notification, read: true } : notification
+      )
+    );
 
     toast({
       title: "Notification marked as read",
       description: "The notification has been marked as read.",
-    })
-  }
+    });
+  };
 
   // Handle marking all notifications as read
   const handleMarkAllAsRead = () => {
-    setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })))
+    setNotifications((prev) =>
+      prev.map((notification) => ({ ...notification, read: true }))
+    );
 
     toast({
       title: "All notifications marked as read",
       description: "All notifications have been marked as read.",
-    })
-  }
+    });
+  };
 
   // Handle clearing a notification
   const handleClearNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((notification) => notification.id !== id))
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.id !== id)
+    );
 
     toast({
       title: "Notification removed",
       description: "The notification has been removed.",
-    })
-  }
+    });
+  };
 
   // Handle clearing all notifications
   const handleClearAllNotifications = () => {
-    setNotifications([])
-    setClearConfirmOpen(false)
+    setNotifications([]);
+    setClearConfirmOpen(false);
 
     toast({
       title: "All notifications cleared",
       description: "All notifications have been removed.",
-    })
-  }
+    });
+  };
 
   // Handle viewing notification details
   const handleViewDetails = (notification: Notification) => {
-    setSelectedNotification(notification)
-    setNotificationDetailsOpen(true)
+    setSelectedNotification(notification);
+    setNotificationDetailsOpen(true);
 
     // Mark as read when viewed
     if (!notification.read) {
-      handleMarkAsRead(notification.id)
+      handleMarkAsRead(notification.id);
     }
-  }
+  };
 
   // Get icon based on notification type
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case "message":
-        return <MessageSquare className="h-5 w-5 text-blue-500" />
+        return <MessageSquare className="h-5 w-5 text-blue-500" />;
       case "system":
-        return <Settings className="h-5 w-5 text-purple-500" />
+        return <Settings className="h-5 w-5 text-purple-500" />;
       case "alert":
-        return <AlertCircle className="h-5 w-5 text-red-500" />
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
       case "info":
-        return <Info className="h-5 w-5 text-green-500" />
+        return <Info className="h-5 w-5 text-green-500" />;
       default:
-        return <Bell className="h-5 w-5 text-gray-500" />
+        return <Bell className="h-5 w-5 text-gray-500" />;
     }
-  }
+  };
 
   // Format relative time
   const formatRelativeTime = (timestamp: string) => {
-    const now = new Date()
-    const notificationTime = new Date(timestamp)
-    const diffInSeconds = Math.floor((now.getTime() - notificationTime.getTime()) / 1000)
+    const now = new Date();
+    const notificationTime = new Date(timestamp);
+    const diffInSeconds = Math.floor(
+      (now.getTime() - notificationTime.getTime()) / 1000
+    );
 
     if (diffInSeconds < 60) {
-      return "Just now"
+      return "Just now";
     } else if (diffInSeconds < 3600) {
-      const minutes = Math.floor(diffInSeconds / 60)
-      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
     } else if (diffInSeconds < 86400) {
-      const hours = Math.floor(diffInSeconds / 3600)
-      return `${hours} hour${hours > 1 ? "s" : ""} ago`
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
     } else {
-      const days = Math.floor(diffInSeconds / 86400)
-      return `${days} day${days > 1 ? "s" : ""} ago`
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days > 1 ? "s" : ""} ago`;
     }
-  }
+  };
 
   return (
     <div className="flex flex-col">
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">Notifications</h2>
+      <div className="flex-1 space-y-4 p-4 pt-4 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 className="text-3xl font-bold tracking-tight pl-6">Notifications</h2>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -236,12 +258,20 @@ export default function NotificationsPage() {
           </Button>
         </div>
 
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList>
+        <Tabs
+          defaultValue="all"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4 w-full"
+        >
+          {/* Tabs List */}
+          <TabsList className="flex flex-wrap justify-start gap-2 sm:gap-4">
             <TabsTrigger value="all" className="relative">
               All
               {notifications.length > 0 && (
-                <Badge className="ml-2 bg-primary text-primary-foreground">{notifications.length}</Badge>
+                <Badge className="ml-2 bg-primary text-primary-foreground">
+                  {notifications.length}
+                </Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="unread" className="relative">
@@ -256,19 +286,20 @@ export default function NotificationsPage() {
             <TabsTrigger value="system">System</TabsTrigger>
           </TabsList>
 
+          {/* Tabs Content */}
           <TabsContent value={activeTab} className="space-y-4">
-            <Card>
+            <Card className="w-full">
               <CardHeader className="p-4">
-                <CardTitle>
+                <CardTitle className="text-lg sm:text-2xl">
                   {activeTab === "all"
                     ? "All Notifications"
                     : activeTab === "unread"
-                      ? "Unread Notifications"
-                      : activeTab === "messages"
-                        ? "Message Notifications"
-                        : "System Notifications"}
+                    ? "Unread Notifications"
+                    : activeTab === "messages"
+                    ? "Message Notifications"
+                    : "System Notifications"}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm sm:text-base">
                   {filteredNotifications.length === 0
                     ? "No notifications to display."
                     : `Showing ${filteredNotifications.length} notification${
@@ -276,6 +307,7 @@ export default function NotificationsPage() {
                       }.`}
                 </CardDescription>
               </CardHeader>
+
               <CardContent className="p-0">
                 {filteredNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-8 text-center">
@@ -294,16 +326,25 @@ export default function NotificationsPage() {
                     {filteredNotifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`flex items-start gap-4 p-4 hover:bg-muted/50 cursor-pointer transition-colors ${
+                        className={`flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 p-4 hover:bg-muted/50 cursor-pointer transition-colors ${
                           !notification.read ? "bg-muted/20" : ""
                         }`}
                         onClick={() => handleViewDetails(notification)}
                       >
+                        {/* Left Avatar/Icon */}
                         <div className="flex-shrink-0">
-                          {notification.type === "message" && notification.sender ? (
+                          {notification.type === "message" &&
+                          notification.sender ? (
                             <Avatar>
-                              <AvatarImage src={notification.sender.avatar || "/placeholder.svg"} />
-                              <AvatarFallback>{notification.sender.initials}</AvatarFallback>
+                              <AvatarImage
+                                src={
+                                  notification.sender.avatar ||
+                                  "/placeholder.svg"
+                                }
+                              />
+                              <AvatarFallback>
+                                {notification.sender.initials}
+                              </AvatarFallback>
                             </Avatar>
                           ) : (
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
@@ -311,22 +352,41 @@ export default function NotificationsPage() {
                             </div>
                           )}
                         </div>
+
+                        {/* Center Content */}
                         <div className="flex-1 space-y-1 overflow-hidden">
-                          <div className="flex items-center justify-between">
-                            <p className="font-medium truncate">{notification.title}</p>
-                            <div className="flex items-center gap-1">
-                              {!notification.read && <Badge className="bg-primary text-primary-foreground">New</Badge>}
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                            <p className="font-medium truncate">
+                              {notification.title}
+                            </p>
+                            <div className="flex items-center gap-1 mt-2 sm:mt-0">
+                              {!notification.read && (
+                                <Badge className="bg-primary text-primary-foreground">
+                                  New
+                                </Badge>
+                              )}
                               <p className="text-xs text-muted-foreground whitespace-nowrap">
                                 {formatRelativeTime(notification.timestamp)}
                               </p>
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground line-clamp-2">{notification.message}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {notification.message}
+                          </p>
                         </div>
+
+                        {/* Right Dropdown */}
                         <div className="flex-shrink-0">
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <DropdownMenuTrigger
+                              asChild
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -336,8 +396,8 @@ export default function NotificationsPage() {
                               {!notification.read && (
                                 <DropdownMenuItem
                                   onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleMarkAsRead(notification.id)
+                                    e.stopPropagation();
+                                    handleMarkAsRead(notification.id);
                                   }}
                                 >
                                   <Check className="mr-2 h-4 w-4" />
@@ -346,8 +406,8 @@ export default function NotificationsPage() {
                               )}
                               <DropdownMenuItem
                                 onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleClearNotification(notification.id)
+                                  e.stopPropagation();
+                                  handleClearNotification(notification.id);
                                 }}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -367,7 +427,10 @@ export default function NotificationsPage() {
       </div>
 
       {/* Notification Details Dialog */}
-      <Dialog open={notificationDetailsOpen} onOpenChange={setNotificationDetailsOpen}>
+      <Dialog
+        open={notificationDetailsOpen}
+        onOpenChange={setNotificationDetailsOpen}
+      >
         <DialogContent className="sm:max-w-[500px]">
           {selectedNotification && (
             <>
@@ -375,29 +438,47 @@ export default function NotificationsPage() {
                 <DialogTitle>{selectedNotification.title}</DialogTitle>
                 <DialogDescription>
                   {formatRelativeTime(selectedNotification.timestamp)} •{" "}
-                  {selectedNotification.type.charAt(0).toUpperCase() + selectedNotification.type.slice(1)} notification
+                  {selectedNotification.type.charAt(0).toUpperCase() +
+                    selectedNotification.type.slice(1)}{" "}
+                  notification
                 </DialogDescription>
               </DialogHeader>
               <div className="py-4">
-                {selectedNotification.type === "message" && selectedNotification.sender && (
-                  <div className="flex items-center gap-3 mb-4">
-                    <Avatar>
-                      <AvatarImage src={selectedNotification.sender.avatar || "/placeholder.svg"} />
-                      <AvatarFallback>{selectedNotification.sender.initials}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{selectedNotification.sender.name}</p>
-                      <p className="text-sm text-muted-foreground">Sent you a message</p>
+                {selectedNotification.type === "message" &&
+                  selectedNotification.sender && (
+                    <div className="flex items-center gap-3 mb-4">
+                      <Avatar>
+                        <AvatarImage
+                          src={
+                            selectedNotification.sender.avatar ||
+                            "/placeholder.svg"
+                          }
+                        />
+                        <AvatarFallback>
+                          {selectedNotification.sender.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">
+                          {selectedNotification.sender.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Sent you a message
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
                 <ScrollArea className="max-h-[300px]">
                   <div className="space-y-4">
                     <p className="text-sm">{selectedNotification.message}</p>
                     {selectedNotification.actionUrl && (
                       <div className="pt-2">
                         <Button asChild>
-                          <a href={selectedNotification.actionUrl} target="_blank" rel="noopener noreferrer">
+                          <a
+                            href={selectedNotification.actionUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             View Details
                           </a>
                         </Button>
@@ -409,9 +490,16 @@ export default function NotificationsPage() {
               <DialogFooter className="flex justify-between items-center">
                 <div className="flex items-center text-xs text-muted-foreground">
                   <Clock className="mr-1 h-3 w-3" />
-                  <span>{new Date(selectedNotification.timestamp).toLocaleString()}</span>
+                  <span>
+                    {new Date(selectedNotification.timestamp).toLocaleString()}
+                  </span>
                 </div>
-                <Button variant="outline" onClick={() => handleClearNotification(selectedNotification.id)}>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    handleClearNotification(selectedNotification.id)
+                  }
+                >
                   Dismiss
                 </Button>
               </DialogFooter>
@@ -426,11 +514,15 @@ export default function NotificationsPage() {
           <DialogHeader>
             <DialogTitle>Clear All Notifications</DialogTitle>
             <DialogDescription>
-              Are you sure you want to clear all notifications? This action cannot be undone.
+              Are you sure you want to clear all notifications? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setClearConfirmOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setClearConfirmOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleClearAllNotifications}>
@@ -440,7 +532,7 @@ export default function NotificationsPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
 
 // Mock notifications data
@@ -532,4 +624,4 @@ const mockNotifications: Notification[] = [
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
     read: true,
   },
-]
+];

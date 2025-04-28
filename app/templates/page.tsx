@@ -221,9 +221,9 @@ useEffect(() => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
+      <div className="flex-1 space-y-4 p-3 pt-3 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-3xl font-bold tracking-tight">Message Templates</h2>
+          <h2 className="text-3xl font-bold tracking-tight ml-8 md:m-0">Templates</h2>
           
               <Button className="gap-1" onClick={() => setIsCreateModalOpen(true)}>
                 <Plus className="h-4 w-4" />

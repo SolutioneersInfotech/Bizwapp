@@ -186,9 +186,9 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-3 md:py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <h1 className="text-3xl font-bold ml-4 md:m-0">Settings</h1>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">

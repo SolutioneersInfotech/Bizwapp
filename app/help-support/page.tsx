@@ -69,9 +69,9 @@ export default function HelpSupportPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto pb-8 pt-4">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Help & Support</h1>
+        <h1 className="text-3xl font-bold pl-4">Help & Support</h1>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">

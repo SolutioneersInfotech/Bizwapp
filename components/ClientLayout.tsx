@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Menu, Search } from "lucide-react";
+import { Menu, PanelLeft, Search } from "lucide-react";
 import {
   Home,
   MessageSquare,
@@ -167,7 +167,7 @@ export default function ClientLayout({
           </div>
 
           {/* Mobile Sidebar Sheet */}
-          <div className="md:hidden">
+          <div className="md:hidden fixed top-1 left-1 z-50">
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
               <SheetTrigger asChild>
                 <Button
@@ -175,12 +175,12 @@ export default function ClientLayout({
                   size="icon"
                   className="!p-1 !h-8 !w-8 mt-3 mt-[12px]"
                   onClick={() => setIsSidebarOpen(true)}
-                >
-                  <Menu className="w-5 h-5" />
+                > 
+                  <PanelLeft />
                 </Button>
               </SheetTrigger>
 
-              <SheetContent side="left">
+              <SheetContent side="left" className="h-full overflow-y-auto max-h-screen">
                 <SidebarHeader className="flex flex-col gap-4">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
@@ -305,6 +305,30 @@ export default function ClientLayout({
                         </Dialog>
                       </div>
                     </SidebarGroupContent>
+                    <SidebarFooter className="p-4">
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          variant="ghost"
+                          className="justify-start gap-2"
+                          onClick={handleSidebarClose}
+                        >
+                          <Bell className="h-4 w-4" />
+                          <Link href={"/notifications"}>
+                            <span>Notifications</span>
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="justify-start gap-2"
+                          onClick={handleSidebarClose}
+                        >
+                          <HelpCircle className="h-4 w-4" />
+                          <Link href={"/help-support"}>
+                            <span>Help & Support</span>
+                          </Link>
+                        </Button>
+                      </div>
+                    </SidebarFooter>
                   </SidebarGroup>
                 </SidebarContent>
               </SheetContent>

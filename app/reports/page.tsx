@@ -67,9 +67,9 @@ export default function ReportsPage() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
+      <div className="flex-1 space-y-4 p-3 pt-3 md:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-3xl font-bold tracking-tight">Reports & Analytics</h2>
+          <h2 className="text-3xl font-bold tracking-tight ml-8 md:m-0">Reports & Analytics</h2>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="h-8 gap-1" onClick={handleExportData}>
               <Download className="h-3.5 w-3.5" />

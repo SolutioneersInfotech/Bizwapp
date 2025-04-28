@@ -596,8 +596,8 @@ export default function ConversationsPage() {
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
       {/* Conversations List */}
       <div className="w-full border-r md:w-80 lg:w-96">
-        <div className="flex h-14 items-center justify-between border-b px-4">
-          <h2 className="font-semibold">Conversations</h2>
+        <div className="flex h-14 items-center justify-between border-b px-4 mt-1">
+          <h2 className="font-semibold m-8 md:m-0">Conversations</h2>
           <div className="flex items-center gap-2">
             <Dialog open={bulkMessageOpen} onOpenChange={setBulkMessageOpen}>
               <DialogTrigger asChild>
