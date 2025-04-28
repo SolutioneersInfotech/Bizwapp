@@ -30,7 +30,7 @@ import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
@@ -38,6 +38,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [ isLoading , setIsLoading ] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,53 +56,57 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     const { identifier, password } = formData;
-
-    // Basic validation
+  
+    // Basic validation FIRST
     if (!identifier || !password) {
       setError("Email/Phone and password are required");
       return;
     }
-
+  
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
     const isPhone = /^[0-9]{10}$/.test(identifier);
-
+  
     if (!isEmail && !isPhone) {
       setError("Please enter a valid email or 10-digit phone number");
       return;
     }
-
+  
+    setIsLoading(true);
+    console.log("checking.", isLoading)
     setError("");
-    console.log("mutate function:", mutate);
-    mutate(
-      { ...formData, rememberMe },
-      {
-        onSuccess: (data) => {
-          toast({
-            title: "Success",
-            description: data.message,
-          });
-          setTimeout(() => {
-            router.push("/dashboard"); // or wherever
-          }, 500);
-          console.log("Login Success:", data);
-        },
-        onError: (error) => {
-          toast({
-            title: "Error",
-            description: error.message || "Something went wrong!", // ✅ Show error message
-          });
-          console.error("Error:", error.message);
-        },
-      }
-    );
-    setError("");
-
-    if (!formData.identifier || !formData.password) {
-      setError("Email/Phone and password are required");
-      return;
+  
+    try {
+      mutate(
+        { ...formData, rememberMe },
+        {
+          onSuccess: (data) => {
+            toast({
+              title: "Success",
+              description: data.message,
+            });
+            setTimeout(() => {
+              router.push("/dashboard");
+            }, 500);
+            console.log("Login Success:", data);
+          },
+          onError: (error) => {
+            setIsLoading(false);
+            toast({
+              title: "Error",
+              description: error.message || "Something went wrong!",
+            });
+            console.error("Error:", error.message);
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
     }
   };
+  
 
   const handleSocialLogin = async (provider: string) => {
     try {
@@ -110,6 +115,8 @@ export default function LoginPage() {
       setError(`${provider} login failed. Please try again.`);
     }
   };
+
+  console.log("isLoading" , isLoading)
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted p-4">
@@ -206,14 +213,14 @@ export default function LoginPage() {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign in"
-                )}
+              {isLoading ? (
+            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+          ) : (
+            'Login'
+          )}
               </Button>
             </form>
 

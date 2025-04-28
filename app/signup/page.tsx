@@ -39,7 +39,7 @@ export default function SignupPage() {
   const [phoneNumberId, setPhoneNumberId] = useState("")
   const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("")
   const [accessToken, setAccessToken] = useState("")
-  const [isLoading, setIsLoading] = useState(false); // <-- ADD THIS LINE
+  const [isLoading, setIsLoading] = useState(false);
 
 
   const { mutate, isError, data } = usePostData("https://api.bizwapp.com/api/auth/signup");
@@ -99,12 +99,15 @@ if (!strongPasswordRegex.test(formData.password)) {
 
   const {toast} = useToast()
 
-  const handleNextPhase = () => {
+  const handleSigUp = () => {
     setError("");
 
     if (!validatePhase1()) {
       return; // 🛑 Stop execution if validation fails
     }
+
+    setIsLoading(true);
+
     mutate(formData, {
       onSuccess: (data) => {
         toast({
@@ -117,6 +120,7 @@ if (!strongPasswordRegex.test(formData.password)) {
         router.push("/dashboard")
       },
       onError: (error) => {
+        setIsLoading(false);
         toast({
           title: "Error",
           description: error.message || "Something went wrong!",
@@ -292,8 +296,15 @@ if (!strongPasswordRegex.test(formData.password)) {
                   />
                 </div>
 
-                <Button type="button" className="w-full" onClick={handleNextPhase}>
-                  Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                <Button type="button" className="w-full" onClick={handleSigUp}>
+                  { isLoading ? (
+                       <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                     </svg>
+                  ) : (
+                     'Login'
+                  )}
                 </Button>
               </form>
             ) : (
