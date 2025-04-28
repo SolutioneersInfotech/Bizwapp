@@ -68,7 +68,7 @@ export default function ReportsPage() {
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h2 className="text-3xl font-bold tracking-tight">Reports & Analytics</h2>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="h-8 gap-1" onClick={handleExportData}>
@@ -83,8 +83,8 @@ export default function ReportsPage() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <Tabs defaultValue="overview" className="w-full md:w-auto">
-            <TabsList>
+          <Tabs defaultValue="overview" className="w-full md:w-auto mb-8  md:mb-0">
+            <TabsList className="bg-gray-200 grid grid-cols-2 gap-2 md:flex md:space-x-2">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
               <TabsTrigger value="contacts">Contacts</TabsTrigger>

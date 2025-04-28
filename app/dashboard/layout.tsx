@@ -40,8 +40,8 @@ export default function DashboardLayout({
         <div className="flex flex-1 flex-col overflow-hidden">
           <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:px-6">
             <SidebarTrigger />
-            <div className="w-full flex items-center justify-between">
-              <h1 className="text-xl font-semibold">WhatsApp Business</h1>
+            <div className="w-full flex items-center justify-end">
+              {/* <h1 className="text-xl font-semibold">WhatsApp Business</h1> */}
               <div className="flex items-center gap-4">
                 <div className="text-sm text-muted-foreground hidden md:block">
                   {authConfig?.phoneNumberId === "demo_phone_id" ? (

@@ -222,7 +222,7 @@ useEffect(() => {
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h2 className="text-3xl font-bold tracking-tight">Message Templates</h2>
           
               <Button className="gap-1" onClick={() => setIsCreateModalOpen(true)}>
@@ -254,8 +254,8 @@ useEffect(() => {
           </Button>
         </div>
 
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList>
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="space-y-4 mb-4 md:mb-0">
+          <TabsList className="grid grid-cols-2 gap-2 sm:flex sm:space-x-2 ">
             <TabsTrigger value="all">All Templates</TabsTrigger>
             <TabsTrigger value="approved">Approved</TabsTrigger>
             <TabsTrigger value="pending">Pending</TabsTrigger>

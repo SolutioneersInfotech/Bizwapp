@@ -298,13 +298,17 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="p-4">
         <div className="flex flex-col gap-2">
-          <Button variant="ghost" className="justify-start gap-2">
+          <Button variant="ghost" className="justify-start gap-2" >
             <Bell className="h-4 w-4" />
+            <Link href={'/notifications'}>
             <span>Notifications</span>
+            </Link>
           </Button>
           <Button variant="ghost" className="justify-start gap-2">
             <HelpCircle className="h-4 w-4" />
+            <Link href={'/help-support'}>
             <span>Help & Support</span>
+            </Link>
           </Button>
         </div>
       </SidebarFooter>
