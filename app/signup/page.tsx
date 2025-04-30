@@ -197,20 +197,6 @@ if (!strongPasswordRegex.test(formData.password)) {
               {phase === 1 ? "Enter your details to create an account" : "Connect your WhatsApp Business API"}
             </CardDescription>
             <div className="flex items-center justify-between mt-2">
-              {/* <div className="flex items-center">
-                <div
-                  className={`flex items-center justify-center w-8 h-8 rounded-full ${phase >= 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
-                >
-                  {phase > 1 ? <Check className="h-4 w-4" /> : "1"}
-                </div>
-                <div className={`h-1 w-8 ${phase > 1 ? "bg-primary" : "bg-muted"}`}></div>
-                <div
-                  className={`flex items-center justify-center w-8 h-8 rounded-full ${phase >= 2 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
-                >
-                  2
-                </div>
-              </div> */}
-              {/* <div className="text-sm text-muted-foreground">Step {phase} of 2</div> */}
             </div>
           </CardHeader>
           <CardContent>
@@ -310,62 +296,7 @@ if (!strongPasswordRegex.test(formData.password)) {
             ) : (
               // Phase 2: WhatsApp API credentials
               <form onSubmit={handleSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phoneNumberId">Phone Number ID</Label>
-                  <Input
-                    id="phoneNumberId"
-                    type="text"
-                    placeholder="Enter your Phone Number ID"
-                    value={phoneNumberId}
-                    onChange={(e) => setPhoneNumberId(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="whatsappBusinessAccountId">WhatsApp Business Account ID</Label>
-                  <Input
-                    id="whatsappBusinessAccountId"
-                    type="text"
-                    placeholder="Enter your WhatsApp Business Account ID"
-                    value={whatsappBusinessAccountId}
-                    onChange={(e) => setWhatsappBusinessAccountId(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="accessToken">Access Token</Label>
-                  <Input
-                    id="accessToken"
-                    type="password"
-                    placeholder="Enter your Access Token"
-                    value={accessToken}
-                    onChange={(e) => setAccessToken(e.target.value)}
-                  />
-                </div>
-
-                <Alert className="mt-2">
-                  <Info className="h-4 w-4" />
-                  <AlertTitle>Optional</AlertTitle>
-                  <AlertDescription>
-                    You can skip this step and configure your WhatsApp API credentials later.
-                  </AlertDescription>
-                </Alert>
-
-                <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={handlePreviousPhase}>
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                  </Button>
-                  <Button type="submit" className="flex-1" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating Account...
-                      </>
-                    ) : (
-                      "Create Account"
-                    )}
-                  </Button>
-                </div>
+                {/*  */}
               </form>
             )}
 

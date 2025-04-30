@@ -38,7 +38,6 @@ export default NextAuth({
       return token;
     },
     async session({ session, token }) {
-      console.log('Session Callback Triggered');
       // Extend the session expiration based on JWT token's maxAge
       session.expires = new Date(Date.now() + (token.maxAge * 1000)); // Set the session expiration time
       return session;
