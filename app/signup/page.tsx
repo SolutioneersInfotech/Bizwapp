@@ -1,29 +1,46 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 // import { useAuth } from "@/contexts/AuthContext"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
-import { Loader2, AlertCircle, Info, Github, Linkedin, Facebook, ArrowRight, ArrowLeft, Check } from "lucide-react"
-import { FcGoogle } from "react-icons/fc"
-import usePostData from "../../hooks/api/usePostData"
-import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import {
+  Loader2,
+  AlertCircle,
+  Info,
+  Github,
+  Linkedin,
+  Facebook,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+} from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import usePostData from "../../hooks/api/usePostData";
+import { useToast } from "@/hooks/use-toast";
 import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
-  const router = useRouter()
+  const router = useRouter();
   // const { login, isLoading } = useAuth()
-  const [phase, setPhase] = useState(1)
-  const [error, setError] = useState("")
+  const [phase, setPhase] = useState(1);
+  const [error, setError] = useState("");
 
   // Phase 1 form fields
   const [formData, setFormData] = useState({
@@ -32,72 +49,75 @@ export default function SignupPage() {
     phone: "",
     email: "",
     password: "",
-  })
-  const [confirmPassword, setConfirmPassword] = useState("")
+  });
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Phase 2 form fields (WhatsApp API credentials)
-  const [phoneNumberId, setPhoneNumberId] = useState("")
-  const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("")
-  const [accessToken, setAccessToken] = useState("")
+  const [phoneNumberId, setPhoneNumberId] = useState("");
+  const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] =
+    useState("");
+  const [accessToken, setAccessToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-
-  const { mutate, isError, data } = usePostData("https://api.bizwapp.com/api/auth/signup");
-
+  const { mutate, isError, data } = usePostData(
+    "https://api.bizwapp.com/api/auth/signup"
+  );
 
   const handleChange = (e) => {
-    console.log("e.target.name", e.target.name)
-    console.log("e.target.value", e.target.value)
+    console.log("e.target.name", e.target.name);
+    console.log("e.target.value", e.target.value);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-
   const validatePhase1 = () => {
     if (!formData.firstName) {
-      setError("first Name is required")
-      return false
+      setError("first Name is required");
+      return false;
     }
     if (!formData.lastName) {
-      setError("last Name is required")
-      return false
+      setError("last Name is required");
+      return false;
     }
     if (!formData.phone) {
-      setError("phone is required")
-      return false
+      setError("phone is required");
+      return false;
     }
     if (!/^\d{10}$/.test(formData.phone)) {
-    setError("Phone number must be 10 digits");
-    return false;
-  }
+      setError("Phone number must be 10 digits");
+      return false;
+    }
     if (!formData.email) {
-      setError("Email is required")
-      return false
+      setError("Email is required");
+      return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError("Please enter a valid email address");
       return false;
     }
     if (!formData.password) {
-      setError("Password is required")
-      return false
+      setError("Password is required");
+      return false;
     }
-    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
 
-if (!strongPasswordRegex.test(formData.password)) {
-  setError("Password must be at least 8 characters long and include Alpha Numeric and special character.");
-  return false;
-}
+    if (!strongPasswordRegex.test(formData.password)) {
+      setError(
+        "Password must be at least 8 characters long and include Alpha Numeric and special character."
+      );
+      return false;
+    }
     if (formData.password !== confirmPassword) {
-      setError("Passwords do not match")
-      return false
+      setError("Passwords do not match");
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
-  const {toast} = useToast()
+  const { toast } = useToast();
 
   const handleSigUp = () => {
     setError("");
@@ -112,12 +132,12 @@ if (!strongPasswordRegex.test(formData.password)) {
       onSuccess: (data) => {
         toast({
           title: "Success",
-          description: data.message
-        })
+          description: data.message,
+        });
         console.log("Success:", data);
-        const user = { ...data.user, token : data.token}
+        const user = { ...data.user, token: data.token };
         localStorage.setItem("user", JSON.stringify(user));
-        router.push("/dashboard")
+        router.push("/dashboard");
       },
       onError: (error) => {
         setIsLoading(false);
@@ -128,19 +148,19 @@ if (!strongPasswordRegex.test(formData.password)) {
         console.error("Error:", error.message);
       },
     });
-    setError("")
+    setError("");
     // if (validatePhase1()) {
     //   setPhase(2)
     // }
-  }
+  };
 
   const handlePreviousPhase = () => {
-    setPhase(1)
-  }
+    setPhase(1);
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     try {
       // In a real app, you would register the user here
@@ -148,32 +168,18 @@ if (!strongPasswordRegex.test(formData.password)) {
       await login({
         phoneNumberId: "606836342508871",
         whatsappBusinessAccountId: "28995967470047562",
-        accessToken: "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6",
-      })
-      router.push("/dashboard")
+        accessToken:
+          "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6",
+      });
+      router.push("/dashboard");
     } catch (err) {
-      setError("Registration failed. Please try again.")
+      setError("Registration failed. Please try again.");
     }
-  }
-
+  };
 
   const handleSocialSignup = async (provider) => {
     console.log("Clicked provider:", provider); // should match e.g., "google"
-    signIn(provider.toLowerCase()); // like "google", "facebook", etc.
-    try {
-      // In a real app, this would redirect to the OAuth flow
-      console.log(`Signing up with ${provider}`)
-
-      // For demo purposes, we'll just log in with demo credentials
-      await login({
-        phoneNumberId: "demo_phone_id",
-        whatsappBusinessAccountId: "demo_account_id",
-        accessToken: "demo_token",
-      })
-      router.push("/dashboard")
-    } catch (err) {
-      setError(`${provider} signup failed. Please try again.`)
-    }
+    signIn(provider.toLowerCase(), { callbackUrl: "/dashboard" }); // like "google", "facebook", etc.
   };
 
   return (
@@ -181,11 +187,11 @@ if (!strongPasswordRegex.test(formData.password)) {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <Image
-                        src="/BIZWAPP.png"
-                        alt="Biz Wapp Logo"
-                        width={64}
-                        height={64}
-                      />
+            src="/BIZWAPP.png"
+            alt="Biz Wapp Logo"
+            width={64}
+            height={64}
+          />
           <h1 className="text-3xl font-bold">BizWApp Messaging</h1>
           <p className="text-muted-foreground mt-2">Create your account</p>
         </div>
@@ -194,10 +200,11 @@ if (!strongPasswordRegex.test(formData.password)) {
           <CardHeader>
             <CardTitle>Sign Up</CardTitle>
             <CardDescription>
-              {phase === 1 ? "Enter your details to create an account" : "Connect your WhatsApp Business API"}
+              {phase === 1
+                ? "Enter your details to create an account"
+                : "Connect your WhatsApp Business API"}
             </CardDescription>
-            <div className="flex items-center justify-between mt-2">
-            </div>
+            <div className="flex items-center justify-between mt-2"></div>
           </CardHeader>
           <CardContent>
             {error && (
@@ -237,7 +244,8 @@ if (!strongPasswordRegex.test(formData.password)) {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="username">Phone</Label>                  <Input
+                  <Label htmlFor="username">Phone</Label>{" "}
+                  <Input
                     id="phone"
                     type="text"
                     name="phone"
@@ -283,13 +291,29 @@ if (!strongPasswordRegex.test(formData.password)) {
                 </div>
 
                 <Button type="button" className="w-full" onClick={handleSigUp}>
-                  { isLoading ? (
-                       <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                     </svg>
+                  {isLoading ? (
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path>
+                    </svg>
                   ) : (
-                     'Login'
+                    "Login"
                   )}
                 </Button>
               </form>
@@ -307,24 +331,42 @@ if (!strongPasswordRegex.test(formData.password)) {
                     <Separator className="w-full" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">Or sign up with</span>
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Or sign up with
+                    </span>
                   </div>
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 gap-3">
-                  <Button variant="outline" onClick={() => handleSocialSignup("Google")} className="w-full">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSocialSignup("Google")}
+                    className="w-full"
+                  >
                     <FcGoogle className="mr-2 h-4 w-4" />
                     Google
                   </Button>
-                  <Button variant="outline" onClick={() => handleSocialSignup("Facebook")} className="w-full">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSocialSignup("Facebook")}
+                    className="w-full"
+                  >
                     <Facebook className="mr-2 h-4 w-4 text-blue-600" />
                     Facebook
                   </Button>
-                  <Button variant="outline" onClick={() => handleSocialSignup("GitHub")} className="w-full">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSocialSignup("GitHub")}
+                    className="w-full"
+                  >
                     <Github className="mr-2 h-4 w-4" />
                     GitHub
                   </Button>
-                  <Button variant="outline" onClick={() => handleSocialSignup("LinkedIn")} className="w-full">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSocialSignup("LinkedIn")}
+                    className="w-full"
+                  >
                     <Linkedin className="mr-2 h-4 w-4 text-blue-700" />
                     LinkedIn
                   </Button>
@@ -343,6 +385,5 @@ if (!strongPasswordRegex.test(formData.password)) {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-
