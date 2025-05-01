@@ -112,10 +112,14 @@ export default function ConversationsPage() {
   const conversationRef = useRef<any[]>([]); // store latest conversation list
   const socketRef = useRef<Socket | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [uniqueConversations, setUniqueConversations] = useState([]);
+  const [message, setMessage] = useState([]);
 
-  const { data: messageHistory } = useMessageHistory(selectedPhone);
+  const { data: messageHistory, refetch } = useMessageHistory(selectedPhone);
 
-  const message = messageHistory?.data || [];
+  useEffect(() => {
+    setMessage(messageHistory?.data || []);
+  }, [messageHistory]);
 
   const { data: getAllConversation } = useGetAllConversation();
 
@@ -152,7 +156,7 @@ export default function ConversationsPage() {
   // Update your socket effect to properly handle new messages
   useEffect(() => {
     socketRef.current = io(
-      "https://74c8-2405-201-601e-b036-5c82-43f2-697c-d294.ngrok-free.app",
+      "https://d126-2409-40e3-3c-77c3-c9ea-2aa-fd96-961e.ngrok-free.app",
       {
         transports: ["websocket"],
       }
@@ -164,7 +168,8 @@ export default function ConversationsPage() {
       // Check if this message belongs to the currently selected conversation
       if (selectedPhone && msg.phoneNumber === selectedPhone) {
         // Update the message history for the current conversation
-        setConversationHistory((prevMessages) => [...prevMessages, msg]);
+        console.log("hello msg ", msg);
+        setMessage((prevMessages) => [...prevMessages, msg]);
       }
 
       // Update the conversation list to show new message preview
@@ -275,6 +280,18 @@ export default function ConversationsPage() {
     }
   });
 
+  useEffect(() => {
+    const unique = conversationHistory
+      ? Array.from(
+          new Map(
+            conversationHistory.map((convo) => [convo.phoneNumber, convo])
+          ).values()
+        )
+      : [];
+
+    setUniqueConversations(unique);
+  }, [conversationHistory]);
+
   // const allTemplates = [/* your template objects */];
   const separatedTexts = Array.isArray(whatsappTemplates?.data)
     ? whatsappTemplates.data.map((template) => {
@@ -306,17 +323,23 @@ export default function ConversationsPage() {
     if (!selectedContact || !newMessage.trim()) return;
 
     const messageToSend = {
-      text: newMessage,
-      sender: "user", // or however you identify the sender
+      message: newMessage,
+      name: "user", // or however you identify the sender
       timestamp: new Date().toISOString(),
+      direction: "outbound",
     };
 
     // Optimistically update UI
-    console.log("messageToSend", messageToSend)
+    console.log("messageToSend", messageToSend);
     setConversationHistory((prev) => [...prev, messageToSend]);
+    setMessage((prev) => [...prev, messageToSend]);
     setNewMessage("");
 
-    console.log("we are inside handleSendMessage" , messageToSend);
+    console.log("Calling refetch...");
+    const result = await refetch();
+    console.log("Refetched data:", result);
+
+    console.log("we are inside handleSendMessage", messageToSend);
     mutate({
       contacts: [
         {
@@ -577,22 +600,15 @@ export default function ConversationsPage() {
     );
   }
 
-  const uniqueConversations = conversationHistory
-    ? Array.from(
-        new Map(
-          conversationHistory.map((convo) => [convo.phoneNumber, convo])
-        ).values()
-      )
-    : [];
-
   // const sortedMessages = [...message].sort(
   //   (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
   // );
 
   console.log("conversationHistory", conversationHistory);
 
-  console.log("isMobileisMobileisMobile", isMobile);
+  console.log("message", message);
 
+  console.log("uniqueConversations", uniqueConversations);
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
       {/* Conversations List */}

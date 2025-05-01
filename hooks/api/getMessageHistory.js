@@ -22,6 +22,7 @@ const useMessageHistory = (phoneNumber) => {
     queryKey: ["messageHistory", phoneNumber],
     queryFn: fetchMessageHistory,
     enabled: !!phoneNumber, // optional: only run if phoneNumber is available
+    staleTime: 0,
   });
 };
 
