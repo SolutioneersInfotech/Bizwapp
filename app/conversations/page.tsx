@@ -642,6 +642,8 @@ export default function ConversationsPage() {
     mobileView === "chat" && (
       <div className="w-full">
         <ChatWindow
+         isMobile={isMobile}
+         setMobileView={setMobileView}
           selectedContact={selectedContact}
           selectedPhone={selectedPhone}
           message={message}

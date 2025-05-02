@@ -1,13 +1,7 @@
-'use client'
+"use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
-import {
-  Button
-} from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,8 +9,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog"
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,18 +18,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Input
-} from "@/components/ui/input"
-import {
-  ScrollArea
-} from "@/components/ui/scroll-area"
-import useSendWhatsAppMessage from "@/hooks/api/useSendWhatsAppMessage "
-import { Socket } from "dgram"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import useSendWhatsAppMessage from "@/hooks/api/useSendWhatsAppMessage ";
+import { Socket } from "dgram";
 
 import {
   Archive,
+  ArrowLeft,
   Bell,
   BellOff,
   Check,
@@ -52,56 +43,58 @@ import {
   Tag,
   Trash2,
   UserPlus,
-} from "lucide-react"
-import { useEffect, useMemo, useRef } from "react"
-import { io } from "socket.io-client"
+} from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
+import { io } from "socket.io-client";
 
 interface Message {
-  _id: string
-  message: string
-  direction: "inbound" | "outbound"
-  timestamp: string
-  status: "sent" | "delivered" | "read"
+  _id: string;
+  message: string;
+  direction: "inbound" | "outbound";
+  timestamp: string;
+  status: "sent" | "delivered" | "read";
 }
 
 interface Template {
-  id: string
-  name: string
-  content: string
-  status: string
+  id: string;
+  name: string;
+  content: string;
+  status: string;
 }
 
 interface Contact {
-  name: string
-  initials: string
-  avatar: string
-  status: "Active" | "Offline"
-  muted: boolean
-  archived: boolean
+  name: string;
+  initials: string;
+  avatar: string;
+  status: "Active" | "Offline";
+  muted: boolean;
+  archived: boolean;
 }
 
 interface ChatWindowProps {
-  selectedContact: Contact | null
-  messages: Message[]
+  selectedContact: Contact | null;
+  messages: Message[];
   // sortedMessages: Message[]
-  newMessage: string
-  messageLoading: boolean
-  templateDialogOpen: boolean
-  templates: Template[]
-  messagesEndRef: React.RefObject<HTMLDivElement>
-  setNewMessage: (msg: string) => void
-  setTemplateDialogOpen: (open: boolean) => void
-  setNewChatDialogOpen: (open: boolean) => void
-  handleSendMessage: () => void
-  handleMuteConversation: (contact: Contact) => void
-  handleArchiveConversation: (contact: Contact) => void
-  handleDeleteConversation: (contact: Contact) => void
-  handleSendTemplate: (templateId: string) => void
+  newMessage: string;
+  messageLoading: boolean;
+  templateDialogOpen: boolean;
+  templates: Template[];
+  messagesEndRef: React.RefObject<HTMLDivElement>;
+  setNewMessage: (msg: string) => void;
+  setTemplateDialogOpen: (open: boolean) => void;
+  setNewChatDialogOpen: (open: boolean) => void;
+  handleSendMessage: () => void;
+  handleMuteConversation: (contact: Contact) => void;
+  handleArchiveConversation: (contact: Contact) => void;
+  handleDeleteConversation: (contact: Contact) => void;
+  handleSendTemplate: (templateId: string) => void;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
+  isMobile,
+  setMobileView,
   message,
-  setMessage ,
+  setMessage,
   selectedContact,
   messages,
   // sortedMessages,
@@ -119,37 +112,31 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   handleDeleteConversation,
   handleSendTemplate,
 }) => {
-
-
   const selectedPhone = selectedContact?.phone;
   const selectedName = selectedContact?.name;
 
-
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
-
-
 
   useEffect(() => {
     socketRef.current = io("https://api.bizwapp.com", {
       transports: ["websocket"],
     });
-  
+
     socketRef.current.on("newMessage", (msg) => {
       console.log("📩 New message received:", msg);
-  
+
       // If the message is for the selected phone, update the current chat
       if (selectedPhone && msg.phoneNumber === selectedPhone) {
         setMessage((prevMessages) => [...prevMessages, msg]);
       }
-  
+
       // Update the conversation list
       setConversationHistory((prev) => {
         const existingIndex = prev.findIndex(
           (c) => c.phoneNumber === msg.phoneNumber
         );
-  
+
         if (existingIndex >= 0) {
           // Update existing conversation
           const updated = [...prev];
@@ -178,7 +165,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         }
       });
     });
-  
+
     return () => {
       socketRef.current?.disconnect();
     };
@@ -195,7 +182,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [sortedMessages]);
-
 
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
@@ -215,7 +201,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setMessage((prev) => [...prev, messageToSend]);
     setNewMessage("");
 
-
     console.log("we are inside handleSendMessage", messageToSend);
     mutate({
       contacts: [
@@ -231,12 +216,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setNewMessage("");
   };
 
-
-
-    
-
-    console.log("selected selectedContact ", selectedContact)
-    console.log("checking mesaage", message)
+  console.log("selected selectedContact ", selectedContact);
+  console.log("checking mesaage", message);
   return (
     <div className="flex flex-1 flex-col">
       {selectedContact ? (
@@ -244,6 +225,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           {/* Header */}
           <div className="flex h-14 items-center justify-between border-b px-4">
             <div className="flex items-center gap-2">
+              {isMobile && (
+                <button
+                  onClick={() => setMobileView("conversations")}
+                  className="text-lg  "
+                >
+                  <ArrowLeft size={20} />
+                </button>
+              )}
               <Avatar>
                 <AvatarImage src={selectedContact.avatar} />
                 <AvatarFallback>{selectedContact.initials}</AvatarFallback>
@@ -384,8 +373,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault()
-                      handleSendMessage()
+                      e.preventDefault();
+                      handleSendMessage();
                     }
                   }}
                 />
@@ -477,10 +466,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             <p className="text-muted-foreground">
               Choose a contact to start messaging
             </p>
-            <Button
-              className="mt-4"
-              onClick={() => setNewChatDialogOpen(true)}
-            >
+            <Button className="mt-4" onClick={() => setNewChatDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               New Chat
             </Button>
@@ -488,7 +474,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default ChatWindow;
