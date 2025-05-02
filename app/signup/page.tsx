@@ -313,7 +313,7 @@ export default function SignupPage() {
                       ></path>
                     </svg>
                   ) : (
-                    "Login"
+                    "Sign up"
                   )}
                 </Button>
               </form>
