@@ -44,7 +44,7 @@ import {
   Trash2,
   UserPlus,
 } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { io } from "socket.io-client";
 
 interface Message {
@@ -98,12 +98,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   selectedContact,
   messages,
   // sortedMessages,
-  newMessage,
   messageLoading,
   templateDialogOpen,
   templates,
   // messagesEndRef,
-  setNewMessage,
   setTemplateDialogOpen,
   setNewChatDialogOpen,
   // handleSendMessage,
@@ -112,33 +110,36 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   handleDeleteConversation,
   handleSendTemplate,
 }) => {
-  const selectedPhone = selectedContact?.phone;
+  const selectedPhone = selectedContact?.phoneNumber;
   const selectedName = selectedContact?.name;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
+
+    const [newMessage, setNewMessage] = useState("");
+  
+
   useEffect(() => {
-    socketRef.current = io("https://api.bizwapp.com", {
-      transports: ["websocket"],
+    socketRef.current = io("https://bizwapp-backend-2.onrender.com", {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
     });
+    
 
     socketRef.current.on("newMessage", (msg) => {
       console.log("📩 New message received:", msg);
 
-      // If the message is for the selected phone, update the current chat
       if (selectedPhone && msg.phoneNumber === selectedPhone) {
         setMessage((prevMessages) => [...prevMessages, msg]);
       }
 
-      // Update the conversation list
       setConversationHistory((prev) => {
         const existingIndex = prev.findIndex(
           (c) => c.phoneNumber === msg.phoneNumber
         );
 
         if (existingIndex >= 0) {
-          // Update existing conversation
           const updated = [...prev];
           updated[existingIndex] = {
             ...updated[existingIndex],
@@ -169,7 +170,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     return () => {
       socketRef.current?.disconnect();
     };
-  }, [selectedPhone]);
+  }, [selectedPhone, setMessage]);
 
   const sortedMessages = useMemo(() => {
     return [...message].sort(
@@ -186,6 +187,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
   const handleSendMessage = async () => {
+    console.log("hello")
     if (!selectedContact || !newMessage.trim()) return;
 
     const messageToSend = {
@@ -195,9 +197,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       direction: "outbound",
     };
 
-    // Optimistically update UI
     console.log("messageToSend", messageToSend);
-    setConversationHistory((prev) => [...prev, messageToSend]);
+    // setConversationHistory((prev) => [...prev, messageToSend]);
     setMessage((prev) => [...prev, messageToSend]);
     setNewMessage("");
 
@@ -216,8 +217,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setNewMessage("");
   };
 
-  console.log("selected selectedContact ", selectedContact);
-  console.log("checking mesaage", message);
   return (
     <div className="flex flex-1 flex-col">
       {selectedContact ? (

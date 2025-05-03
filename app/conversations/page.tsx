@@ -85,7 +85,6 @@ export default function ConversationsPage() {
   const { templates } = useTemplates();
   const { toast } = useToast();
 
-  const [newMessage, setNewMessage] = useState("");
   const [contactMessages, setContactMessages] = useState<Message[]>([]);
   const [bulkMessageOpen, setBulkMessageOpen] = useState(false);
   const [bulkMessage, setBulkMessage] = useState("");
@@ -448,10 +447,6 @@ export default function ConversationsPage() {
   //   (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
   // );
 
-  console.log("conversationHistory", conversationHistory);
-
-  console.log("hdbkhdabkbak", message);
-
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
   {/* Conversations Panel (Left Sidebar) */}
@@ -648,8 +643,6 @@ export default function ConversationsPage() {
           selectedPhone={selectedPhone}
           message={message}
           setMessage={setMessage}
-          newMessage={newMessage}
-          setNewMessage={setNewMessage}
           messageLoading={messageLoading}
           handleMuteConversation={handleMuteConversation}
           handleDeleteConversation={handleDeleteConversation}
@@ -668,8 +661,6 @@ export default function ConversationsPage() {
         selectedPhone={selectedPhone}
         message={message}
         setMessage={setMessage}
-        newMessage={newMessage}
-        setNewMessage={setNewMessage}
         messageLoading={messageLoading}
         handleMuteConversation={handleMuteConversation}
         handleDeleteConversation={handleDeleteConversation}

@@ -120,9 +120,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
     // setCurrentContact(contact);
     setSelectedPhone(phone);
   };
-
-
-    console.log("selectedContact" , selectedContact)
     
   return (
     <div className="p-4">
