@@ -650,7 +650,7 @@ export default function ContactsPage() {
                 contactData={newContact}
                 onChange={handleChange}
                 onSubmit={handleSubmit}
-                onClose={() => setIsDialogOpen(false)}
+                onClose={() => setAddContactDialogOpen(false)}
               />
             </Dialog>
           </div>
