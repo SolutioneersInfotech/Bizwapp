@@ -150,11 +150,15 @@ export default function ContactsPage() {
     email: "",
   });
 
+  const userData = JSON.parse(localStorage.getItem('user'));
+  console.log("userIdhhhh", userData.user._id);
+  const userId = userData?.user?._id;
+
   const {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts("https://api.bizwapp.com/api/auth/getContacts");
+  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
 
   const updateContactMutation = useUpdateContact();
 
@@ -435,8 +439,25 @@ export default function ContactsPage() {
     setNewContact({ ...newContact, [e.target.name]: e.target.value });
   };
 
+  const mutation = usePostData("https://api.bizwapp.com/api/auth/addContact");
+
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const userData = JSON.parse(localStorage.getItem('user'));
+  console.log("userId", userData.user._id);
+  const userId = userData?.user?._id;
+  const contactWithUserId = { ...newContact , userId}
+    const contactArray = [contactWithUserId];
+    mutation.mutate(contactArray,{
+      onSuccess:(data) =>{
+        console.log("data" , data)
+        setAddContactDialogOpen(false);
+      },
+      onError:(error)=>{
+        console.error(error)
+      }
+    })
   };
 
   // Handle form submission

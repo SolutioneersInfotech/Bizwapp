@@ -149,6 +149,8 @@ export function AppSidebar() {
   const handleEditTemplate = async () => {
     if (!editingTemplate) return;
 
+    console.log("new contact " , newContact)
+
     try {
       await updateTemplate(editingTemplate.id, {
         name: templateName,

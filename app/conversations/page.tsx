@@ -197,6 +197,8 @@ export default function ConversationsPage() {
       })
     : [];
 
+    const {mutate} = useSendWhatsAppMessage()
+
   const handleSendBulkMessage = async () => {
     if (
       bulkMessageTab === "text" &&
@@ -233,6 +235,9 @@ export default function ConversationsPage() {
 
         let messageToSend = bulkMessage;
 
+        console.log("contactsToSend", contactsToSend);
+        console.log("messageToSend", messageToSend)
+
         mutate({
           contacts: contactsToSend,
           message: messageToSend,
@@ -266,6 +271,7 @@ export default function ConversationsPage() {
       setSelectedContacts([]);
       setBulkMessageOpen(false);
     } catch (error) {
+      console.error("Mutation failed", error);
       toast({
         title: "Error",
         description: "Failed to send bulk message",
