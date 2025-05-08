@@ -160,9 +160,6 @@ const userId = userData?.user?._id;
     }
   }, [searchQuery, activeTab]);
 
-  const userData = JSON.parse(localStorage.getItem('user'));
-  console.log("userDatajjjj", userData)
-const userId = userData?.user?._id;
 
 
   const {
