@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-const getAllConversation = async()=>{
+const getAllConversation = async(userId)=>{
 
     const userData = JSON.parse(localStorage.getItem('user'));
   console.log("userIdgggg", userData.user._id);
@@ -14,10 +14,10 @@ const getAllConversation = async()=>{
     return response.json();
 }
 
-const useGetAllConversation =()=>{
+const useGetAllConversation =(userId)=>{
     return useQuery({
-        queryKey:["conversation"],
-        queryFn:getAllConversation
+        queryKey:["conversation" , userId],
+        queryFn: () => getAllConversation(userId),
     })
 }
 

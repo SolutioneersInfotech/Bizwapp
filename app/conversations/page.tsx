@@ -116,7 +116,10 @@ export default function ConversationsPage() {
   const [message, setMessage] = useState([]);
   const [selectedPhone, setSelectedPhone] = useState(null);
 
-  const { data: getAllConversation } = useGetAllConversation();
+  const userData = JSON.parse(localStorage.getItem("user") || "{}");
+const userId = userData?.user?._id;
+
+  const { data: getAllConversation } = useGetAllConversation(userId);
 
   useEffect(() => {
     setConversationHistory(getAllConversation?.conversations);
