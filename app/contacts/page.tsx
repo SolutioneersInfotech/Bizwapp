@@ -317,9 +317,9 @@ export default function ContactsPage() {
       onError: (error) => {
         toast({
           title: "Error",
-          description: error.message || "Something went wrong!", // ✅ Show error message
+          description: error.error || "Something went wrong!", // ✅ Show error message
         });
-        console.error("Error:", error.message);
+        console.error("Error:", error.error);
       },
     });
 
@@ -450,11 +450,19 @@ export default function ContactsPage() {
     const contactArray = [contactWithUserId];
     mutation.mutate(contactArray,{
       onSuccess:(data) =>{
-        console.log("data" , data)
+        console.log("data" , data);
+        toast({
+          title: "Success",
+          description: data.message,
+        });
         setAddContactDialogOpen(false);
       },
       onError:(error)=>{
-        console.error(error)
+        console.log("rrrrrrrrrr", error);
+        toast({
+          title: "Error",
+          description: error.error || "Enter unique email or Phone Number!",
+        });
       }
     })
   };
