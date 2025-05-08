@@ -184,6 +184,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   }, [sortedMessages]);
 
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const userId = userData?.user?._id;
+
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
   const handleSendMessage = async () => {
@@ -204,6 +207,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
     console.log("we are inside handleSendMessage", messageToSend);
     mutate({
+      userId:userId,
       contacts: [
         {
           phoneNumber: selectedPhone,

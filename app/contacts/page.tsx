@@ -151,14 +151,13 @@ export default function ContactsPage() {
   });
 
   const userData = JSON.parse(localStorage.getItem('user'));
-  console.log("userIdhhhh", userData.user._id);
   const userId = userData?.user?._id;
 
   const {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
+  } = useGetContacts(`https://bizwapp-backend-2.onrender.com/api/auth/getContacts/${userId}`);
 
   const updateContactMutation = useUpdateContact();
 

@@ -157,11 +157,16 @@ export default function ConversationsPage() {
     }
   }, [searchQuery, activeTab]);
 
+  const userData = JSON.parse(localStorage.getItem('user'));
+  console.log("userDatajjjj", userData)
+const userId = userData?.user?._id;
+
+
   const {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts("https://api.bizwapp.com/api/auth/getContacts");
+  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
 
   useEffect(() => {
     setContact(getContacts);
@@ -196,6 +201,7 @@ export default function ConversationsPage() {
         };
       })
     : [];
+
 
     const {mutate} = useSendWhatsAppMessage()
 
@@ -239,6 +245,7 @@ export default function ConversationsPage() {
         console.log("messageToSend", messageToSend)
 
         mutate({
+          userId:userId,
           contacts: contactsToSend,
           message: messageToSend,
         });
