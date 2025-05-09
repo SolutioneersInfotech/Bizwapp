@@ -86,6 +86,9 @@ export default function LoginPage() {
               title: "Success",
               description: data.message,
             });
+            console.log("Success:", data);
+        const user = { ...data.user, token: data.token };
+        localStorage.setItem("user", JSON.stringify(user));
             setTimeout(() => {
               router.push("/dashboard");
             }, 500);
