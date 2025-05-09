@@ -119,7 +119,7 @@ export default function ConversationsPage() {
 
   useEffect(()=>{
     const userData = JSON.parse(localStorage.getItem('user'));
-    setUserId(userData?.user?._id)
+      setUserId(userData?.id || null);
   },[])
 
   const { data: getAllConversation } = useGetAllConversation(userId);
