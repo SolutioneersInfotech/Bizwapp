@@ -150,8 +150,14 @@ export default function ContactsPage() {
     email: "",
   });
 
-  const userData = JSON.parse(localStorage.getItem('user'));
-  const userId = userData?.user?._id;
+  const [userId , setUserId ] = useState(null)
+
+  useEffect(()=>{
+    const userData = JSON.parse(localStorage.getItem('user'));
+    setUserId(userData?.user?._id)
+  },[])
+
+  
 
   const {
     data: getContacts,
@@ -443,9 +449,6 @@ export default function ContactsPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const userData = JSON.parse(localStorage.getItem('user'));
-  console.log("userId", userData.user._id);
-  const userId = userData?.user?._id;
   const contactWithUserId = { ...newContact , userId}
     const contactArray = [contactWithUserId];
     mutation.mutate(contactArray,{

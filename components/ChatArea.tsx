@@ -118,6 +118,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
 
     const [newMessage, setNewMessage] = useState("");
+    const [userId , setUserId]= useState(null);
   
 
   useEffect(() => {
@@ -184,8 +185,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   }, [sortedMessages]);
 
-  const userData = JSON.parse(localStorage.getItem('user'));
-  const userId = userData?.user?._id;
+  useEffect(()=>{
+    const userData = JSON.parse(localStorage.getItem('user'));
+    setUserId(userData?.user?._id)
+  },[])
 
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 

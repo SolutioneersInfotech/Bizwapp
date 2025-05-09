@@ -115,9 +115,12 @@ export default function ConversationsPage() {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [message, setMessage] = useState([]);
   const [selectedPhone, setSelectedPhone] = useState(null);
+  const [userId , setUserId]= useState(null);
 
-  const userData = JSON.parse(localStorage.getItem("user") || "{}");
-const userId = userData?.user?._id;
+  useEffect(()=>{
+    const userData = JSON.parse(localStorage.getItem('user'));
+    setUserId(userData?.user?._id)
+  },[])
 
   const { data: getAllConversation } = useGetAllConversation(userId);
 
