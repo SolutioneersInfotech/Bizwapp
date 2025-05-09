@@ -36,7 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import ContactForm from "./ui/contactForm";
 import usePostData from "@/hooks/api/usePostData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NewChatDialog from "./newChat";
 import CreateTemplateModal from "@/app/templates/create-template-modal";
 
@@ -118,6 +118,16 @@ export default function ClientLayout({
     email: "",
   });
 
+   const [userId , setUserId]= useState(null);
+    
+      useEffect(()=>{
+        const userData = JSON.parse(localStorage.getItem('user'));
+        if (userData) {
+          const id = userData.id || userData.user?._id || null;
+          setUserId(id);
+        }
+      },[])
+
   const handleStartNewChat = () => {
     console.log("New chat with", newChatPhone, newChatMessage);
     setNewChatDialogOpen(false);
@@ -143,7 +153,8 @@ export default function ClientLayout({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("New Contact:", newContact);
-    const contactArray = [newContact];
+    const contactWithUserId = { ...newContact , userId}
+    const contactArray = [contactWithUserId];
     mutation.mutate(contactArray, {
       onSuccess: (data) => {
         console.log(data);

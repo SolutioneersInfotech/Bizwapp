@@ -33,7 +33,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import ContactForm from "./ui/contactForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import usePostData from "@/hooks/api/usePostData";
 import NewChatDialog from "../components/newChat";
 import CreateTemplateModal from "@/app/templates/create-template-modal";
@@ -90,6 +90,16 @@ export function AppSidebar() {
     email: "",
   });
 
+  const [userId , setUserId]= useState(null);
+  
+    useEffect(()=>{
+      const userData = JSON.parse(localStorage.getItem('user'));
+      if (userData) {
+        const id = userData.id || userData.user?._id || null;
+        setUserId(id);
+      }
+    },[])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewContact((prev) => ({
@@ -101,9 +111,14 @@ export function AppSidebar() {
   const mutation = usePostData("https://api.bizwapp.com/api/auth/addContact");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("hello")
     e.preventDefault();
-    console.log("New Contact:", newContact);
-    const contactArray = [newContact];
+    console.log("userId", userId)
+    console.log("New Contactjkkj:", newContact);
+    console.log("hhjavbjh")
+    console.log("userId", userId)
+    const contactWithUserId = { ...newContact , userId}
+    const contactArray = [contactWithUserId];
     mutation.mutate(contactArray, {
       onSuccess: (data) => {
         console.log(data);

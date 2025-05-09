@@ -157,7 +157,10 @@ export default function ContactsPage() {
     setMounted(true);
       console.log("i am inside useEffect.")
       const userData = JSON.parse(localStorage.getItem('user'));
-      setUserId(userData?.id || null);
+      if (userData) {
+        const id = userData.id || userData.user?._id || null;
+        setUserId(id);
+      }
 
   }, []);
 
@@ -463,7 +466,7 @@ export default function ContactsPage() {
         setAddContactDialogOpen(false);
       },
       onError:(error)=>{
-        console.log("rrrrrrrrrr", error);
+        console.log("error", error);
         toast({
           title: "Error",
           description: error.error || "Enter unique email or Phone Number!",

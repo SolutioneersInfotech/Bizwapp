@@ -114,24 +114,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 }) => {
   const selectedPhone = selectedContact?.phoneNumber;
   const selectedName = selectedContact?.name;
-  const [open , setOpen]= useState(false);
+  const [open, setOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-
-    const [newMessage, setNewMessage] = useState("");
-    const [userId , setUserId]= useState(null);
-  
+  const [newMessage, setNewMessage] = useState("");
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     socketRef.current = io("https://bizwapp-backend-2.onrender.com", {
       withCredentials: true,
       transports: ["websocket", "polling"],
     });
-    
 
     socketRef.current.on("newMessage", (msg) => {
       console.log("📩 New message received:", msg);
@@ -190,15 +187,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   }, [sortedMessages]);
 
-  useEffect(()=>{
-    const userData = JSON.parse(localStorage.getItem('user'));
-    setUserId(userData?.user?._id)
-  },[])
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    setUserId(userData?.user?._id);
+  }, []);
 
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
   const handleSendMessage = async () => {
-    console.log("hello")
+    console.log("hello");
     if (!selectedContact || !newMessage.trim()) return;
 
     const messageToSend = {
@@ -215,7 +212,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
     console.log("we are inside handleSendMessage", messageToSend);
     mutate({
-      userId:userId,
+      userId: userId,
       contacts: [
         {
           phoneNumber: selectedPhone,
@@ -229,18 +226,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setNewMessage("");
   };
 
-  const handleDocumentUpload = ()=>{
+  const handleDocumentUpload = () => {
     fileInputRef.current?.click();
     setOpen(false);
   };
 
-  const handleImageUpload = ()=>{
+  const handleImageUpload = () => {
     imageInputRef.current?.click();
     setOpen(false);
-  }
+  };
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-col h-screen">
       {selectedContact ? (
         <>
           {/* Header */}
@@ -381,42 +378,57 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           </div>
 
           {/* Message Input */}
-          <div className="border-t p-4">
+          <div className="border-t px-4 py-4 mt-10 relative sticky bottom-0 bg-white ">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={()=>setOpen(!open)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setOpen(!open)}
+              >
                 <Paperclip className="h-4 w-4" />
               </Button>
-              { open && (
-                <div className="absolute bottom-12 right-0 bg-white rounded-lg shadow-lg p-2 w-40 z-50">
-                <div
-                  onClick={handleDocumentUpload}
-                  className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
-                >
-                  <File className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm">Document</span>
+              {open && (
+                <div className="absolute bottom-14 right-16 bg-white rounded-lg shadow-lg p-2 w-40 z-50">
+                  <div
+                    onClick={handleDocumentUpload}
+                    className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
+                  >
+                    <File className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm">Document</span>
+                  </div>
+                  <div
+                    onClick={handleImageUpload}
+                    className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
+                  >
+                    <ImageIcon className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm">Gallery</span>
+                  </div>
+                  <div
+                    onClick={() => {
+                      handleOpenCamera();
+                      setOpen(false);
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
+                  >
+                    <Camera className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm">Camera</span>
+                  </div>
                 </div>
-                <div
-                  onClick={handleImageUpload}
-                  className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
-                >
-                  <ImageIcon className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm">Gallery</span>
-                </div>
-                <div
-                  onClick={() => {
-                    alert("Camera action - implement if needed");
-                    setOpen(false);
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
-                >
-                  <Camera className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm">Camera</span>
-                </div>
-              </div>
               )}
 
-              <input type="file" ref={fileInputRef} className="hidden" onChange={(e)=> console.log("Doc Selected", e.target.files)}/>
-              <input type="file" accept="image/*" ref={imageInputRef} className="hidden" onChange={(e)=>console.log("Image Selected", e.target.files)}/>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={(e) => console.log("Doc Selected", e.target.files)}
+              />
+              <input
+                type="file"
+                accept="image/*"
+                ref={imageInputRef}
+                className="hidden"
+                onChange={(e) => console.log("Image Selected", e.target.files)}
+              />
 
               <div className="relative flex-1">
                 <Input
