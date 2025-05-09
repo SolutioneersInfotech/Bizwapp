@@ -153,10 +153,8 @@ export default function ContactsPage() {
   const [userId , setUserId ] = useState(null)
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const userData = JSON.parse(localStorage.getItem('user'));
-      setUserId(userData?.user?._id || null);
-    }
+    const userData = JSON.parse(localStorage.getItem('user'));
+    setUserId(userData?.user?._id || null);
   }, []);
 
   const {
