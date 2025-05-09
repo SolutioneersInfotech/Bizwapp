@@ -157,7 +157,7 @@ export default function ContactsPage() {
     setMounted(true);
       console.log("i am inside useEffect.")
       const userData = JSON.parse(localStorage.getItem('user'));
-      console.log("i am userId." , userId)
+      console.log("i am userId." , userData)
       setUserId(userData?.user?._id || null);
 
   }, []);
