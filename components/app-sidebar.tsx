@@ -90,15 +90,6 @@ export function AppSidebar() {
     email: "",
   });
 
-  const [userId , setUserId]= useState(null);
-  
-    useEffect(()=>{
-      const userData = JSON.parse(localStorage.getItem('user'));
-      if (userData) {
-        const id = userData.id || userData.user?._id || null;
-        setUserId(id);
-      }
-    },[])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -113,11 +104,8 @@ export function AppSidebar() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     console.log("hello")
     e.preventDefault();
-    console.log("userId", userId)
     console.log("New Contactjkkj:", newContact);
-    console.log("hhjavbjh")
-    console.log("userId", userId)
-    const contactWithUserId = { ...newContact , userId}
+    const contactWithUserId = { ...newContact }
     const contactArray = [contactWithUserId];
     mutation.mutate(contactArray, {
       onSuccess: (data) => {

@@ -49,7 +49,7 @@ export default function LoginPage() {
   };
 
   const { mutate, isError, data } = usePostData(
-    "http://localhost:5001/api/auth/login"
+    "https://api.bizwapp.com/api/auth/login"
   );
 
   const { toast } = useToast();

@@ -236,6 +236,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setOpen(false);
   };
 
+
   return (
     <div className="flex flex-col h-screen">
       {selectedContact ? (
