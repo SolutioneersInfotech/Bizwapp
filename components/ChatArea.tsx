@@ -29,8 +29,10 @@ import {
   ArrowLeft,
   Bell,
   BellOff,
+  Camera,
   Check,
   CheckCircle,
+  File,
   ImageIcon,
   Loader2,
   Mic,
@@ -112,9 +114,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 }) => {
   const selectedPhone = selectedContact?.phoneNumber;
   const selectedName = selectedContact?.name;
+  const [open , setOpen]= useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
 
     const [newMessage, setNewMessage] = useState("");
@@ -223,6 +228,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     await sendMessage(selectedContact.phone, newMessage);
     setNewMessage("");
   };
+
+  const handleDocumentUpload = ()=>{
+    fileInputRef.current?.click();
+    setOpen(false);
+  };
+
+  const handleImageUpload = ()=>{
+    imageInputRef.current?.click();
+    setOpen(false);
+  }
 
   return (
     <div className="flex flex-1 flex-col">
@@ -368,9 +383,41 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           {/* Message Input */}
           <div className="border-t p-4">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" onClick={()=>setOpen(!open)}>
                 <Paperclip className="h-4 w-4" />
               </Button>
+              { open && (
+                <div className="absolute bottom-12 right-0 bg-white rounded-lg shadow-lg p-2 w-40 z-50">
+                <div
+                  onClick={handleDocumentUpload}
+                  className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
+                >
+                  <File className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm">Document</span>
+                </div>
+                <div
+                  onClick={handleImageUpload}
+                  className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
+                >
+                  <ImageIcon className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm">Gallery</span>
+                </div>
+                <div
+                  onClick={() => {
+                    alert("Camera action - implement if needed");
+                    setOpen(false);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer"
+                >
+                  <Camera className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm">Camera</span>
+                </div>
+              </div>
+              )}
+
+              <input type="file" ref={fileInputRef} className="hidden" onChange={(e)=> console.log("Doc Selected", e.target.files)}/>
+              <input type="file" accept="image/*" ref={imageInputRef} className="hidden" onChange={(e)=>console.log("Image Selected", e.target.files)}/>
+
               <div className="relative flex-1">
                 <Input
                   placeholder="Type a message..."
