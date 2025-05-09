@@ -236,14 +236,17 @@ export default function ConversationsPage() {
       return;
     }
     try {
-      // In a real app, you would call the API to send bulk messages
-      if (bulkMessageTab === "text") {
-        const contactsToSend = contacts?.contacts
+
+      const contactsToSend = contacts?.contacts
           .filter((contact) => selectedContacts.includes(contact.phone))
           .map((contact) => ({
             phoneNumber: contact.phone,
             name: contact.name,
           }));
+      // In a rea
+      // l app, you would call the API to send bulk messages
+      if (bulkMessageTab === "text") {
+        
 
         let messageToSend = bulkMessage;
 
@@ -264,12 +267,14 @@ export default function ConversationsPage() {
         const templateMessage = template.texts.join("\n"); // or ". " if preferred
 
         console.log("Sending template message to backend:", {
-          phoneNumbers: selectedContacts,
+          userId:userId,
+          contacts: contactsToSend,
           message: templateMessage,
         });
 
         mutate({
-          phoneNumbers: selectedContacts,
+          userId:userId,
+          contacts: contactsToSend,
           message: templateMessage,
         });
       }
@@ -293,6 +298,7 @@ export default function ConversationsPage() {
     }
   };
 
+
   const handleSendTemplate = async (templateId: string) => {
     if (!selectedContact) return;
 
@@ -301,10 +307,20 @@ export default function ConversationsPage() {
 
     try {
       // In a real app, you would call the API to send a template message
-      await sendMessage(
-        selectedContact.phone,
-        `[Template: ${template.name}] ${template.content}`
-      );
+      console.log("selectedContact",selectedContact)
+      const simplifiedContacts = [{
+        phoneNumber: selectedContact.phoneNumber,
+        name: selectedContact.name
+      }];
+      
+
+      console.log("simplifiedContactssimplifiedContacts",simplifiedContacts)
+      
+      mutate({
+        userId:userId,
+        contacts: simplifiedContacts,
+        message: JSON.stringify(templates),
+      });
       setTemplateDialogOpen(false);
 
       toast({
@@ -312,6 +328,7 @@ export default function ConversationsPage() {
         description: `Template "${template.name}" sent successfully`,
       });
     } catch (error) {
+      console.error("Template send error:", error);
       toast({
         title: "Error",
         description: "Failed to send template",
@@ -391,25 +408,6 @@ export default function ConversationsPage() {
     }
   };
 
-  // const handleArchiveConversation = (contact) => {
-  //   // In a real app, this would be an API call
-  //   const index = conversations.findIndex((c) => c.id === contact.id);
-  //   if (index !== -1) {
-  //     conversations[index].archived = !conversations[index].archived;
-
-  //     toast({
-  //       title: conversations[index].archived
-  //         ? "Conversation Archived"
-  //         : "Conversation Unarchived",
-  //       description: `Conversation with ${contact.name} has been ${
-  //         conversations[index].archived ? "archived" : "unarchived"
-  //       }`,
-  //     });
-
-  //     // Refresh filtered conversations
-  //     setFilteredConversations([...filteredConversations]);
-  //   }
-  // };
 
   const handleDeleteConversation = (contact) => {
     // In a real app, this would be an API call
