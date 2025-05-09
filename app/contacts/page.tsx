@@ -150,11 +150,15 @@ export default function ContactsPage() {
     email: "",
   });
 
-  const [userId , setUserId ] = useState(null)
+  const [userId , setUserId ] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    setUserId(userData?.user?._id || null);
+    setMounted(true);
+
+      const userData = JSON.parse(localStorage.getItem('user'));
+      setUserId(userData?.user?._id || null);
+
   }, []);
 
   const {
