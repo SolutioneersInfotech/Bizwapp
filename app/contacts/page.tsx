@@ -152,16 +152,18 @@ export default function ContactsPage() {
 
   const [userId , setUserId ] = useState(null)
 
-  if (typeof window !== "undefined"){
-    const userData = JSON.parse(localStorage.getItem('user'));
-    setUserId(userData?.user?._id)
-  }
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      setUserId(userData?.user?._id || null);
+    }
+  }, []);
 
   const {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts(`https://bizwapp-backend-2.onrender.com/api/auth/getContacts/${userId}`);
+  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
 
   const updateContactMutation = useUpdateContact();
 
