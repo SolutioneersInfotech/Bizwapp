@@ -70,6 +70,7 @@ import NewChatDialog from "../../components/newChat";
 import { Spinner } from "@/components/ui/spinner";
 import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatArea";
+import axios from "axios";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -117,6 +118,8 @@ export default function ConversationsPage() {
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [userId , setUserId]= useState(null);
   const [template , setTemplate] =useState({ });
+    const fileInputRef = useRef();
+
 
   useEffect(()=>{
     const userData = JSON.parse(localStorage.getItem('user'));
@@ -413,6 +416,35 @@ export default function ConversationsPage() {
     }
   };
 
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
+
+  const handleFileChange = async (event) => {
+    console.log("svgvsjdgvjgvsj")
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Cloudinary upload logic
+    const formData = new FormData();
+    formData.append('file', file);
+    console.log("filefilefile", file)
+    formData.append('upload_preset', 'preset'); // Replace with your preset
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/di3jsead7/image/upload',
+        formData
+      );
+      const imageUrl = response.data.secure_url;
+      console.log('Uploaded Image URL:', imageUrl);
+      // if (onUpload) onUpload(imageUrl);
+    } catch (error) {
+      console.error('Upload error:', error);
+    }
+  };
+
 
   const handleDeleteConversation = (contact) => {
     // In a real app, this would be an API call
@@ -547,6 +579,16 @@ export default function ConversationsPage() {
                     </div>
                   )}
                 </div>
+                <button className="w-full px-4 py-2 rounded hover:bg-green-600 hover:text-white transition bg-white-700 text-green-600 border border-green-600" onClick={handleButtonClick}>
+                Select Image File
+              </button>
+              <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileChange}
+              />
               </TabsContent>
             </Tabs>
 
