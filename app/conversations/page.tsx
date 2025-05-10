@@ -116,6 +116,7 @@ export default function ConversationsPage() {
   const [message, setMessage] = useState([]);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [userId , setUserId]= useState(null);
+  const [template , setTemplate] =useState({ });
 
   useEffect(()=>{
     const userData = JSON.parse(localStorage.getItem('user'));
@@ -123,7 +124,7 @@ export default function ConversationsPage() {
       const id = userData.id || userData.user?._id || null;
       setUserId(id);
     }
-  },[])
+  },[]);
 
   const { data: getAllConversation } = useGetAllConversation(userId);
 
@@ -303,6 +304,10 @@ export default function ConversationsPage() {
     if (!selectedContact) return;
 
     const template = templates.find((t) => t.id === templateId);
+    console.log("templatevvvvvvvvv", template)
+    if(template){
+      setTemplate(template);
+    }
     if (!template) return;
 
     try {
@@ -314,12 +319,12 @@ export default function ConversationsPage() {
       }];
       
 
-      console.log("simplifiedContactssimplifiedContacts",simplifiedContacts)
+      let cleanedMessage = template.content.replace(/\\\"/g,'');
       
       mutate({
         userId:userId,
         contacts: simplifiedContacts,
-        message: JSON.stringify(templates),
+        message: cleanedMessage,
       });
       setTemplateDialogOpen(false);
 
@@ -664,6 +669,7 @@ export default function ConversationsPage() {
           handleMuteConversation={handleMuteConversation}
           handleDeleteConversation={handleDeleteConversation}
           templates={templates}
+          template={template}
           handleSendTemplate={handleSendTemplate}
           templateDialogOpen={templateDialogOpen}
           setTemplateDialogOpen={setTemplateDialogOpen}
@@ -682,6 +688,7 @@ export default function ConversationsPage() {
         handleMuteConversation={handleMuteConversation}
         handleDeleteConversation={handleDeleteConversation}
         templates={templates}
+        template={template}
         handleSendTemplate={handleSendTemplate}
         templateDialogOpen={templateDialogOpen}
         setTemplateDialogOpen={setTemplateDialogOpen}

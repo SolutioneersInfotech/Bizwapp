@@ -37,7 +37,7 @@ export interface Template {
   id: string
   name: string
   category: string
-  content: string
+  message: string
   status: "Approved" | "Pending" | "Rejected"
   updated: string
   usageCount: number

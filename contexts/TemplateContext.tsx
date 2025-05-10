@@ -181,7 +181,7 @@ const mockTemplates: Template[] = [
     id: "template_1",
     name: "Welcome Message",
     category: "Onboarding",
-    content: "Hello {{1}}, thank you for contacting us! How can we assist you today?",
+    message: "Hello {{1}}, thank you for contacting us! How can we assist you today?",
     status: "Approved",
     updated: "2023-05-15T10:30:00Z",
     usageCount: 245,
@@ -202,7 +202,7 @@ const mockTemplates: Template[] = [
     id: "template_2",
     name: "Order Confirmation",
     category: "Transactional",
-    content:
+    message:
       "Your order #{{1}} has been confirmed and is being processed. Expected delivery: {{2}}. Thank you for shopping with us!",
     status: "Approved",
     updated: "2023-05-10T14:20:00Z",
@@ -228,7 +228,7 @@ const mockTemplates: Template[] = [
     id: "template_3",
     name: "Support Follow-up",
     category: "Customer Support",
-    content:
+    message:
       "Hi {{1}}, we wanted to follow up on your recent support request. Has your issue been resolved to your satisfaction?",
     status: "Pending",
     updated: "2023-05-18T09:15:00Z",
@@ -250,7 +250,7 @@ const mockTemplates: Template[] = [
     id: "template_4",
     name: "Appointment Reminder",
     category: "Scheduling",
-    content:
+    message:
       "Reminder: You have an appointment scheduled for {{1}} at {{2}}. Please reply YES to confirm or NO to reschedule.",
     status: "Approved",
     updated: "2023-05-12T11:45:00Z",
@@ -276,7 +276,7 @@ const mockTemplates: Template[] = [
     id: "template_5",
     name: "Feedback Request",
     category: "Engagement",
-    content: "We value your opinion! Please rate your recent experience with us from 1-5, with 5 being excellent.",
+    message: "We value your opinion! Please rate your recent experience with us from 1-5, with 5 being excellent.",
     status: "Rejected",
     updated: "2023-05-19T16:30:00Z",
     usageCount: 0,
@@ -286,7 +286,7 @@ const mockTemplates: Template[] = [
     id: "template_6",
     name: "Product Restock",
     category: "Marketing",
-    content: "Good news! The {{1}} you were interested in is back in stock. Shop now before it sells out again!",
+    message: "Good news! The {{1}} you were interested in is back in stock. Shop now before it sells out again!",
     status: "Pending",
     updated: "2023-05-17T13:10:00Z",
     usageCount: 0,

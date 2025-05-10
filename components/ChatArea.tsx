@@ -2,6 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import Picker, { Emoji } from "emoji-picker-react";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import EmojiPicker from "./ui/emoji-picker";
 
 interface Message {
   _id: string;
@@ -111,6 +113,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   handleArchiveConversation,
   handleDeleteConversation,
   handleSendTemplate,
+  template,
 }) => {
   const selectedPhone = selectedContact?.phoneNumber;
   const selectedName = selectedContact?.name;
@@ -120,9 +123,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const socketRef = useRef<Socket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+    const [showPicker, setShowPicker] = useState(false);
 
   const [newMessage, setNewMessage] = useState("");
   const [userId, setUserId] = useState(null);
+
+  useEffect(()=>{
+    const userData = JSON.parse(localStorage.getItem('user'));
+    if (userData) {
+      const id = userData.id || userData.user?._id || null;
+      setUserId(id);
+    }
+  },[]);
 
   useEffect(() => {
     socketRef.current = io("https://bizwapp-backend-2.onrender.com", {
@@ -187,15 +199,23 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   }, [sortedMessages]);
 
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    setUserId(userData?.user?._id);
-  }, []);
+  useEffect(()=>{
+    // setMessage((prev) => [...prev, template.content]);
+    const messageToSend = {
+      message: template.content,
+      name: "user", // or however you identify the sender
+      timestamp: new Date().toISOString(),
+      direction: "outbound",
+    };
+    setMessage((prev) => [...prev, messageToSend]);
+  }, [template.content])
+
+  console.log("template.contenttemplate.content", template.content)
+
 
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 
   const handleSendMessage = async () => {
-    console.log("hello");
     if (!selectedContact || !newMessage.trim()) return;
 
     const messageToSend = {
@@ -204,13 +224,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       timestamp: new Date().toISOString(),
       direction: "outbound",
     };
-
-    console.log("messageToSend", messageToSend);
-    // setConversationHistory((prev) => [...prev, messageToSend]);
     setMessage((prev) => [...prev, messageToSend]);
     setNewMessage("");
-
-    console.log("we are inside handleSendMessage", messageToSend);
     mutate({
       userId: userId,
       contacts: [
@@ -222,7 +237,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       message: newMessage,
     });
 
-    await sendMessage(selectedContact.phone, newMessage);
     setNewMessage("");
   };
 
@@ -236,6 +250,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setOpen(false);
   };
 
+  const handleEmojiSelect = (emoji: string) => {
+    setNewMessage((prev) => prev + emoji)
+  };
 
   return (
     <div className="flex flex-col h-screen">
@@ -445,9 +462,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   }}
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Smile className="h-4 w-4" />
-                  </Button>
+                  {/* <Button variant="ghost" size="icon" className="h-8 w-8" onClick={()=>setShowPicker(!showPicker)}> */}
+                    <EmojiPicker  onEmojiSelect={handleEmojiSelect} />
+                  {/* </Button> */}
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <ImageIcon className="h-4 w-4" />
                   </Button>
