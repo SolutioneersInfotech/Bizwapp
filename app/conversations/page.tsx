@@ -71,6 +71,7 @@ import { Spinner } from "@/components/ui/spinner";
 import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatArea";
 import axios from "axios";
+import useSendWhatsAppImage from "../../hooks/api/sendImageWhatsapp";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -118,6 +119,7 @@ export default function ConversationsPage() {
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [userId , setUserId]= useState(null);
   const [template , setTemplate] =useState({ });
+  const [ imagesend , setImageSend ] = useState("")
     const fileInputRef = useRef();
 
 
@@ -213,7 +215,7 @@ export default function ConversationsPage() {
     : [];
 
 
-    const {mutate} = useSendWhatsAppMessage()
+    const {mutate : sendImageMutation} = useSendWhatsAppMessage()
 
   const handleSendBulkMessage = async () => {
     if (
@@ -237,6 +239,18 @@ export default function ConversationsPage() {
         description: "Please select a template and at least one contact",
         variant: "destructive",
       });
+      return;
+    }
+
+    const contactsToSend = contacts?.contacts
+          .filter((contact) => selectedContacts.includes(contact.phone))
+          .map((contact) => ({
+            phoneNumber: contact.phone,
+            name: contact.name,
+          }));
+
+    if (!imagesend){
+      sendImageMutation({ contacts :contactsToSend, imageUrl})
       return;
     }
     try {
@@ -301,6 +315,8 @@ export default function ConversationsPage() {
       });
     }
   };
+
+  const { mutate  } = useSendWhatsAppImage();
 
 
   const handleSendTemplate = async (templateId: string) => {
@@ -439,7 +455,9 @@ export default function ConversationsPage() {
       );
       const imageUrl = response.data.secure_url;
       console.log('Uploaded Image URL:', imageUrl);
+      setImageSend(imageUrl)
       // if (onUpload) onUpload(imageUrl);
+      
     } catch (error) {
       console.error('Upload error:', error);
     }

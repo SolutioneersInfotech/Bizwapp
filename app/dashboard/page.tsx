@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/contexts/AuthContext"
 import { useAnalytics } from "@/contexts/AnalyticsContext"
-import { toast } from "react-toastify"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -38,9 +37,6 @@ export default function DashboardPage() {
     return <DashboardSkeleton />
   }
 
-  const Conversation = ()=>{
-    toast.success('This is a success message!');
-  }
 
   return (
     <div className="flex flex-col">
@@ -48,10 +44,8 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
           <div className="flex items-center space-x-2">
-            <Button onClick={Conversation}>
               <MessageSquare className="mr-2 h-4 w-4" />
               New Conversation
-            </Button>
           </div>
         </div>
 
