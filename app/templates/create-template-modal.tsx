@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import useUploadMedia from "../../hooks/api/useUploadImage.ts";
 import {
   Select,
   SelectContent,
@@ -20,11 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, Trash2 } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { PlusCircle, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
 import { useSendTemplateMutation } from "../../hooks/api/templateApproaval.ts";
-
-
+import  useFacebookUpload  from "../../hooks/api/useUploadMedia.ts";
 
 interface TemplateComponent {
   type: string;
@@ -44,38 +45,38 @@ interface TemplateData {
 }
 
 const defaultTemplate: TemplateData = {
-  "name": "orderdate",
-  "category": "UTILITY",
-  "language": "en",
-  "components": [
+  name: "orderdate",
+  category: "UTILITY",
+  language: "en",
+  components: [
     {
-      "type": "HEADER",
-      "format": "TEXT",
-      "text": "Order Update"
+      type: "HEADER",
+      format: "TEXT",
+      text: "Order Update",
     },
     {
-      "type": "BODY",
-      "text": "Hello Abhi, your order macbook has been shipped! 🚚"
+      type: "BODY",
+      text: "Hello Abhi, your order macbook has been shipped! 🚚",
     },
     {
-      "type": "FOOTER",
-      "text": "Thank you for shopping with us!"
+      type: "FOOTER",
+      text: "Thank you for shopping with us!",
     },
     {
-      "type": "BUTTONS",
-      "buttons": [
+      type: "BUTTONS",
+      buttons: [
         {
-          "type": "QUICK_REPLY",
-          "text": "Track Order"
+          type: "QUICK_REPLY",
+          text: "Track Order",
         },
         {
-          "type": "QUICK_REPLY",
-          "text": "Contact Support"
-        }
-      ]
-    }
-  ]
-}
+          type: "QUICK_REPLY",
+          text: "Contact Support",
+        },
+      ],
+    },
+  ],
+};
 
 interface CreateTemplateModalProps {
   open: boolean;
@@ -89,19 +90,54 @@ export default function CreateTemplateModal({
   onSubmit,
 }: CreateTemplateModalProps) {
   const [activeTab, setActiveTab] = useState<"visual" | "json">("visual");
-  const [template, setTemplate] = useState<TemplateData>({ ...defaultTemplate });
+  const [template, setTemplate] = useState<TemplateData>({
+    ...defaultTemplate,
+  });
   const [jsonInput, setJsonInput] = useState<string>(
     JSON.stringify(defaultTemplate, null, 2)
   );
   const [jsonError, setJsonError] = useState<string | null>(null);
 
-  const updateTemplate = (updatedTemplate: TemplateData) => {
-    setTemplate(updatedTemplate);
-    setJsonInput(JSON.stringify(updatedTemplate, null, 2));
+    const [file, setFile] = useState(null);
+  const [uploadUrl, setUploadUrl] = useState('');
+  const { uploadToFacebook, uploading, responseData } = useFacebookUpload();
+
+      const fileInputRef = useRef(null);
+
+      const handleButtonClick = () => {
+    fileInputRef.current?.click(); // Trigger file input
+  };
+
+    const { uploadMedia, loading, error:uploadMediaError, response:uploadMediaResponse } = useUploadMedia();
+
+  const handleFileChange = async(event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log("Selected file:", file);
+      console.log("file,  fileType: file.type" , file,  file.type)
+
+      uploadMedia({ file,  fileType: file.type });
+      console.log("uploadMediaResponse", uploadMediaResponse.id)
+
+      if(uploadMediaResponse){
+         const result =   await uploadToFacebook(file, uploadMediaResponse.id);
+
+      if (result.success) {
+    console.log("Upload success", result.data);
+  } else {
+    console.error("Upload failed", result.error);
+  }
+      }
+
+    }
   };
 
 
 
+  const updateTemplate = (updatedTemplate: TemplateData) => {
+    setTemplate(updatedTemplate);
+    setJsonInput(JSON.stringify(updatedTemplate, null, 2));
+  };
 
   const handleJsonChange = (value: string) => {
     setJsonInput(value);
@@ -116,9 +152,8 @@ export default function CreateTemplateModal({
 
   const { mutate, isLoading, isError, error } = useSendTemplateMutation();
 
-
   const handleSubmit = (jsonInput) => {
-    console.log("jsonInput", jsonInput)
+    console.log("jsonInput", jsonInput);
     mutate(jsonInput, {
       onSuccess: (response) => {
         if (response.status === "APPROVED") {
@@ -132,8 +167,7 @@ export default function CreateTemplateModal({
             progress: undefined,
             theme: "colored",
           });
-        }
-        else {
+        } else {
           toast.error(`ℹ️ Template status: ${response.status}`, {
             position: "bottom-right",
             autoClose: 5000,
@@ -145,31 +179,30 @@ export default function CreateTemplateModal({
             theme: "colored",
           });
         }
-
-
       },
       onError: (err) => {
         console.error("Error submitting template:", err);
-    
-        // Extract error message from the response
-        const errorTitle = err?.response?.data?.error?.error_user_title || "Error";
-    const errorMessage =
-      err?.response?.data?.error?.error_user_msg ||
-      err?.response?.data?.error?.message ||
-      err?.message ||
-      "Something went wrong!";
 
-    // Show error toast with both title and message
-    toast.error(`❌ ${errorTitle}: ${errorMessage}`, {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+        // Extract error message from the response
+        const errorTitle =
+          err?.response?.data?.error?.error_user_title || "Error";
+        const errorMessage =
+          err?.response?.data?.error?.error_user_msg ||
+          err?.response?.data?.error?.message ||
+          err?.message ||
+          "Something went wrong!";
+
+        // Show error toast with both title and message
+        toast.error(`❌ ${errorTitle}: ${errorMessage}`, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
       },
     });
     onSubmit(template);
@@ -192,10 +225,15 @@ export default function CreateTemplateModal({
     updateTemplate(updatedTemplate);
   };
 
-  const updateButton = (componentIndex: number, buttonIndex: number, text: string) => {
+  const updateButton = (
+    componentIndex: number,
+    buttonIndex: number,
+    text: string
+  ) => {
     const updatedTemplate = { ...template };
     if (updatedTemplate.components[componentIndex].buttons) {
-      updatedTemplate.components[componentIndex].buttons![buttonIndex].text = text;
+      updatedTemplate.components[componentIndex].buttons![buttonIndex].text =
+        text;
       updateTemplate(updatedTemplate);
     }
   };
@@ -203,7 +241,10 @@ export default function CreateTemplateModal({
   const removeButton = (componentIndex: number, buttonIndex: number) => {
     const updatedTemplate = { ...template };
     if (updatedTemplate.components[componentIndex].buttons) {
-      updatedTemplate.components[componentIndex].buttons!.splice(buttonIndex, 1);
+      updatedTemplate.components[componentIndex].buttons!.splice(
+        buttonIndex,
+        1
+      );
       updateTemplate(updatedTemplate);
     }
   };
@@ -228,6 +269,8 @@ export default function CreateTemplateModal({
       updateTemplate(updatedTemplate);
     }
   };
+
+  console.log("templatetemplatetemplate" , template)
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -321,48 +364,71 @@ export default function CreateTemplateModal({
                   {component.type === "HEADER" && (
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Format</label>
-                      <Select
-                        value={component.format || "TEXT"}
-                        onValueChange={(value) => {
-                          const updatedTemplate = { ...template };
-                          updatedTemplate.components[index].format = value;
-                          updateTemplate(updatedTemplate);
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="TEXT">Text</SelectItem>
-                          <SelectItem value="IMAGE">Image</SelectItem>
-                          <SelectItem value="VIDEO">Video</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 max-w-[600px]">
+                          <Select
+                            value={component.format || "TEXT"}
+                            onValueChange={(value) => {
+                              const updatedTemplate = { ...template };
+                              updatedTemplate.components[index].format = value;
+                              updateTemplate(updatedTemplate);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="TEXT">Text</SelectItem>
+                              <SelectItem value="IMAGE">Image</SelectItem>
+                              <SelectItem value="VIDEO">Video</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {component.format === "IMAGE" && (
+                          <button
+                            type="button"
+                            className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                            onClick={handleButtonClick}
+                          >
+                            Select Image
+                          </button>
+                        )}
+                        <Input
+                        type='file'
+                        className='hidden'
+                        accept='image/*'
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        />
+                      </div>
                     </div>
                   )}
 
                   {(component.type === "HEADER" ||
                     component.type === "BODY" ||
                     component.type === "FOOTER") && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Text</label>
-                        <Textarea
-                          value={component.text || ""}
-                          onChange={(e) => {
-                            const updatedTemplate = { ...template };
-                            updatedTemplate.components[index].text = e.target.value;
-                            updateTemplate(updatedTemplate);
-                          }}
-                          placeholder={`Enter ${component.type.toLowerCase()} text`}
-                          rows={component.type === "BODY" ? 4 : 2}
-                        />
-                        {component.type === "BODY" && (
-                          <p className="text-xs text-muted-foreground">
-                            Use &#123;&#123;1&#125;&#125;, &#123;&#123;2&#125;&#125; for variables
-                          </p>
-                        )}
-                      </div>
-                    )}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Text</label>
+                      <Textarea
+                        value={component.text || ""}
+                        onChange={(e) => {
+                          const updatedTemplate = { ...template };
+                          updatedTemplate.components[index].text =
+                            e.target.value;
+                          updateTemplate(updatedTemplate);
+                        }}
+                        placeholder={`Enter ${component.type.toLowerCase()} text`}
+                        rows={component.type === "BODY" ? 4 : 2}
+                      />
+                      {component.type === "BODY" && (
+                        <p className="text-xs text-muted-foreground">
+                          Use &#123;&#123;1&#125;&#125;,
+                          &#123;&#123;2&#125;&#125; for variables
+                        </p>
+                      )}
+                    </div>
+                  )}
                   {/* <ToastContainer
                   position="bottom-right"
                   autoClose={5000}
@@ -445,7 +511,9 @@ export default function CreateTemplateModal({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => handleSubmit(jsonInput)}>Create Template</Button>
+          <Button onClick={() => handleSubmit(jsonInput)}>
+            Create Template
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

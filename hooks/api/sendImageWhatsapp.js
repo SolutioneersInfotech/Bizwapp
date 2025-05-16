@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 
 const sendWhatsAppImage = async ({ phone, imageUrl }) => {
-  const response = await fetch("/api/send-image", {
+  const response = await fetch("/send-image-whatsapp", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
