@@ -16,7 +16,6 @@ interface TemplateData {
 
   const useSendTemplateMutation = () => {
     const accessToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN ?? "";
-
     return useMutation({
       mutationFn: async (jsonInput: TemplateData) => {
       const response = await fetch(API_URL, {
@@ -30,12 +29,21 @@ interface TemplateData {
 
       console.log("response.",response)
   
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Failed to send template");
+        // ✅ Instead of throwing just the message, throw the full object
+        throw {
+          name: "ApiError",
+          message: responseData?.error?.message || "Request failed",
+          response: {
+            data: responseData,
+            status: response.status,
+          },
+        };
       }
-  
-      return response.json();
+
+      return responseData;
     }
     });
   };

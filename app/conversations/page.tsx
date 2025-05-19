@@ -71,7 +71,7 @@ import { Spinner } from "@/components/ui/spinner";
 import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatArea";
 import axios from "axios";
-import useSendWhatsAppImage from "../../hooks/api/sendImageWhatsapp";
+// import useSendWhatsAppImage from "../../hooks/api/sendImageWhatsapp";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -215,7 +215,7 @@ export default function ConversationsPage() {
     : [];
 
 
-    const {mutate : sendImageMutation} = useSendWhatsAppMessage()
+    const {mutate} = useSendWhatsAppMessage()
 
   const handleSendBulkMessage = async () => {
     if (
@@ -249,10 +249,10 @@ export default function ConversationsPage() {
             name: contact.name,
           }));
 
-    if (!imagesend){
-      sendImageMutation({ contacts :contactsToSend, imageUrl})
-      return;
-    }
+    // if (!imagesend){
+    //   sendImageMutation({ contacts :contactsToSend, imageUrl})
+    //   return;
+    // }
     try {
 
       const contactsToSend = contacts?.contacts
@@ -271,7 +271,7 @@ export default function ConversationsPage() {
         console.log("contactsToSend", contactsToSend);
         console.log("messageToSend", messageToSend)
 
-        mutate({
+        sendImageMutation({
           userId:userId,
           contacts: contactsToSend,
           message: messageToSend,
@@ -290,7 +290,7 @@ export default function ConversationsPage() {
           message: templateMessage,
         });
 
-        mutate({
+        sendImageMutation({
           userId:userId,
           contacts: contactsToSend,
           message: templateMessage,
@@ -316,7 +316,6 @@ export default function ConversationsPage() {
     }
   };
 
-  const { mutate  } = useSendWhatsAppImage();
 
 
   const handleSendTemplate = async (templateId: string) => {
@@ -597,7 +596,7 @@ export default function ConversationsPage() {
                     </div>
                   )}
                 </div>
-                <button className="w-full px-4 py-2 rounded hover:bg-green-600 hover:text-white transition bg-white-700 text-green-600 border border-green-600" onClick={handleButtonClick}>
+                {/* <button className="w-full px-4 py-2 rounded hover:bg-green-600 hover:text-white transition bg-white-700 text-green-600 border border-green-600" onClick={handleButtonClick}>
                 Select Image File
               </button>
               <input
@@ -606,7 +605,7 @@ export default function ConversationsPage() {
               ref={fileInputRef}
               className="hidden"
               onChange={handleFileChange}
-              />
+              /> */}
               </TabsContent>
             </Tabs>
 

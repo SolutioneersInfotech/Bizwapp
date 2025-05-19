@@ -1,32 +1,31 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-const useGetContacts =  (url)=>{
+const fetchContacts = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  return response.json();
+};
 
-    const [ data , setData ] = useState(null);
-    const [ loading , setLoading] = useState(true);
-    const [ error , setError ] = useState(null)
+const useGetContacts = (url) => {
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['contacts', url],
+    queryFn: () => fetchContacts(url),
+  });
 
-    useEffect(()=>{
-        const fetchData = async () =>{
-            try {
-                const response = await fetch(url)
-                if (!response.ok){
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const result = await response.json();
-                setData(result)
-            } catch (error) {
-                setError(error.message)
-            } finally{
-                setLoading(false)
-            }
-        }
-        fetchData();
-
-    }, [url]);
-
-    return { data , loading , error };
+  return {
+    data,
+    loading: isLoading,
+    error: isError ? error.message : null,
+    refetch,
+  };
 };
 
 export default useGetContacts;

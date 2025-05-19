@@ -25,7 +25,7 @@ import {
 import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useSendTemplateMutation } from "../../hooks/api/templateApproaval.ts";
-import  useFacebookUpload  from "../../hooks/api/useUploadMedia.ts";
+import useFacebookUpload from "../../hooks/api/useUploadMedia.ts";
 
 interface TemplateComponent {
   type: string;
@@ -98,41 +98,60 @@ export default function CreateTemplateModal({
   );
   const [jsonError, setJsonError] = useState<string | null>(null);
 
-    const [file, setFile] = useState(null);
-  const [uploadUrl, setUploadUrl] = useState('');
+  const [file, setFile] = useState(null);
+  const [uploadUrl, setUploadUrl] = useState("");
   const { uploadToFacebook, uploading, responseData } = useFacebookUpload();
+  const [uploadSuccess, SetUploadSuccess] = useState(null);
 
-      const fileInputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-      const handleButtonClick = () => {
+  const handleButtonClick = () => {
     fileInputRef.current?.click(); // Trigger file input
   };
 
-    const { uploadMedia, loading, error:uploadMediaError, response:uploadMediaResponse } = useUploadMedia();
+  const {
+    uploadMedia,
+    loading,
+    error: uploadMediaError,
+    response: uploadMediaResponse,
+  } = useUploadMedia();
 
-  const handleFileChange = async(event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
       console.log("Selected file:", file);
-      console.log("file,  fileType: file.type" , file,  file.type)
+      console.log("file,  fileType: file.type", file, file.type);
 
-      uploadMedia({ file,  fileType: file.type });
-      console.log("uploadMediaResponse", uploadMediaResponse.id)
+      uploadMedia({ file, fileType: file.type });
+      console.log("uploadMediaResponse", uploadMediaResponse.id);
 
-      if(uploadMediaResponse){
-         const result =   await uploadToFacebook(file, uploadMediaResponse.id);
+      if (uploadMediaResponse) {
+        const result = await uploadToFacebook(file, uploadMediaResponse.id);
 
-      if (result.success) {
-    console.log("Upload success", result.data);
-  } else {
-    console.error("Upload failed", result.error);
-  }
+        if (result.success) {
+          const handle = result.data.h;
+          console.log("Upload success", handle);
+          SetUploadSuccess(handle); // Optional, for display
+
+          // 🔥 Update the template with the actual header_handle
+          const updatedTemplate = { ...template };
+          const headerIndex = updatedTemplate.components.findIndex(
+            (c) => c.type === "HEADER"
+          );
+
+          if (headerIndex !== -1) {
+            delete updatedTemplate.components[headerIndex].text;
+            updatedTemplate.components[headerIndex].example = {
+              header_handle: handle,
+            };
+            updateTemplate(updatedTemplate);
+          }
+        } else {
+          console.error("Upload failed", result.error);
+        }
       }
-
     }
   };
-
-
 
   const updateTemplate = (updatedTemplate: TemplateData) => {
     setTemplate(updatedTemplate);
@@ -156,7 +175,7 @@ export default function CreateTemplateModal({
     console.log("jsonInput", jsonInput);
     mutate(jsonInput, {
       onSuccess: (response) => {
-        if (response.status === "APPROVED") {
+        if (response.status === "PENDING" || response.status === "APPROVED") {
           toast.success(`✅ Your submitted Template is ${response.status}`, {
             position: "bottom-right",
             autoClose: 5000,
@@ -181,26 +200,24 @@ export default function CreateTemplateModal({
         }
       },
       onError: (err) => {
-        console.error("Error submitting template:", err);
+        console.log("error", err);
 
-        // Extract error message from the response
-        const errorTitle =
-          err?.response?.data?.error?.error_user_title || "Error";
+        const error = err?.response?.data?.error || err?.data?.error || {}; // fallback
+
+        const errorTitle = error?.error_user_title || "Error";
         const errorMessage =
-          err?.response?.data?.error?.error_user_msg ||
-          err?.response?.data?.error?.message ||
-          err?.message ||
+          error?.error_user_msg ||
+          error?.message ||
+          err?.message || // fallback for thrown Error objects
           "Something went wrong!";
 
-        // Show error toast with both title and message
-        toast.error(`❌ ${errorTitle}: ${errorMessage}`, {
+        toast.error(`❌ Error: ${errorMessage}`, {
           position: "bottom-right",
-          autoClose: 5000,
+          autoClose: 6000,
           hideProgressBar: false,
-          closeOnClick: false,
+          closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          progress: undefined,
           theme: "colored",
         });
       },
@@ -270,7 +287,7 @@ export default function CreateTemplateModal({
     }
   };
 
-  console.log("templatetemplatetemplate" , template)
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -370,7 +387,21 @@ export default function CreateTemplateModal({
                             value={component.format || "TEXT"}
                             onValueChange={(value) => {
                               const updatedTemplate = { ...template };
-                              updatedTemplate.components[index].format = value;
+                              const headerComponent =
+                                updatedTemplate.components[index];
+
+                              headerComponent.format = value;
+
+                              if (value === "IMAGE") {
+                                delete headerComponent.text;
+                                delete headerComponent.example; // clear for now
+                              } else {
+                                if (!headerComponent.text) {
+                                  headerComponent.text = "Order Update";
+                                }
+                                delete headerComponent.example;
+                              }
+
                               updateTemplate(updatedTemplate);
                             }}
                           >
@@ -395,11 +426,28 @@ export default function CreateTemplateModal({
                           </button>
                         )}
                         <Input
-                        type='file'
-                        className='hidden'
-                        accept='image/*'
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                        />
+
+                        {component.format === "VIDEO" && (
+                          <button
+                            type="button"
+                            className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                            onClick={handleButtonClick}
+                          >
+                            Select Image
+                          </button>
+                        )}
+                        <Input
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
                         />
                       </div>
                     </div>
@@ -407,28 +455,37 @@ export default function CreateTemplateModal({
 
                   {(component.type === "HEADER" ||
                     component.type === "BODY" ||
-                    component.type === "FOOTER") && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Text</label>
-                      <Textarea
-                        value={component.text || ""}
-                        onChange={(e) => {
-                          const updatedTemplate = { ...template };
-                          updatedTemplate.components[index].text =
-                            e.target.value;
-                          updateTemplate(updatedTemplate);
-                        }}
-                        placeholder={`Enter ${component.type.toLowerCase()} text`}
-                        rows={component.type === "BODY" ? 4 : 2}
-                      />
-                      {component.type === "BODY" && (
-                        <p className="text-xs text-muted-foreground">
-                          Use &#123;&#123;1&#125;&#125;,
-                          &#123;&#123;2&#125;&#125; for variables
-                        </p>
-                      )}
-                    </div>
-                  )}
+                    component.type === "FOOTER") &&
+                    !(
+                      (component.type === "HEADER" &&
+                        component.format === "IMAGE") ||
+                      (component.type === "HEADER" &&
+                        component.format === "VIDEO")
+                    ) && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Text</label>
+
+                        <Textarea
+                          value={component.text || ""}
+                          onChange={(e) => {
+                            const updatedTemplate = { ...template };
+                            updatedTemplate.components[index].text =
+                              e.target.value;
+                            updateTemplate(updatedTemplate);
+                          }}
+                          placeholder={`Enter ${component.type.toLowerCase()} text`}
+                          rows={component.type === "BODY" ? 4 : 2}
+                        />
+
+                        {component.type === "BODY" && (
+                          <p className="text-xs text-muted-foreground">
+                            Use &#123;&#123;1&#125;&#125;,
+                            &#123;&#123;2&#125;&#125; for variables
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                   {/* <ToastContainer
                   position="bottom-right"
                   autoClose={5000}

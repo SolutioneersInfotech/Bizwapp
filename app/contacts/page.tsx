@@ -164,10 +164,18 @@ export default function ContactsPage() {
 
   }, []);
 
+  // const {
+  //   data: getContacts,
+  //   loading,
+  //   error,
+  //   refetch
+  // } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
+
   const {
-    data: getContacts,
+    data : getContacts,
     loading,
     error,
+    refetch
   } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
 
   const updateContactMutation = useUpdateContact();
@@ -324,6 +332,7 @@ export default function ContactsPage() {
           description: data.message,
         });
         console.log("Success:", data);
+        refetch;
       },
       onError: (error) => {
         toast({
@@ -459,6 +468,7 @@ export default function ContactsPage() {
     mutation.mutate(contactArray,{
       onSuccess:(data) =>{
         console.log("data" , data);
+        refetch;
         toast({
           title: "Success",
           description: data.message,
@@ -490,6 +500,7 @@ export default function ContactsPage() {
       {
         onSuccess: () => {
           console.log("Contact updated successfully!");
+          refetch;
         },
         onError: (error) => {
           console.error("Error updating contact:", error);

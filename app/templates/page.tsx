@@ -216,7 +216,6 @@ useEffect(() => {
     setDeleteDialogOpen(true)
   }
 
-  console.log("Filtered Templates:", filteredTemplates)
   console.log("isLoading", isLoading)
 
   return (
