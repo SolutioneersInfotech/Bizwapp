@@ -248,11 +248,6 @@ export default function ConversationsPage() {
             phoneNumber: contact.phone,
             name: contact.name,
           }));
-
-    // if (!imagesend){
-    //   sendImageMutation({ contacts :contactsToSend, imageUrl})
-    //   return;
-    // }
     try {
 
       const contactsToSend = contacts?.contacts
@@ -271,7 +266,7 @@ export default function ConversationsPage() {
         console.log("contactsToSend", contactsToSend);
         console.log("messageToSend", messageToSend)
 
-        sendImageMutation({
+        mutate({
           userId:userId,
           contacts: contactsToSend,
           message: messageToSend,
@@ -290,7 +285,7 @@ export default function ConversationsPage() {
           message: templateMessage,
         });
 
-        sendImageMutation({
+        mutate({
           userId:userId,
           contacts: contactsToSend,
           message: templateMessage,
