@@ -39,6 +39,7 @@ import usePostData from "@/hooks/api/usePostData";
 import { useEffect, useState } from "react";
 import NewChatDialog from "./newChat";
 import CreateTemplateModal from "@/app/templates/create-template-modal";
+import {  useQueryClient  } from "@tanstack/react-query";
 
 const mainMenuItems = [
   {
@@ -126,10 +127,11 @@ export default function ClientLayout({
           const id = userData.id || userData.user?._id || null;
           setUserId(id);
         }
-      },[])
+      },[]);
+
+  const queryClient = useQueryClient();
 
   const handleStartNewChat = () => {
-    console.log("New chat with", newChatPhone, newChatMessage);
     setNewChatDialogOpen(false);
   };
 
@@ -148,17 +150,19 @@ export default function ClientLayout({
     }));
   };
 
-  const mutation = usePostData("https://api.bizwapp.com/api/auth/addContact");
+  const mutation = usePostData(`http://localhost:5001/api/auth/addContact/${userId}`);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("New Contact:", newContact);
-    const contactWithUserId = { ...newContact , userId}
-    const contactArray = [contactWithUserId];
+    const contactArray = [newContact]
+    // const contactWithUserId = { ...newContact , userId}
+    // const contactArray = [contactWithUserId];
+
     mutation.mutate(contactArray, {
       onSuccess: (data) => {
         console.log(data);
-        alert(data["message"]);
+        queryClient.invalidateQueries({ queryKey: ['contacts'] });
+
       },
       onError: (data) => {
         alert(data["message"]);

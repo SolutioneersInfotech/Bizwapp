@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import {  useQueryClient } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -153,9 +154,11 @@ export default function ContactsPage() {
   const [userId , setUserId ] = useState(null);
   const [mounted, setMounted] = useState(false);
 
+  const queryClient = useQueryClient();
+
+
   useEffect(() => {
     setMounted(true);
-      console.log("i am inside useEffect.")
       const userData = JSON.parse(localStorage.getItem('user'));
       if (userData) {
         const id = userData.id || userData.user?._id || null;
@@ -295,8 +298,9 @@ export default function ContactsPage() {
     reader.readAsArrayBuffer(file);
   };
 
+
   const { mutate, isError, data } = usePostData(
-    "https://api.bizwapp.com/api/auth/addContact"
+    `http://localhost:5001/api/auth/addContact/${userId}`
   );
 
   // Handle import confirmation
@@ -324,7 +328,6 @@ export default function ContactsPage() {
     const contactsToSend = importedContacts.map(
       ({ id, ...contact }) => contact
     );
-    console.log("importedContacts. ", contactsToSend);
     mutate(contactsToSend, {
       onSuccess: (data) => {
         toast({
@@ -332,7 +335,7 @@ export default function ContactsPage() {
           description: data.message,
         });
         console.log("Success:", data);
-        refetch;
+        queryClient.invalidateQueries({ queryKey: ['contacts'] });
       },
       onError: (error) => {
         toast({
@@ -353,7 +356,6 @@ export default function ContactsPage() {
   };
 
   const handleEdit = (contact) => {
-    console.log("contact", contact);
     const { _id, name, phone, email } = contact;
     setUpdatingContactId(_id);
     const updateData = { name, phone, email };
@@ -458,17 +460,19 @@ export default function ContactsPage() {
     setNewContact({ ...newContact, [e.target.name]: e.target.value });
   };
 
-  const mutation = usePostData("https://api.bizwapp.com/api/auth/addContact");
+  const mutation = usePostData(`http://localhost:5001/api/auth/addContact/${userId}`);
 
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  const contactWithUserId = { ...newContact , userId}
-    const contactArray = [contactWithUserId];
+
+    const contactArray = [newContact];
+
     mutation.mutate(contactArray,{
+
       onSuccess:(data) =>{
         console.log("data" , data);
-        refetch;
+        queryClient.invalidateQueries({ queryKey: ['contacts'] });
         toast({
           title: "Success",
           description: data.message,
@@ -489,9 +493,7 @@ export default function ContactsPage() {
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle saving the contact data here
-    console.log("Saving contact:", contactData);
-    console.log("updatingContactId", updatingContactId);
-    console.log("contactData dddd", contactData);
+
     updateContactMutation.mutate(
       {
         id: updatingContactId, // Pass ID correctly
@@ -513,8 +515,6 @@ export default function ContactsPage() {
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log("name", name);
-    console.log("value", value);
     setContactData((prev) => ({ ...prev, [name]: value }));
     setSelectedContact((prev) => ({ ...prev, [name]: value }));
   };
@@ -524,9 +524,6 @@ export default function ContactsPage() {
     setIsDialogOpen(false);
   };
 
-  console.log("Loading:", loading);
-  console.log("Error:", error);
-  console.log("Data:", getContacts);
 
   return (
     <div className="flex flex-col">
