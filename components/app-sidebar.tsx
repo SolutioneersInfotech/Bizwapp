@@ -100,7 +100,7 @@ export function AppSidebar() {
   };
 
 
-  const mutation = usePostData(`http://localhost:5001/api/auth/addContact`);
+  const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact`);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     console.log("hello")

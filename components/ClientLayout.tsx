@@ -150,7 +150,7 @@ export default function ClientLayout({
     }));
   };
 
-  const mutation = usePostData(`http://localhost:5001/api/auth/addContact/${userId}`);
+  const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact/${userId}`);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

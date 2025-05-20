@@ -300,7 +300,7 @@ export default function ContactsPage() {
 
 
   const { mutate, isError, data } = usePostData(
-    `http://localhost:5001/api/auth/addContact/${userId}`
+    `https://api.bizwapp.com/api/auth/addContact/${userId}`
   );
 
   // Handle import confirmation
@@ -460,7 +460,7 @@ export default function ContactsPage() {
     setNewContact({ ...newContact, [e.target.name]: e.target.value });
   };
 
-  const mutation = usePostData(`http://localhost:5001/api/auth/addContact/${userId}`);
+  const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact/${userId}`);
 
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
