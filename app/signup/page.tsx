@@ -64,8 +64,6 @@ export default function SignupPage() {
   );
 
   const handleChange = (e) => {
-    console.log("e.target.name", e.target.name);
-    console.log("e.target.value", e.target.value);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -152,6 +150,20 @@ export default function SignupPage() {
     // if (validatePhase1()) {
     //   setPhase(2)
     // }
+
+    console.log(
+      "process.env.NEXT_PUBLIC_META_APP_ID:",
+      process.env.NEXT_PUBLIC_META_APP_ID
+    );
+
+    const metaOAuthURL =
+      `https://www.facebook.com/v22.0/dialog/oauth?` +
+      `client_id=${process.env.NEXT_PUBLIC_META_APP_ID}` +
+      `&redirect_uri=https://api.bizwapp.com/auth/facebook/callback` +
+      `&state=secureRandom123` +
+      `&scope=whatsapp_business_management,business_management`;
+
+    window.location.href = metaOAuthURL;
   };
 
   const handlePreviousPhase = () => {

@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   // console.log("Raw cookie header:", cookieHeader);
 
   const token = request.cookies.get("token");
-  console.log("Parsed cookie:", token);
+  // console.log("Parsed cookie:", token);
 
   // console.log("request", request);
 

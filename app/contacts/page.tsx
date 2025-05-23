@@ -298,9 +298,9 @@ export default function ContactsPage() {
     reader.readAsArrayBuffer(file);
   };
 
-
+console.log("userid of contact", userId)
   const { mutate, isError, data } = usePostData(
-    `https://api.bizwapp.com/api/auth/addContact/${userId}`
+    `http://localhost:5001/api/auth/addContact/${userId}`
   );
 
   // Handle import confirmation
@@ -467,7 +467,7 @@ export default function ContactsPage() {
     e.preventDefault();
 
     const contactArray = [newContact];
-
+console.log("contactdata", contactArray)
     mutation.mutate(contactArray,{
 
       onSuccess:(data) =>{

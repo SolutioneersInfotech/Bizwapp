@@ -255,11 +255,11 @@ export default function ClientLayout({
                                   <span>{item.title}</span>
                                 </Link>
                               </SidebarMenuButton>
-                              {item.badge && (
+                              {/* {item.badge && (
                                 <Badge className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground">
                                   {item.badge}
-                                </Badge>
-                              )}
+                                </Badge> */}
+                              {/* )} */}
                             </SidebarMenuItem>
                           );
                         })}

@@ -74,7 +74,6 @@ export default function LoginPage() {
     }
   
     setIsLoading(true);
-    console.log("checking.", isLoading)
     setError("");
   
     try {
@@ -118,8 +117,6 @@ export default function LoginPage() {
       setError(`${provider} login failed. Please try again.`);
     }
   };
-
-  console.log("isLoading" , isLoading)
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted p-4">
