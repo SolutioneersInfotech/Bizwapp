@@ -326,7 +326,7 @@ useEffect(() => {
                         </DropdownMenu>
                       </div>
                       <CardTitle className="mt-2">{template.components[0].text}</CardTitle>
-                      <CardDescription>{template.components[1].text}</CardDescription>
+                      <CardDescription>{template.components[1]?.text}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
                       <div className="mb-4 rounded-md border p-3 text-sm">{template.content}</div>

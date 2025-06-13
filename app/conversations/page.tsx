@@ -117,19 +117,18 @@ export default function ConversationsPage() {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [message, setMessage] = useState([]);
   const [selectedPhone, setSelectedPhone] = useState(null);
-  const [userId , setUserId]= useState(null);
-  const [template , setTemplate] =useState({ });
-  const [ imagesend , setImageSend ] = useState("")
-    const fileInputRef = useRef();
+  const [userId, setUserId] = useState(null);
+  const [template, setTemplate] = useState({});
+  const [imagesend, setImageSend] = useState("");
+  const fileInputRef = useRef();
 
-
-  useEffect(()=>{
-    const userData = JSON.parse(localStorage.getItem('user'));
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
     if (userData) {
       const id = userData.id || userData.user?._id || null;
       setUserId(id);
     }
-  },[]);
+  }, []);
 
   const { data: getAllConversation } = useGetAllConversation(userId);
 
@@ -172,8 +171,6 @@ export default function ConversationsPage() {
     }
   }, [searchQuery, activeTab]);
 
-
-
   const {
     data: getContacts,
     loading,
@@ -214,8 +211,7 @@ export default function ConversationsPage() {
       })
     : [];
 
-
-    const {mutate} = useSendWhatsAppMessage()
+  const { mutate } = useSendWhatsAppMessage();
 
   const handleSendBulkMessage = async () => {
     if (
@@ -242,32 +238,29 @@ export default function ConversationsPage() {
       return;
     }
 
-    const contactsToSend = contacts?.contacts
-          .filter((contact) => selectedContacts.includes(contact.phone))
-          .map((contact) => ({
-            phoneNumber: contact.phone,
-            name: contact.name,
-          }));
+    // const contactsToSend = contacts?.contacts
+    //       .filter((contact) => selectedContacts.includes(contact.phone))
+    //       .map((contact) => ({
+    //         phoneNumber: contact.phone,
+    //         name: contact.name,
+    //       }));
     try {
-
       const contactsToSend = contacts?.contacts
-          .filter((contact) => selectedContacts.includes(contact.phone))
-          .map((contact) => ({
-            phoneNumber: contact.phone,
-            name: contact.name,
-          }));
+        .filter((contact) => selectedContacts.includes(contact.phone))
+        .map((contact) => ({
+          phoneNumber: contact.phone,
+          name: contact.name,
+        }));
       // In a rea
       // l app, you would call the API to send bulk messages
       if (bulkMessageTab === "text") {
-        
-
         let messageToSend = bulkMessage;
 
         console.log("contactsToSend", contactsToSend);
-        console.log("messageToSend", messageToSend)
+        console.log("messageToSend", messageToSend);
 
         mutate({
-          userId:userId,
+          userId: userId,
           contacts: contactsToSend,
           message: messageToSend,
         });
@@ -279,28 +272,43 @@ export default function ConversationsPage() {
 
         const templateMessage = template.texts.join("\n"); // or ". " if preferred
 
-        console.log("Sending template message to backend:", {
-          userId:userId,
-          contacts: contactsToSend,
-          message: templateMessage,
+        const sendPayload = contactsToSend.map((contact) => {
+          const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+          const personalizedMessage = templateMessage.replace(
+            /{{\s*\d+\s*}}/g,
+            otp
+          ); // Replace {{1}} with OTP
+
+          return {
+            phoneNumber: contact.phoneNumber,
+            name: contact.name,
+            message: personalizedMessage,
+          };
         });
 
-        mutate({
-          userId:userId,
-          contacts: contactsToSend,
-          message: templateMessage,
+        for (const contactMessage of sendPayload) {
+          mutate({
+            userId,
+            contacts: [
+              {
+                phoneNumber: contactMessage.phoneNumber,
+                name: contactMessage.name,
+              },
+            ],
+            message: contactMessage.message,
+          });
+        }
+
+        toast({
+          title: "Bulk Message Sent",
+          description: `Message sent to ${selectedContacts.length} contacts`,
         });
+
+        setBulkMessage("");
+        setSelectedBulkTemplate("");
+        setSelectedContacts([]);
+        setBulkMessageOpen(false);
       }
-
-      toast({
-        title: "Bulk Message Sent",
-        description: `Message sent to ${selectedContacts.length} contacts`,
-      });
-
-      setBulkMessage("");
-      setSelectedBulkTemplate("");
-      setSelectedContacts([]);
-      setBulkMessageOpen(false);
     } catch (error) {
       console.error("Mutation failed", error);
       toast({
@@ -311,31 +319,32 @@ export default function ConversationsPage() {
     }
   };
 
-
-
   const handleSendTemplate = async (templateId: string) => {
     if (!selectedContact) return;
 
     const template = templates.find((t) => t.id === templateId);
-    console.log("templatevvvvvvvvv", template)
-    if(template){
+    console.log("templatevvvvvvvvv", template);
+    if (template) {
       setTemplate(template);
     }
     if (!template) return;
 
     try {
       // In a real app, you would call the API to send a template message
-      console.log("selectedContact",selectedContact)
-      const simplifiedContacts = [{
-        phoneNumber: selectedContact.phoneNumber,
-        name: selectedContact.name
-      }];
-      
+      console.log("selectedContact", selectedContact);
+      const simplifiedContacts = [
+        {
+          phoneNumber: selectedContact.phoneNumber,
+          name: selectedContact.name,
+        },
+      ];
 
-      let cleanedMessage = template.content.replace(/\\\"/g,'');
-      
+      let cleanedMessage = template.content.replace(/\\\"/g, "");
+
+      console.log("cleanedMessagecleanedMessage", cleanedMessage);
+
       mutate({
-        userId:userId,
+        userId: userId,
         contacts: simplifiedContacts,
         message: cleanedMessage,
       });
@@ -430,33 +439,30 @@ export default function ConversationsPage() {
     fileInputRef.current.click();
   };
 
-
   const handleFileChange = async (event) => {
-    console.log("svgvsjdgvjgvsj")
+    console.log("svgvsjdgvjgvsj");
     const file = event.target.files[0];
     if (!file) return;
 
     // Cloudinary upload logic
     const formData = new FormData();
-    formData.append('file', file);
-    console.log("filefilefile", file)
-    formData.append('upload_preset', 'preset'); // Replace with your preset
+    formData.append("file", file);
+    console.log("filefilefile", file);
+    formData.append("upload_preset", "preset"); // Replace with your preset
 
     try {
       const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/di3jsead7/image/upload',
+        "https://api.cloudinary.com/v1_1/di3jsead7/image/upload",
         formData
       );
       const imageUrl = response.data.secure_url;
-      console.log('Uploaded Image URL:', imageUrl);
-      setImageSend(imageUrl)
+      console.log("Uploaded Image URL:", imageUrl);
+      setImageSend(imageUrl);
       // if (onUpload) onUpload(imageUrl);
-      
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error("Upload error:", error);
     }
   };
-
 
   const handleDeleteConversation = (contact) => {
     // In a real app, this would be an API call
@@ -515,83 +521,88 @@ export default function ConversationsPage() {
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
-  {/* Conversations Panel (Left Sidebar) */}
-  <div className="w-full md:w-80 lg:w-96 border-r">
-    <div className="flex h-14 items-center justify-between border-b px-4 mt-1">
-      <h2 className="font-semibold m-8 md:m-0">Conversations</h2>
-      <div className="flex items-center gap-2">
-        {/* Bulk Message Dialog */}
-        <Dialog open={bulkMessageOpen} onOpenChange={setBulkMessageOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">Bulk Message</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Send Bulk Message</DialogTitle>
-              <DialogDescription>
-                Send a message to multiple contacts at once.
-              </DialogDescription>
-            </DialogHeader>
+      {/* Conversations Panel (Left Sidebar) */}
+      <div className="w-full md:w-80 lg:w-96 border-r">
+        <div className="flex h-14 items-center justify-between border-b px-4 mt-1">
+          <h2 className="font-semibold m-8 md:m-0">Conversations</h2>
+          <div className="flex items-center gap-2">
+            {/* Bulk Message Dialog */}
+            <Dialog open={bulkMessageOpen} onOpenChange={setBulkMessageOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Bulk Message
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Send Bulk Message</DialogTitle>
+                  <DialogDescription>
+                    Send a message to multiple contacts at once.
+                  </DialogDescription>
+                </DialogHeader>
 
-            <Tabs value={bulkMessageTab} onValueChange={setBulkMessageTab}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="text">Text Message</TabsTrigger>
-                <TabsTrigger value="template">Template</TabsTrigger>
-              </TabsList>
+                <Tabs value={bulkMessageTab} onValueChange={setBulkMessageTab}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="text">Text Message</TabsTrigger>
+                    <TabsTrigger value="template">Template</TabsTrigger>
+                  </TabsList>
 
-              <TabsContent value="text" className="mt-4">
-                <div className="grid gap-4 py-4">
-                  <Label htmlFor="bulk-message">Message</Label>
-                  <Textarea
-                    id="bulk-message"
-                    placeholder="Type your message here..."
-                    value={bulkMessage}
-                    onChange={(e) => setBulkMessage(e.target.value)}
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="template" className="mt-4">
-                <div className="grid gap-4 py-4">
-                  <Label htmlFor="template-select">Select Template</Label>
-                  <Select
-                    value={selectedBulkTemplate}
-                    onValueChange={setSelectedBulkTemplate}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose a template" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {separatedTexts.map((template) => (
-                        <SelectItem
-                          key={template.templateName}
-                          value={template.templateName}
-                        >
-                          {template.templateName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {selectedBulkTemplate && (
-                    <div className="mt-2 rounded-md border p-3 text-sm space-y-1">
-                      {separatedTexts
-                        .find(t => t.templateName === selectedBulkTemplate)
-                        ?.texts.map((text, index) => (
-                          <div key={index}>{text}</div>
-                        ))}
+                  <TabsContent value="text" className="mt-4">
+                    <div className="grid gap-4 py-4">
+                      <Label htmlFor="bulk-message">Message</Label>
+                      <Textarea
+                        id="bulk-message"
+                        placeholder="Type your message here..."
+                        value={bulkMessage}
+                        onChange={(e) => setBulkMessage(e.target.value)}
+                      />
                     </div>
-                  )}
+                  </TabsContent>
 
-                  {selectedBulkTemplate && (
-                    <div className="mt-2 rounded-md border p-3 text-sm">
-                      {
-                        templates.find(t => t.id === selectedBulkTemplate)?.content
-                      }
+                  <TabsContent value="template" className="mt-4">
+                    <div className="grid gap-4 py-4">
+                      <Label htmlFor="template-select">Select Template</Label>
+                      <Select
+                        value={selectedBulkTemplate}
+                        onValueChange={setSelectedBulkTemplate}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose a template" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {separatedTexts.map((template) => (
+                            <SelectItem
+                              key={template.templateName}
+                              value={template.templateName}
+                            >
+                              {template.templateName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {selectedBulkTemplate && (
+                        <div className="mt-2 rounded-md border p-3 text-sm space-y-1">
+                          {separatedTexts
+                            .find(
+                              (t) => t.templateName === selectedBulkTemplate
+                            )
+                            ?.texts.map((text, index) => (
+                              <div key={index}>{text}</div>
+                            ))}
+                        </div>
+                      )}
+
+                      {selectedBulkTemplate && (
+                        <div className="mt-2 rounded-md border p-3 text-sm">
+                          {
+                            templates.find((t) => t.id === selectedBulkTemplate)
+                              ?.content
+                          }
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                {/* <button className="w-full px-4 py-2 rounded hover:bg-green-600 hover:text-white transition bg-white-700 text-green-600 border border-green-600" onClick={handleButtonClick}>
+                    {/* <button className="w-full px-4 py-2 rounded hover:bg-green-600 hover:text-white transition bg-white-700 text-green-600 border border-green-600" onClick={handleButtonClick}>
                 Select Image File
               </button>
               <input
@@ -601,64 +612,104 @@ export default function ConversationsPage() {
               className="hidden"
               onChange={handleFileChange}
               /> */}
-              </TabsContent>
-            </Tabs>
+                  </TabsContent>
+                </Tabs>
 
-            <div className="grid gap-4 py-4">
-              <Label>Select Contacts ({selectedContacts.length} selected)</Label>
-              <ScrollArea className="h-[200px] rounded-md border p-2">
-                {contacts?.contacts?.length > 0 ? (
-                  contacts.contacts.map((contact) => (
-                    <div key={contact._id} className="flex items-center gap-2 py-2">
-                      <input
-                        type="checkbox"
-                        id={`contact-${contact._id}`}
-                        checked={selectedContacts.includes(contact.phone)}
-                        onChange={() => toggleContactSelection(contact.phone)}
-                        className="h-4 w-4 rounded border-gray-300"
-                      />
-                      <Label
-                        htmlFor={`contact-${contact._id}`}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={contact.avatar} />
-                          <AvatarFallback>{contact.initials}</AvatarFallback>
-                        </Avatar>
-                        <span>{contact.name}</span>
-                      </Label>
-                    </div>
-                  ))
-                ) : (
-                  <p>No contacts found</p>
-                )}
-              </ScrollArea>
+                <div className="grid gap-4 py-4">
+                  <Label>
+                    Select Contacts ({selectedContacts.length} selected)
+                  </Label>
+                  <ScrollArea className="h-[200px] rounded-md border p-2">
+                    {contacts?.contacts?.length > 0 ? (
+                      contacts.contacts.map((contact) => (
+                        <div
+                          key={contact._id}
+                          className="flex items-center gap-2 py-2"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`contact-${contact._id}`}
+                            checked={selectedContacts.includes(contact.phone)}
+                            onChange={() =>
+                              toggleContactSelection(contact.phone)
+                            }
+                            className="h-4 w-4 rounded border-gray-300"
+                          />
+                          <Label
+                            htmlFor={`contact-${contact._id}`}
+                            className="flex items-center gap-2 cursor-pointer"
+                          >
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={contact.avatar} />
+                              <AvatarFallback>
+                                {contact.initials}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{contact.name}</span>
+                          </Label>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No contacts found</p>
+                    )}
+                  </ScrollArea>
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setBulkMessageOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSendBulkMessage}
+                    disabled={selectedContacts.length === 0}
+                  >
+                    Send to {selectedContacts.length} contacts
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Button variant="ghost" size="icon">
+              <Filter className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Conditional Rendering: Mobile or Desktop Conversation List */}
+        {isMobile ? (
+          mobileView === "conversations" && (
+            <div className="w-full">
+              <ConversationList
+                isMobile={isMobile}
+                setMobileView={setMobileView}
+                searchQuery={searchQuery}
+                setSelectedPhone={setSelectedPhone}
+                setMessages={setMessage}
+                setSearchQuery={setSearchQuery}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                loading={loading}
+                uniqueConversations={uniqueConversations}
+                selectedContact={selectedContact}
+                setSelectedContact={setSelectedContact}
+                selectedContacts={selectedContacts}
+                bulkMessageOpen={bulkMessageOpen}
+                toggleContactSelection={toggleContactSelection}
+                handleDeleteConversation={handleDeleteConversation}
+                handleMuteConversation={handleMuteConversation}
+                setNewChatDialogOpen={setNewChatDialogOpen}
+                conversationHistory={[]}
+                selectedContact={null}
+                handleContactSelect={() => {}}
+                handleArchiveConversation={() => {}}
+              />
             </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setBulkMessageOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSendBulkMessage} disabled={selectedContacts.length === 0}>
-                Send to {selectedContacts.length} contacts
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <Button variant="ghost" size="icon">
-          <Filter className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-
-    {/* Conditional Rendering: Mobile or Desktop Conversation List */}
-    {isMobile ? (
-      mobileView === "conversations" && (
-        <div className="w-full">
+          )
+        ) : (
           <ConversationList
-            isMobile={isMobile}
-            setMobileView={setMobileView}
             searchQuery={searchQuery}
             setSelectedPhone={setSelectedPhone}
             setMessages={setMessage}
@@ -680,89 +731,63 @@ export default function ConversationsPage() {
             handleContactSelect={() => {}}
             handleArchiveConversation={() => {}}
           />
-        </div>
-      )
-    ) : (
-      <ConversationList
-        searchQuery={searchQuery}
-        setSelectedPhone={setSelectedPhone}
-        setMessages={setMessage}
-        setSearchQuery={setSearchQuery}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        loading={loading}
-        uniqueConversations={uniqueConversations}
-        selectedContact={selectedContact}
-        setSelectedContact={setSelectedContact}
-        selectedContacts={selectedContacts}
-        bulkMessageOpen={bulkMessageOpen}
-        toggleContactSelection={toggleContactSelection}
-        handleDeleteConversation={handleDeleteConversation}
-        handleMuteConversation={handleMuteConversation}
-        setNewChatDialogOpen={setNewChatDialogOpen}
-        conversationHistory={[]}
-        selectedContact={null}
-        handleContactSelect={() => {}}
-        handleArchiveConversation={() => {}}
-      />
-    )}
-  </div>
-
-  {/* Chat Panel (Right Side) */}
-  {isMobile ? (
-    mobileView === "chat" && (
-      <div className="w-full">
-        <ChatWindow
-         isMobile={isMobile}
-         setMobileView={setMobileView}
-          selectedContact={selectedContact}
-          selectedPhone={selectedPhone}
-          message={message}
-          setMessage={setMessage}
-          messageLoading={messageLoading}
-          handleMuteConversation={handleMuteConversation}
-          handleDeleteConversation={handleDeleteConversation}
-          templates={templates}
-          template={template}
-          handleSendTemplate={handleSendTemplate}
-          templateDialogOpen={templateDialogOpen}
-          setTemplateDialogOpen={setTemplateDialogOpen}
-          setNewChatDialogOpen={setNewChatDialogOpen}
-        />
+        )}
       </div>
-    )
-  ) : (
-    <div className="flex-1">
-      <ChatWindow
-        selectedContact={selectedContact}
-        selectedPhone={selectedPhone}
-        message={message}
-        setMessage={setMessage}
-        messageLoading={messageLoading}
-        handleMuteConversation={handleMuteConversation}
-        handleDeleteConversation={handleDeleteConversation}
-        templates={templates}
-        template={template}
-        handleSendTemplate={handleSendTemplate}
-        templateDialogOpen={templateDialogOpen}
-        setTemplateDialogOpen={setTemplateDialogOpen}
-        setNewChatDialogOpen={setNewChatDialogOpen}
+
+      {/* Chat Panel (Right Side) */}
+      {isMobile ? (
+        mobileView === "chat" && (
+          <div className="w-full">
+            <ChatWindow
+              isMobile={isMobile}
+              setMobileView={setMobileView}
+              selectedContact={selectedContact}
+              selectedPhone={selectedPhone}
+              message={message}
+              setMessage={setMessage}
+              messageLoading={messageLoading}
+              handleMuteConversation={handleMuteConversation}
+              handleDeleteConversation={handleDeleteConversation}
+              templates={templates}
+              template={template}
+              handleSendTemplate={handleSendTemplate}
+              templateDialogOpen={templateDialogOpen}
+              setTemplateDialogOpen={setTemplateDialogOpen}
+              setNewChatDialogOpen={setNewChatDialogOpen}
+            />
+          </div>
+        )
+      ) : (
+        <div className="flex-1">
+          <ChatWindow
+            selectedContact={selectedContact}
+            selectedPhone={selectedPhone}
+            message={message}
+            setMessage={setMessage}
+            messageLoading={messageLoading}
+            handleMuteConversation={handleMuteConversation}
+            handleDeleteConversation={handleDeleteConversation}
+            templates={templates}
+            template={template}
+            handleSendTemplate={handleSendTemplate}
+            templateDialogOpen={templateDialogOpen}
+            setTemplateDialogOpen={setTemplateDialogOpen}
+            setNewChatDialogOpen={setNewChatDialogOpen}
+          />
+        </div>
+      )}
+
+      {/* New Chat Dialog */}
+      <NewChatDialog
+        open={newChatDialogOpen}
+        onOpenChange={setNewChatDialogOpen}
+        phone={newChatPhone}
+        onPhoneChange={setNewChatPhone}
+        message={newChatMessage}
+        onMessageChange={setNewChatMessage}
+        onSubmit={handleStartNewChat}
       />
     </div>
-  )}
-
-  {/* New Chat Dialog */}
-  <NewChatDialog
-    open={newChatDialogOpen}
-    onOpenChange={setNewChatDialogOpen}
-    phone={newChatPhone}
-    onPhoneChange={setNewChatPhone}
-    message={newChatMessage}
-    onMessageChange={setNewChatMessage}
-    onSubmit={handleStartNewChat}
-  />
-</div>
-
   );
 }
 
