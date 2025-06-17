@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,24 +10,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, MessageSquare, Mail, Phone, Video, ChevronRight, Loader2, Send } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useToast } from "@/hooks/use-toast"
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import "flatpickr/dist/themes/material_blue.css";
+import Flatpickr from "react-flatpickr";
 
 export default function HelpSupportPage() {
-  const { toast } = useToast()
+  const { toast } = useToast();
+const pickerRef = useRef<HTMLInputElement>(null);
+
   const [searchQuery, setSearchQuery] = useState("")
   const [contactName, setContactName] = useState("")
   const [contactEmail, setContactEmail] = useState("")
   const [contactSubject, setContactSubject] = useState("")
   const [contactMessage, setContactMessage] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const handleSearch = (e) => {
-    e.preventDefault()
-    // In a real app, this would search the knowledge base
-    toast({
-      title: "Search Results",
-      description: `Showing results for "${searchQuery}"`,
-    })
-  }
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleContactSubmit = async (e) => {
     e.preventDefault()
@@ -68,8 +64,42 @@ export default function HelpSupportPage() {
     }
   }
 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    description: '',
+    date: new Date(),
+  })
+
+  const [isLoading, setIsLoading] = useState(false);
+
+ useEffect(() => {
+  if (!pickerRef.current) return;
+
+  const stopClick = (e: MouseEvent) => e.stopPropagation();
+  const inputEl = pickerRef.current;
+
+  inputEl.addEventListener("mousedown", stopClick);
+  return () => inputEl.removeEventListener("mousedown", stopClick);
+}, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    // Simulate submission
+    setTimeout(() => {
+      console.log('Submitted:', formData)
+      setIsLoading(false)
+    }, 1500)
+  }
+
   return (
-    <div className="container mx-auto pb-8 pt-4">
+    <div className="container mx-auto pb-8 pt-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold pl-4">Help & Support</h1>
       </div>
@@ -79,10 +109,10 @@ export default function HelpSupportPage() {
           <Card>
             <CardHeader>
               <CardTitle>How can we help you?</CardTitle>
-              <CardDescription>Search our knowledge base or browse frequently asked questions</CardDescription>
+              {/* <CardDescription>Search our knowledge base or browse frequently asked questions</CardDescription> */}
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSearch} className="relative">
+              {/* <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
@@ -94,7 +124,7 @@ export default function HelpSupportPage() {
                 <Button type="submit" className="absolute right-1 top-1">
                   Search
                 </Button>
-              </form>
+              </form> */}
             </CardContent>
           </Card>
 
@@ -448,7 +478,7 @@ export default function HelpSupportPage() {
                 </div>
                 <div>
                   <h3 className="font-medium">Email Support</h3>
-                  <p className="text-sm text-muted-foreground">support@whatsappbusiness.com</p>
+                  <p className="text-sm text-muted-foreground">bizwapp@solutioneers.in</p>
                 </div>
               </div>
 
@@ -458,7 +488,7 @@ export default function HelpSupportPage() {
                 </div>
                 <div>
                   <h3 className="font-medium">Phone Support</h3>
-                  <p className="text-sm text-muted-foreground">+1 (555) 123-4567</p>
+                  <p className="text-sm text-muted-foreground">+91 7376700783</p>
                 </div>
               </div>
 
@@ -466,10 +496,91 @@ export default function HelpSupportPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
                   <Video className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <h3 className="font-medium">Schedule a Demo</h3>
-                  <p className="text-sm text-muted-foreground">Get a personalized walkthrough</p>
-                </div>
+                 <Dialog>
+      <DialogTrigger asChild>
+        <div className="cursor-pointer">
+          <h3 className="font-medium">Schedule a Demo</h3>
+          <p className="text-sm text-muted-foreground">Get a personalized walkthrough</p>
+        </div>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Schedule a Demo</DialogTitle>
+          <DialogDescription> by filling this form</DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter your name"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Briefly describe your needs"
+            />
+          </div>
+
+          <div className="space-y-2 space-x-2">
+            <Label htmlFor="date">Date & Time</Label>
+  <Flatpickr
+  ref={pickerRef}
+  options={{
+    enableTime: true,
+    dateFormat: "Y-m-d H:i",
+    appendTo: typeof window !== "undefined" ? document.body : undefined,
+    allowInput: true,
+    clickOpens: true,
+  }}
+  value={formData.date}
+  onChange={(selectedDates) => {
+    setFormData((prev) => ({
+      ...prev,
+      date: selectedDates[0],
+    }));
+  }}
+  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 bg-white"
+/>
+
+
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+            ) : (
+              'Submit'
+            )}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
               </div>
             </CardContent>
           </Card>

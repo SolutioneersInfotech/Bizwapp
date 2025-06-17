@@ -71,6 +71,7 @@ import { Spinner } from "@/components/ui/spinner";
 import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatArea";
 import axios from "axios";
+import usePostData from "@/hooks/api/usePostData";
 // import useSendWhatsAppImage from "../../hooks/api/sendImageWhatsapp";
 
 export default function ConversationsPage() {
@@ -213,6 +214,10 @@ export default function ConversationsPage() {
 
   const { mutate } = useSendWhatsAppMessage();
 
+  const { mutate:sendTemplateMutate, isError, data } = usePostData(
+    `http://localhost:5001/api/auth/send-template`
+  );
+
   const handleSendBulkMessage = async () => {
     if (
       bulkMessageTab === "text" &&
@@ -265,50 +270,32 @@ export default function ConversationsPage() {
           message: messageToSend,
         });
       } else {
-        const template = separatedTexts.find(
-          (t) => t.templateName === selectedBulkTemplate
-        );
-        if (!template) return;
+  const template = separatedTexts.find(
+    (t) => t.templateName === selectedBulkTemplate
+  );
 
-        const templateMessage = template.texts.join("\n"); // or ". " if preferred
+  if (!template) return;
 
-        const sendPayload = contactsToSend.map((contact) => {
-          const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-          const personalizedMessage = templateMessage.replace(
-            /{{\s*\d+\s*}}/g,
-            otp
-          ); // Replace {{1}} with OTP
+  for (const contact of contactsToSend) {
+    sendTemplateMutate({
+      userId,
+      to: contact.phoneNumber,
+      templateName: selectedBulkTemplate,
+      languageCode: "en", // Or use dynamic language if needed
+    });
+  }
 
-          return {
-            phoneNumber: contact.phoneNumber,
-            name: contact.name,
-            message: personalizedMessage,
-          };
-        });
+  toast({
+    title: "Bulk Template Sent",
+    description: `Template sent to ${selectedContacts.length} contacts`,
+  });
 
-        for (const contactMessage of sendPayload) {
-          mutate({
-            userId,
-            contacts: [
-              {
-                phoneNumber: contactMessage.phoneNumber,
-                name: contactMessage.name,
-              },
-            ],
-            message: contactMessage.message,
-          });
-        }
+  setBulkMessage("");
+  setSelectedBulkTemplate("");
+  setSelectedContacts([]);
+  setBulkMessageOpen(false);
+}
 
-        toast({
-          title: "Bulk Message Sent",
-          description: `Message sent to ${selectedContacts.length} contacts`,
-        });
-
-        setBulkMessage("");
-        setSelectedBulkTemplate("");
-        setSelectedContacts([]);
-        setBulkMessageOpen(false);
-      }
     } catch (error) {
       console.error("Mutation failed", error);
       toast({

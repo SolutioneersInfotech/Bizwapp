@@ -153,6 +153,7 @@ export default function ContactsPage() {
 
   const [userId , setUserId ] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [contactIdToDelete , setContactIdToDelete] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -298,7 +299,6 @@ export default function ContactsPage() {
     reader.readAsArrayBuffer(file);
   };
 
-console.log("userid of contact", userId)
   const { mutate, isError, data } = usePostData(
     `http://localhost:5001/api/auth/addContact/${userId}`
   );
@@ -524,6 +524,18 @@ console.log("contactdata", contactArray)
     setIsDialogOpen(false);
   };
 
+  console.log("contactIdToDelete", contactIdToDelete)
+
+
+  const handleDelete = async (contactId)=>{
+    console.log("contactId", contactId)
+    setContactIdToDelete(contactId)
+   const confirmed = window.confirm("Are you sure you want to delete?");
+    if (confirmed) {
+    } 
+  }
+  
+  queryClient.invalidateQueries({ queryKey: ['contacts'] });
 
   return (
     <div className="flex flex-col">
@@ -820,7 +832,7 @@ console.log("contactdata", contactArray)
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem className="text-destructive focus:text-destructive">
                                     <Trash className="mr-2 h-4 w-4" />
-                                    <span>Delete</span>
+                                    <span onClick={()=>handleDelete(contact._id)}>Delete</span>
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>

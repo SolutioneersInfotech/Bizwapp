@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-// import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,13 +35,21 @@ import usePostData from "../../hooks/api/usePostData";
 import { useToast } from "@/hooks/use-toast";
 import { signIn } from "next-auth/react";
 
+type formData = {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  password: string;
+}
+
+type Provider = "Google" | "Facebook" | "GitHub" | "LinkedIn";
+
 export default function SignupPage() {
   const router = useRouter();
-  // const { login, isLoading } = useAuth()
   const [phase, setPhase] = useState(1);
   const [error, setError] = useState("");
 
-  // Phase 1 form fields
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -51,15 +58,9 @@ export default function SignupPage() {
     password: "",
   });
   const [confirmPassword, setConfirmPassword] = useState("");
-
-  // Phase 2 form fields (WhatsApp API credentials)
-  const [phoneNumberId, setPhoneNumberId] = useState("");
-  const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] =
-    useState("");
-  const [accessToken, setAccessToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { mutate, isError, data } = usePostData(
+  const { mutate, isError, data } = usePostData<formData >(
     "https://api.bizwapp.com/api/auth/signup"
   );
 
@@ -121,7 +122,7 @@ export default function SignupPage() {
     setError("");
 
     if (!validatePhase1()) {
-      return; // 🛑 Stop execution if validation fails
+      return; 
     }
 
     setIsLoading(true);
@@ -159,37 +160,19 @@ export default function SignupPage() {
     const metaOAuthURL =
       `https://www.facebook.com/v22.0/dialog/oauth?` +
       `client_id=${process.env.NEXT_PUBLIC_META_APP_ID}` +
-      `&redirect_uri=https://api.bizwapp.com/auth/facebook/callback` +
+      `&redirect_uri=https://api.bizwapp.com/api/auth/facebook/callback` +
       `&state=secureRandom123` +
       `&scope=whatsapp_business_management,business_management`;
 
     window.location.href = metaOAuthURL;
   };
 
-  const handlePreviousPhase = () => {
-    setPhase(1);
-  };
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    try {
-      // In a real app, you would register the user here
-      // For demo purposes, we'll just log in with demo credentials
-      await login({
-        phoneNumberId: "606836342508871",
-        whatsappBusinessAccountId: "28995967470047562",
-        accessToken:
-          "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6",
-      });
-      router.push("/dashboard");
-    } catch (err) {
-      setError("Registration failed. Please try again.");
-    }
   };
 
-  const handleSocialSignup = async (provider) => {
+  const handleSocialSignup = async (provider: Provider) => {
     console.log("Clicked provider:", provider); // should match e.g., "google"
     signIn(provider.toLowerCase(), { callbackUrl: "/dashboard" }); // like "google", "facebook", etc.
   };

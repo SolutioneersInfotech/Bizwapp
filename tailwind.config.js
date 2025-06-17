@@ -7,6 +7,7 @@ module.exports = {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
     "*.{js,ts,jsx,tsx,mdx}",
+        "./node_modules/@heroui/react/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     container: {

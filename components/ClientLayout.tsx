@@ -82,7 +82,7 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const showSidebar = !["/", "/signup", "/login"].includes(pathname);
+  const showSidebar = !["/", "/signup", "/login", "/privacy-policy" , "/terms-of-service" , "/help-support"].includes(pathname);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newChatDialogOpen, setNewChatDialogOpen] = useState(false);

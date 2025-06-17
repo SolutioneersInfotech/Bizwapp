@@ -39,14 +39,14 @@ export default function PrivacyPolicyPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Welcome to WhatsApp Business Messaging Platform ("we," "our," or "us"). We are committed to protecting
-              your privacy and ensuring the security of your personal information. This Privacy Policy explains how we
-              collect, use, disclose, and safeguard your information when you use our WhatsApp Business API integration
-              platform and related services.
+              Welcome to <strong>BizWapp</strong> ("we," "our," or "us"). We are committed to protecting your privacy
+              and ensuring the security of your personal information. This Privacy Policy explains how we collect,
+              use, disclose, and safeguard your information when you use our WhatsApp Business API integration platform
+              and related services.
             </p>
             <p>
-              By using our services, you agree to the collection and use of information in accordance with this Privacy
-              Policy. If you do not agree with our policies and practices, please do not use our services.
+              By using BizWapp’s services, you agree to the collection and use of information in accordance with this
+              Privacy Policy. If you do not agree with our policies and practices, please do not use our services.
             </p>
           </CardContent>
         </Card>
@@ -62,22 +62,11 @@ export default function PrivacyPolicyPage() {
           <CardContent className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-3">Personal Information</h3>
-              <p className="mb-3">We may collect the following types of personal information:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>
-                  <strong>Account Information:</strong> Name, email address, phone number, business name, and business
-                  category
-                </li>
-                <li>
-                  <strong>Authentication Data:</strong> WhatsApp Business Account ID, Phone Number ID, and access tokens
-                </li>
-                <li>
-                  <strong>Business Information:</strong> Company website, business description, and verification
-                  documents
-                </li>
-                <li>
-                  <strong>Contact Information:</strong> Customer contact details including phone numbers and names
-                </li>
+                <li><strong>Account Information:</strong> Name, email address, phone number, business name, and business category</li>
+                <li><strong>Authentication Data:</strong> WhatsApp Business Account ID, Phone Number ID, and access tokens</li>
+                <li><strong>Business Information:</strong> Company website, business description, and verification documents</li>
+                <li><strong>Contact Information:</strong> Customer contact details including phone numbers and names</li>
               </ul>
             </div>
 
@@ -86,7 +75,7 @@ export default function PrivacyPolicyPage() {
             <div>
               <h3 className="text-lg font-semibold mb-3">Message Data</h3>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Message content sent and received through our platform</li>
+                <li>Message content sent and received through BizWapp</li>
                 <li>Message delivery status and read receipts</li>
                 <li>Message templates and their usage statistics</li>
                 <li>Conversation metadata and analytics</li>
@@ -116,26 +105,31 @@ export default function PrivacyPolicyPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p>We use the collected information for the following purposes:</p>
+            <p>We use the collected information to:</p>
             <div className="grid gap-4 md:grid-cols-2">
+              {/* Service Provision */}
               <div className="space-y-3">
                 <h4 className="font-semibold">Service Provision</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>Facilitate WhatsApp Business API integration</li>
+                  <li>Facilitate WhatsApp Business API integration via BizWapp</li>
                   <li>Process and deliver messages</li>
                   <li>Manage your account and preferences</li>
                   <li>Provide customer support</li>
                 </ul>
               </div>
+
+              {/* Analytics */}
               <div className="space-y-3">
                 <h4 className="font-semibold">Analytics & Improvement</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
                   <li>Generate usage analytics and reports</li>
-                  <li>Improve our services and features</li>
+                  <li>Improve BizWapp services and features</li>
                   <li>Monitor system performance</li>
                   <li>Detect and prevent fraud</li>
                 </ul>
               </div>
+
+              {/* Communication */}
               <div className="space-y-3">
                 <h4 className="font-semibold">Communication</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
@@ -145,6 +139,8 @@ export default function PrivacyPolicyPage() {
                   <li>Respond to inquiries</li>
                 </ul>
               </div>
+
+              {/* Legal Compliance */}
               <div className="space-y-3">
                 <h4 className="font-semibold">Legal Compliance</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
@@ -158,7 +154,7 @@ export default function PrivacyPolicyPage() {
           </CardContent>
         </Card>
 
-        {/* Information Sharing */}
+        {/* Sharing Information */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -167,34 +163,30 @@ export default function PrivacyPolicyPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p>We may share your information in the following circumstances:</p>
+            <p>BizWapp may share your data:</p>
             <div className="space-y-4">
               <div>
                 <h4 className="font-semibold mb-2">With Meta/WhatsApp</h4>
                 <p className="text-sm">
-                  We share necessary information with Meta (WhatsApp) to facilitate the WhatsApp Business API
-                  integration, including business verification data and message delivery information.
+                  For WhatsApp Business API functionality, including verification and message delivery.
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Service Providers</h4>
                 <p className="text-sm">
-                  We may share information with trusted third-party service providers who assist us in operating our
-                  platform, such as cloud hosting providers, analytics services, and customer support tools.
+                  We partner with third-party vendors for cloud hosting, analytics, and support services.
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Legal Requirements</h4>
                 <p className="text-sm">
-                  We may disclose information when required by law, court order, or government request, or to protect
-                  our rights, property, or safety.
+                  If required by law or to protect our legal rights.
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Business Transfers</h4>
                 <p className="text-sm">
-                  In the event of a merger, acquisition, or sale of assets, your information may be transferred as part
-                  of the transaction.
+                  In case of acquisition or merger, your data may be transferred to the new entity.
                 </p>
               </div>
             </div>
@@ -210,33 +202,29 @@ export default function PrivacyPolicyPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p>
-              We implement appropriate technical and organizational security measures to protect your personal
-              information against unauthorized access, alteration, disclosure, or destruction.
-            </p>
+            <p>BizWapp implements security measures including:</p>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <h4 className="font-semibold mb-2">Technical Safeguards</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>End-to-end encryption for message data</li>
-                  <li>Secure HTTPS connections</li>
-                  <li>Regular security audits and updates</li>
-                  <li>Access controls and authentication</li>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  <li>End-to-end encryption</li>
+                  <li>HTTPS encryption</li>
+                  <li>Regular audits</li>
+                  <li>Strict access control</li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Organizational Measures</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>Employee training on data protection</li>
-                  <li>Limited access on a need-to-know basis</li>
-                  <li>Regular security assessments</li>
-                  <li>Incident response procedures</li>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  <li>Employee training</li>
+                  <li>Need-to-know access</li>
+                  <li>Security assessments</li>
+                  <li>Incident response plan</li>
                 </ul>
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              While we strive to protect your information, no method of transmission over the internet or electronic
-              storage is 100% secure. We cannot guarantee absolute security.
+              However, no system is 100% secure. Use BizWapp at your own discretion.
             </p>
           </CardContent>
         </Card>
@@ -247,122 +235,84 @@ export default function PrivacyPolicyPage() {
             <CardTitle>Data Retention</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p>
-              We retain your information for as long as necessary to provide our services and fulfill the purposes
-              outlined in this Privacy Policy:
-            </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>
-                <strong>Account Information:</strong> Retained while your account is active and for 30 days after
-                account deletion
-              </li>
-              <li>
-                <strong>Message Data:</strong> Retained for up to 90 days for delivery and support purposes
-              </li>
-              <li>
-                <strong>Analytics Data:</strong> Aggregated and anonymized data may be retained indefinitely
-              </li>
-              <li>
-                <strong>Legal Requirements:</strong> Some data may be retained longer to comply with legal obligations
-              </li>
+              <li><strong>Account Data:</strong> Retained while account is active, deleted after 30 days of deactivation</li>
+              <li><strong>Messages:</strong> Stored for up to 90 days</li>
+              <li><strong>Analytics:</strong> Retained indefinitely in anonymized form</li>
+              <li><strong>Legal:</strong> Retained as required by law</li>
             </ul>
           </CardContent>
         </Card>
 
-        {/* Your Rights */}
+        {/* Rights */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Your Rights and Choices</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p>Depending on your location, you may have the following rights regarding your personal information:</p>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <h4 className="font-semibold mb-2">Access and Portability</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>Request access to your personal data</li>
-                  <li>Receive a copy of your data in a portable format</li>
-                  <li>Request information about data processing</li>
+                <h4 className="font-semibold">Access & Portability</h4>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  <li>View or export your data</li>
+                  <li>Understand data usage</li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">Control and Deletion</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>Correct inaccurate information</li>
-                  <li>Request deletion of your data</li>
-                  <li>Restrict or object to processing</li>
+                <h4 className="font-semibold">Manage & Delete</h4>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  <li>Request data deletion</li>
+                  <li>Update incorrect information</li>
+                  <li>Restrict processing</li>
                 </ul>
               </div>
             </div>
-            <p className="text-sm">
-              To exercise these rights, please contact us using the information provided in the "Contact Us" section
-              below.
-            </p>
           </CardContent>
         </Card>
 
-        {/* International Transfers */}
+        {/* Transfers */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>International Data Transfers</CardTitle>
+            <CardTitle>International Transfers</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2">
             <p>
-              Your information may be transferred to and processed in countries other than your country of residence.
-              These countries may have different data protection laws than your country.
-            </p>
-            <p>
-              When we transfer your information internationally, we ensure appropriate safeguards are in place to
-              protect your data, including:
+              Your data may be processed outside your country. BizWapp ensures:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Standard contractual clauses approved by relevant authorities</li>
-              <li>Adequacy decisions by regulatory bodies</li>
-              <li>Certification schemes and codes of conduct</li>
+              <li>Standard contractual clauses</li>
+              <li>Legal adequacy approvals</li>
+              <li>Certification schemes</li>
             </ul>
           </CardContent>
         </Card>
 
-        {/* Children's Privacy */}
+        {/* Children */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Children's Privacy</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              Our services are not intended for children under the age of 13 (or the minimum age in your jurisdiction).
-              We do not knowingly collect personal information from children under 13.
-            </p>
-            <p>
-              If you are a parent or guardian and believe your child has provided us with personal information, please
-              contact us immediately. We will take steps to remove such information from our systems.
-            </p>
+          <CardContent className="space-y-2">
+            <p>BizWapp is not intended for children under 13. We do not knowingly collect data from minors.</p>
           </CardContent>
         </Card>
 
-        {/* Changes to Privacy Policy */}
+        {/* Changes */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Changes to This Privacy Policy</CardTitle>
+            <CardTitle>Changes to Privacy Policy</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              We may update this Privacy Policy from time to time to reflect changes in our practices, technology, or
-              legal requirements. We will notify you of any material changes by:
-            </p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Posting the updated policy on our website</li>
-              <li>Sending you an email notification</li>
-              <li>Displaying a prominent notice in our application</li>
+          <CardContent className="space-y-2">
+            <p>BizWapp may update this policy. You will be notified via:</p>
+            <ul className="list-disc list-inside ml-4">
+              <li>Our website</li>
+              <li>Email</li>
+              <li>In-app notification</li>
             </ul>
-            <p>
-              Your continued use of our services after the effective date of the updated Privacy Policy constitutes
-              acceptance of the changes.
-            </p>
           </CardContent>
         </Card>
 
-        {/* Contact Information */}
+        {/* Contact */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -370,35 +320,29 @@ export default function PrivacyPolicyPage() {
               Contact Us
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices,
-              please contact us:
-            </p>
-            <div className="grid gap-4 md:grid-cols-2">
+          <CardContent className="space-y-2">
+            <p>For any queries regarding privacy:</p>
+            <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <h4 className="font-semibold mb-2">Email</h4>
-                <p className="text-sm">privacy@whatsappbusiness.com</p>
+                <h4 className="font-semibold">Email</h4>
+                <p className="text-sm">bizwapp@solutioneers.in</p>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">Phone</h4>
-                <p className="text-sm">+1 (555) 123-4567</p>
+                <h4 className="font-semibold">DPO</h4>
+                <p className="text-sm">dpo@solutioneers.com</p>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">Address</h4>
+                <h4 className="font-semibold">Phone</h4>
+                <p className="text-sm">+917376700783</p>
+              </div>
+              <div>
+                <h4 className="font-semibold">Address</h4>
                 <p className="text-sm">
-                  WhatsApp Business Platform
-                  <br />
-                  123 Business Street
-                  <br />
-                  San Francisco, CA 94105
-                  <br />
-                  United States
+                  solutioneers Infotech<br />
+                  Indira Nagar<br />
+                  Lucknow , Uttar Pradesh<br />
+                  India
                 </p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Data Protection Officer</h4>
-                <p className="text-sm">dpo@whatsappbusiness.com</p>
               </div>
             </div>
           </CardContent>
