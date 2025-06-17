@@ -153,24 +153,30 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="bg-background border-t py-4">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <Image
-              src="/BIZWAPP.png"
-              alt="Biz Wapp Logo"
-              width={54}
-              height={54}
-            />
-              <span className="text-lg font-semibold">BizWApp</span>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              &copy; 2025 Bizwapp (Solutioneers Infotech Private Limited). All
-              rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+  <div className="container mx-auto px-4">
+    <div className="flex flex-col md:flex-row justify-between items-center">
+      <div className="flex items-center gap-2 mb-4 md:mb-0">
+        <Image
+          src="/BIZWAPP.png"
+          alt="Biz Wapp Logo"
+          width={54}
+          height={54}
+        />
+        <span className="text-lg font-semibold">BizWApp</span>
+      </div>
+
+      <div className="text-sm text-muted-foreground text-center md:text-left">
+        &copy; 2025 Bizwapp (Solutioneers Infotech Private Limited). All rights reserved.
+      </div>
+
+      <div className="flex gap-4 mt-2 md:mt-0 text-sm text-muted-foreground">
+        <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
+        <a href="/terms-of-service" className="hover:underline">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
     </div>
   );
 }

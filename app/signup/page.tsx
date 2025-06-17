@@ -157,14 +157,15 @@ export default function SignupPage() {
       process.env.NEXT_PUBLIC_META_APP_ID
     );
 
-    const metaOAuthURL =
-      `https://www.facebook.com/v22.0/dialog/oauth?` +
-      `client_id=${process.env.NEXT_PUBLIC_META_APP_ID}` +
-      `&redirect_uri=https://api.bizwapp.com/api/auth/facebook/callback` +
-      `&state=secureRandom123` +
-      `&scope=whatsapp_business_management,business_management`;
+const metaOAuthURL =
+  `https://www.facebook.com/v19.0/dialog/oauth?` +
+  `client_id=${process.env.NEXT_PUBLIC_META_APP_ID}` +
+  `&redirect_uri=https://api.bizwapp.com/api/auth/auth/facebook/callback` +
+  `&state=secureRandom123` +
+  `&scope=whatsapp_business_management,business_management`;
 
-    window.location.href = metaOAuthURL;
+window.location.href = metaOAuthURL;
+
   };
 
   const handleSignup = async (e: React.FormEvent) => {
