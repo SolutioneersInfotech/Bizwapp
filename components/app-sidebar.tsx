@@ -51,7 +51,7 @@ const mainMenuItems = [
     title: "Conversations",
     icon: MessageSquare,
     url: "/conversations",
-    badge: 12,
+    // badge: 12,
   },
   {
     title: "Contacts",
