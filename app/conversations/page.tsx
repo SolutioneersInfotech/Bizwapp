@@ -215,7 +215,7 @@ export default function ConversationsPage() {
   const { mutate } = useSendWhatsAppMessage();
 
   const { mutate:sendTemplateMutate, isError, data } = usePostData(
-    `http://localhost:5001/api/auth/send-template`
+    `https://api.bizwapp.com/api/auth/send-template`
   );
 
   const handleSendBulkMessage = async () => {
