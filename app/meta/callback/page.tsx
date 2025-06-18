@@ -1,37 +1,51 @@
-// pages/meta/callback.tsx or /meta/callback/page.tsx if using App Router
-import { useRouter } from "next/router";
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import usePostData from "@/hooks/api/usePostData";
 
 export default function MetaCallback() {
   const router = useRouter();
-  const { code, error, state } = router.query;
+  const searchParams = useSearchParams();
+
+  // ✅ If searchParams is null, do nothing or wait
+  if (!searchParams) return <div>Loading...</div>;
+
+  const code = searchParams.get("code");
+  const error = searchParams.get("error");
+
   const { mutate } = usePostData("https://api.bizwapp.com/api/auth/signup");
 
   useEffect(() => {
     if (error) {
-      alert("Meta OAuth failed. Please try again.");
+      alert("Meta OAuth failed: " + error);
       router.push("/signup");
       return;
     }
 
-    if (code && state) {
-      const parsedFormData = JSON.parse(state);
+    if (code) {
+      const formDataRaw = sessionStorage.getItem("signupFormData");
+      if (!formDataRaw) {
+        alert("Session expired or missing form data. Please try again.");
+        router.push("/signup");
+        return;
+      }
 
-      mutate(parsedFormData, {
+      const formData = JSON.parse(formDataRaw);
+
+      mutate(formData, {
         onSuccess: (data) => {
-          const user = { ...data.user, token: data.token };
-          localStorage.setItem("user", JSON.stringify(user));
+          localStorage.setItem("user", JSON.stringify({ ...data.user, token: data.token }));
+          sessionStorage.removeItem("signupFormData");
           router.push("/dashboard");
         },
-        onError: (error) => {
-          console.error("Signup error:", error.message);
-          alert("Signup failed. Please try again.");
+        onError: (err) => {
+          alert("Signup failed: " + err.message);
           router.push("/signup");
         },
       });
     }
-  }, [code, error, state]);
+  }, [code, error]);
 
-  return <div>Completing signup...</div>;
+  return <div>Completing Meta authentication...</div>;
 }
