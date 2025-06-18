@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -49,6 +50,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [phase, setPhase] = useState(1);
   const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -160,7 +162,7 @@ export default function SignupPage() {
 const metaOAuthURL =
   `https://www.facebook.com/v19.0/dialog/oauth?` +
   `client_id=${process.env.NEXT_PUBLIC_META_APP_ID}` +
-  `&redirect_uri=https://api.bizwapp.com/api/auth/auth/facebook/callback` +
+  `&redirect_uri=https://bizwapp.com/meta/callback` +
   `&state=secureRandom123` +
   `&scope=whatsapp_business_management,business_management`;
 
@@ -263,27 +265,47 @@ window.location.href = metaOAuthURL;
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="relative space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Create a password"
                     value={formData.password}
                     onChange={handleChange}
+                    className="pr-10"
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 top-6 px-3  text-muted-foreground"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="relative space-y-2">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>
                   <Input
                     id="confirmPassword"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Confirm your password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    tabIndex={-1}
+                  >
+                  </button>
                 </div>
 
                 <Button type="button" className="w-full" onClick={handleSigUp}>
