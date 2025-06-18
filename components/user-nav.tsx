@@ -21,17 +21,29 @@ export function UserNav() {
     firstName:"",
     lastName:"",
     email:""
-  })
-  const { logout } = useAuth()
-  const router = useRouter()
+  });
 
-  const handleLogout = async() => {
-    await fetch("https://api.bizwapp.com/api/auth/logout", {
-      method: "POST", // or GET if you make it that
-      credentials: "include"
+    const router = useRouter();
+
+
+
+ const handleLogout = async () => {
+
+  try {
+    const response = await fetch("https://api.bizwapp.com/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
     });
-    
+
+    if (response.ok) {
+      router.push("/login");
+    } else {
+      console.error("Logout failed");
+    }
+  } catch (error) {
+    console.error("Error during logout:", error);
   }
+};
 
 
   useEffect(()=>{
