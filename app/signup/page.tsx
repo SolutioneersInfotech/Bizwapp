@@ -129,30 +129,33 @@ export default function SignupPage() {
 
     setIsLoading(true);
 
-    mutate(formData, {
-      onSuccess: (data) => {
-        toast({
-          title: "Success",
-          description: data.message,
-        });
-        console.log("Success:", data);
-        const user = { ...data.user, token: data.token };
-        localStorage.setItem("user", JSON.stringify(user));
-        router.push("/dashboard");
-      },
-      onError: (error) => {
-        setIsLoading(false);
-        toast({
-          title: "Error",
-          description: error.message || "Something went wrong!",
-        });
-        console.error("Error:", error.message);
-      },
-    });
+    // mutate(formData, {
+    //   onSuccess: (data) => {
+    //     toast({
+    //       title: "Success",
+    //       description: data.message,
+    //     });
+    //     console.log("Success:", data);
+    //     const user = { ...data.user, token: data.token };
+    //     localStorage.setItem("user", JSON.stringify(user));
+    //     router.push("/dashboard");
+    //   },
+    //   onError: (error) => {
+    //     setIsLoading(false);
+    //     toast({
+    //       title: "Error",
+    //       description: error.message || "Something went wrong!",
+    //     });
+    //     console.error("Error:", error.message);
+    //   },
+    // });
     setError("");
     // if (validatePhase1()) {
     //   setPhase(2)
     // }
+
+    sessionStorage.setItem("signupFormData", JSON.stringify(formData));
+
 
     console.log(
       "process.env.NEXT_PUBLIC_META_APP_ID:",
