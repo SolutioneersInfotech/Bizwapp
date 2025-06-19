@@ -26,6 +26,7 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useSendTemplateMutation } from "../../hooks/api/templateApproaval.ts";
 import useFacebookUpload from "../../hooks/api/useUploadMedia.ts";
+import { useToast } from "@/hooks/use-toast";
 
 interface TemplateComponent {
   type: string;
@@ -86,9 +87,11 @@ interface CreateTemplateModalProps {
 
 export default function CreateTemplateModal({
   open,
-  onOpenChange,
+  onOpenChange, 
   onSubmit,
-}: CreateTemplateModalProps) {
+}: CreateTemplateModalProps) {  
+    const { toast } = useToast();
+
   const [activeTab, setActiveTab] = useState<"visual" | "json">("visual");
   const [template, setTemplate] = useState<TemplateData>({
     ...defaultTemplate,
@@ -169,10 +172,11 @@ export default function CreateTemplateModal({
     }
   };
 
-  const { mutate, isLoading, isError, error } = useSendTemplateMutation();
+  const { mutate, status, isError, error } = useSendTemplateMutation();
+  const isLoading = status === "pending";
 
   const handleSubmit = (jsonInput) => {
-    console.log("jsonInput", jsonInput);
+    console.log("jsonInput", jsonInput); 
     mutate(jsonInput, {
       onSuccess: (response) => {
         if (response.status === "PENDING" || response.status === "APPROVED") {
@@ -287,6 +291,14 @@ export default function CreateTemplateModal({
     }
   };
 
+  console.log("lllllllllll", isLoading)
+
+  if(isLoading){
+    toast({
+          title: "Template is Sending",
+          description: `Successfully imported  contacts.`,
+        });
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -569,7 +581,14 @@ export default function CreateTemplateModal({
             Cancel
           </Button>
           <Button onClick={() => handleSubmit(jsonInput)}>
-            Create Template
+            {isLoading ? (
+            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+          ) : (
+            'Create Template'
+          )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -32,10 +32,12 @@ import { useToast } from "@/hooks/use-toast"
 import  CreateTemplateModal  from "../templates/create-template-modal"
 import { useWhatsAppTemplates} from '../../hooks/api/getTemplate.js';
 import { Spinner } from "../../components/ui/spinner";
-
-
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function TemplatesPage() {
+
+  const queryClient = useQueryClient();
+
   const { templates, createTemplate, updateTemplate, deleteTemplate } = useTemplates()
   const { toast } = useToast()
 
@@ -61,6 +63,8 @@ export default function TemplatesPage() {
 
   const { data: whatsappTemplates , isLoading } = useWhatsAppTemplates();
 const [filteredTemplates, setFilteredTemplates] = useState([]);
+
+
 
 
 useEffect(() => {
@@ -217,6 +221,8 @@ useEffect(() => {
   }
 
   console.log("isLoading", isLoading)
+
+queryClient.invalidateQueries({ queryKey: ['whatsappTemplates'] });
 
   return (
     <div className="flex flex-col">

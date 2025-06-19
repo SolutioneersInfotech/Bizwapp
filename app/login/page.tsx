@@ -108,6 +108,10 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  const handleGoogleLogin = () => {
+  window.location.href = 'https://bizwapp-backend-2.onrender.com/api/auth/auth/google';
+};
   
 
   const handleSocialLogin = async (provider: string) => {
@@ -239,7 +243,7 @@ export default function LoginPage() {
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => handleSocialLogin("google")}
+                  onClick={handleGoogleLogin}
                   className="w-full"
                 >
                   <FcGoogle className="mr-2 h-4 w-4" />
@@ -253,22 +257,22 @@ export default function LoginPage() {
                   <Facebook className="mr-2 h-4 w-4 text-blue-600" />
                   Facebook
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   onClick={() => handleSocialLogin("github")}
                   className="w-full"
                 >
                   <Github className="mr-2 h-4 w-4" />
                   GitHub
-                </Button>
-                <Button
+                </Button> */}
+                {/* <Button
                   variant="outline"
                   onClick={() => handleSocialLogin("linkedin")}
                   className="w-full"
                 >
                   <Linkedin className="mr-2 h-4 w-4 text-blue-700" />
                   LinkedIn
-                </Button>
+                </Button> */}
               </div>
             </div>
           </CardContent>

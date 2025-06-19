@@ -167,7 +167,7 @@ const metaOAuthURL =
   `client_id=${process.env.NEXT_PUBLIC_META_APP_ID}` +
   `&redirect_uri=https://bizwapp.com/meta/callback` +
   `&state=secureRandom123` +
-  `&scope=whatsapp_business_management,business_management`;
+  `&scope=whatsapp_business_messaging`;
 
 window.location.href = metaOAuthURL;
 
