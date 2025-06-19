@@ -72,16 +72,15 @@ import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatArea";
 import axios from "axios";
 import usePostData from "@/hooks/api/usePostData";
-// import useSendWhatsAppImage from "../../hooks/api/sendImageWhatsapp";
 
 export default function ConversationsPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated: authLoading } = useAuth();
   const {
     messages,
     sendMessage,
     getMessageHistory,
-    isLoading: messageLoading,
+    messageLoading,
     currentContact,
     setCurrentContact,
   } = useMessages();
@@ -94,11 +93,9 @@ export default function ConversationsPage() {
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
 
-  // New state for bulk message template
   const [bulkMessageTab, setBulkMessageTab] = useState("text");
   const [selectedBulkTemplate, setSelectedBulkTemplate] = useState("");
 
-  // New state for search and filters
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [filteredConversations, setFilteredConversations] = useState([]);
@@ -109,7 +106,7 @@ export default function ConversationsPage() {
   const [conversation, setConversation] = useState([]);
   const [webhookMessages, setWebhookMessages] = useState([]);
   const [conversationHistory, setConversationHistory] = useState<any[]>([]);
-  const conversationRef = useRef<any[]>([]); // store latest conversation list
+  const conversationRef = useRef<any[]>([]); 
   const [isMobile, setIsMobile] = useState(false);
   const [mobileView, setMobileView] = useState<"conversations" | "chat">(
     "conversations"
@@ -122,6 +119,7 @@ export default function ConversationsPage() {
   const [template, setTemplate] = useState({});
   const [imagesend, setImageSend] = useState("");
   const fileInputRef = useRef();
+  const [isSendingTemplates, setIsSendingTemplates] = useState(false);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
@@ -200,7 +198,6 @@ export default function ConversationsPage() {
     setUniqueConversations(unique);
   }, [conversationHistory]);
 
-  // const allTemplates = [/* your template objects */];
   const separatedTexts = Array.isArray(whatsappTemplates?.data)
     ? whatsappTemplates.data.map((template) => {
         return {
@@ -212,13 +209,18 @@ export default function ConversationsPage() {
       })
     : [];
 
-  const { mutate } = useSendWhatsAppMessage();
+  const { mutate, isPending: isPendingSendWhatsAppMessage } =
+    useSendWhatsAppMessage();
 
-  const { mutate:sendTemplateMutate, isError, data } = usePostData(
-    `https://api.bizwapp.com/api/auth/send-template`
-  );
+  const {
+    mutate: sendTemplateMutate,
+    isError,
+    isPending,
+    data,
+  } = usePostData(`https://api.bizwapp.com/api/auth/send-template`);
 
   const handleSendBulkMessage = async () => {
+    setIsSendingTemplates(true);
     if (
       bulkMessageTab === "text" &&
       (!bulkMessage.trim() || selectedContacts.length === 0)
@@ -243,12 +245,6 @@ export default function ConversationsPage() {
       return;
     }
 
-    // const contactsToSend = contacts?.contacts
-    //       .filter((contact) => selectedContacts.includes(contact.phone))
-    //       .map((contact) => ({
-    //         phoneNumber: contact.phone,
-    //         name: contact.name,
-    //       }));
     try {
       const contactsToSend = contacts?.contacts
         .filter((contact) => selectedContacts.includes(contact.phone))
@@ -256,8 +252,7 @@ export default function ConversationsPage() {
           phoneNumber: contact.phone,
           name: contact.name,
         }));
-      // In a rea
-      // l app, you would call the API to send bulk messages
+
       if (bulkMessageTab === "text") {
         let messageToSend = bulkMessage;
 
@@ -269,33 +264,37 @@ export default function ConversationsPage() {
           contacts: contactsToSend,
           message: messageToSend,
         });
+        toast({
+          title: "Message sent to selected user.",
+          description: `Template sent to ${selectedContacts.length} contacts`,
+        });
+        setBulkMessageOpen(false);
       } else {
-  const template = separatedTexts.find(
-    (t) => t.templateName === selectedBulkTemplate
-  );
+        const template = separatedTexts.find(
+          (t) => t.templateName === selectedBulkTemplate
+        );
 
-  if (!template) return;
+        if (!template) return;
 
-  for (const contact of contactsToSend) {
-    sendTemplateMutate({
-      userId,
-      to: contact.phoneNumber,
-      templateName: selectedBulkTemplate,
-      languageCode: "en", // Or use dynamic language if needed
-    });
-  }
+        for (const contact of contactsToSend) {
+          sendTemplateMutate({
+            userId,
+            to: contact.phoneNumber,
+            templateName: selectedBulkTemplate,
+            languageCode: "en", 
+          });
+        }
 
-  toast({
-    title: "Bulk Template Sent",
-    description: `Template sent to ${selectedContacts.length} contacts`,
-  });
+        toast({
+          title: "Bulk Template Sent",
+          description: `Template sent to ${selectedContacts.length} contacts`,
+        });
 
-  setBulkMessage("");
-  setSelectedBulkTemplate("");
-  setSelectedContacts([]);
-  setBulkMessageOpen(false);
-}
-
+        setBulkMessage("");
+        setSelectedBulkTemplate("");
+        setSelectedContacts([]);
+        setBulkMessageOpen(false);
+      }
     } catch (error) {
       console.error("Mutation failed", error);
       toast({
@@ -303,6 +302,8 @@ export default function ConversationsPage() {
         description: "Failed to send bulk message",
         variant: "destructive",
       });
+    } finally {
+      setIsSendingTemplates(false);
     }
   };
 
@@ -310,15 +311,12 @@ export default function ConversationsPage() {
     if (!selectedContact) return;
 
     const template = templates.find((t) => t.id === templateId);
-    console.log("templatevvvvvvvvv", template);
     if (template) {
       setTemplate(template);
     }
     if (!template) return;
 
     try {
-      // In a real app, you would call the API to send a template message
-      console.log("selectedContact", selectedContact);
       const simplifiedContacts = [
         {
           phoneNumber: selectedContact.phoneNumber,
@@ -327,8 +325,6 @@ export default function ConversationsPage() {
       ];
 
       let cleanedMessage = template.content.replace(/\\\"/g, "");
-
-      console.log("cleanedMessagecleanedMessage", cleanedMessage);
 
       mutate({
         userId: userId,
@@ -368,16 +364,13 @@ export default function ConversationsPage() {
     }
 
     try {
-      // Check if contact exists
       const existingContact = conversations.find(
         (c) => c.phone === newChatPhone
       );
 
       if (existingContact) {
-        // If contact exists, select it
         handleContactSelect(existingContact);
       } else {
-        // Create a new contact
         const newContact = {
           id: Date.now(),
           name: `New Contact (${newChatPhone})`,
@@ -393,13 +386,10 @@ export default function ConversationsPage() {
           archived: false,
         };
 
-        // Add to conversations (in a real app, this would be an API call)
         conversations.push(newContact);
 
-        // Select the new contact
         handleContactSelect(newContact);
 
-        // Send initial message if provided
         if (newChatMessage) {
           await sendMessage(newChatPhone, newChatMessage);
         }
@@ -427,15 +417,12 @@ export default function ConversationsPage() {
   };
 
   const handleFileChange = async (event) => {
-    console.log("svgvsjdgvjgvsj");
     const file = event.target.files[0];
     if (!file) return;
 
-    // Cloudinary upload logic
     const formData = new FormData();
     formData.append("file", file);
-    console.log("filefilefile", file);
-    formData.append("upload_preset", "preset"); // Replace with your preset
+    formData.append("upload_preset", "preset"); 
 
     try {
       const response = await axios.post(
@@ -445,14 +432,12 @@ export default function ConversationsPage() {
       const imageUrl = response.data.secure_url;
       console.log("Uploaded Image URL:", imageUrl);
       setImageSend(imageUrl);
-      // if (onUpload) onUpload(imageUrl);
     } catch (error) {
       console.error("Upload error:", error);
     }
   };
 
   const handleDeleteConversation = (contact) => {
-    // In a real app, this would be an API call
     const index = conversations.findIndex((c) => c.id === contact.id);
     if (index !== -1) {
       conversations.splice(index, 1);
@@ -462,12 +447,6 @@ export default function ConversationsPage() {
         description: `Conversation with ${contact.name} has been deleted`,
       });
 
-      // Refresh filtered conversations
-      // setFilteredConversations([
-      //   ...filteredConversations.filter((c) => c.id !== contact.id),
-      // ]);
-
-      // If the deleted contact was selected, clear selection
       if (selectedContact && selectedContact.id === contact.id) {
         setSelectedContact(null);
       }
@@ -488,9 +467,6 @@ export default function ConversationsPage() {
           conversations[index].muted ? "muted" : "unmuted"
         }`,
       });
-
-      // Refresh filtered conversations
-      // setFilteredConversations([...filteredConversations]);
     }
   };
 
@@ -501,10 +477,6 @@ export default function ConversationsPage() {
       </div>
     );
   }
-
-  // const sortedMessages = [...message].sort(
-  //   (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
-  // );
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -651,9 +623,39 @@ export default function ConversationsPage() {
                   </Button>
                   <Button
                     onClick={handleSendBulkMessage}
-                    disabled={selectedContacts.length === 0}
+                    disabled={
+                      selectedContacts.length === 0 ||
+                      isPending ||
+                      isSendingTemplates ||
+                      isPendingSendWhatsAppMessage
+                    }
                   >
-                    Send to {selectedContacts.length} contacts
+                    {isPending ||
+                    isSendingTemplates ||
+                    isPendingSendWhatsAppMessage ? (
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8z"
+                        ></path>
+                      </svg>
+                    ) : (
+                      `Send to ${selectedContacts.length} contacts`
+                    )}
                   </Button>
                 </DialogFooter>
               </DialogContent>

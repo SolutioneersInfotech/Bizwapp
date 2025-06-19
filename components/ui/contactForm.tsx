@@ -10,6 +10,7 @@ interface ContactFormProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onClose: () => void;
+  isLoading: boolean;
 }
 
 const ContactForm: React.FC<ContactFormProps> = ({ 
@@ -18,8 +19,10 @@ const ContactForm: React.FC<ContactFormProps> = ({
   contactData,
   onChange,
   onSubmit,
-  onClose
+  onClose,
+  isLoading,
 }) => {
+  console.log("hhhhh", isLoading)
   return (
     <DialogContent>
       <DialogHeader>
@@ -73,7 +76,26 @@ const ContactForm: React.FC<ContactFormProps> = ({
           <Button variant="outline" type="button" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit">Save Contact</Button>
+          <Button type="submit" disabled={isLoading}>{isLoading ? <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8z"
+                        ></path>
+                      </svg> : "Save"}</Button>
         </DialogFooter>
       </form>
     </DialogContent>

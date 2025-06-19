@@ -460,7 +460,8 @@ export default function ContactsPage() {
     setNewContact({ ...newContact, [e.target.name]: e.target.value });
   };
 
-  const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact/${userId}`);
+  const { mutate: addContactMutate, status } = usePostData(`https://api.bizwapp.com/api/auth/addContact/${userId}`);
+  const isLoading = status === "pending";
 
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -468,7 +469,7 @@ export default function ContactsPage() {
 
     const contactArray = [newContact];
 console.log("contactdata", contactArray)
-    mutation.mutate(contactArray,{
+    addContactMutate(contactArray,{
 
       onSuccess:(data) =>{
         console.log("data" , data);
@@ -679,6 +680,7 @@ console.log("contactdata", contactArray)
                 onChange={handleChange}
                 onSubmit={handleSubmit}
                 onClose={() => setAddContactDialogOpen(false)}
+                isLoading={isLoading}
               />
             </Dialog>
           </div>
