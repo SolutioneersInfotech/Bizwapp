@@ -172,6 +172,7 @@ export default function LandingPage() {
       <div className="flex gap-4 mt-2 md:mt-0 text-sm text-muted-foreground">
         <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
         <a href="/terms-of-service" className="hover:underline">Terms of Service</a>
+        <a href="/data-deletion" className="hover:underline">Data Deletion</a>
       </div>
     </div>
   </div>
