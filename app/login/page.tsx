@@ -114,7 +114,7 @@ export default function LoginPage() {
 };
   
 const handleFacebookLogin = () => {
-    window.location.href = "https://bizwapp-backend-2.onrender.com/auth/facebook";
+    window.location.href = "https://bizwapp-backend-2.onrender.com/api/auth/auth/facebook";
   };
 
   const handleSocialLogin = async (provider: string) => {
