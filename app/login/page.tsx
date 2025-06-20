@@ -113,6 +113,9 @@ export default function LoginPage() {
   window.location.href = 'https://bizwapp-backend-2.onrender.com/api/auth/auth/google';
 };
   
+const handleFacebookLogin = () => {
+    window.location.href = "https://api.bizwapp.com/auth/facebook";
+  };
 
   const handleSocialLogin = async (provider: string) => {
     try {
@@ -251,7 +254,7 @@ export default function LoginPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => handleSocialLogin("facebook")}
+                  onClick={handleFacebookLogin}
                   className="w-full"
                 >
                   <Facebook className="mr-2 h-4 w-4 text-blue-600" />
