@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 
 const fetchUser = async () => {
-  const res = await fetch('https://api.bizwapp.com/api/auth/me', {
+  const res = await fetch('https://bizwapp-backend-2.onrender.com/api/auth/me', {
     method: 'GET',
     credentials: 'include', // sends cookies (important)
   });
