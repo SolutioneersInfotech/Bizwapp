@@ -10,11 +10,15 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/contexts/AuthContext"
 import { useAnalytics } from "@/contexts/AnalyticsContext"
+import useUser from "../../hooks/api/getuser"
 
 export default function DashboardPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading } = useAuth()
   const { analytics, refreshAnalytics } = useAnalytics()
+
+    const { data: user, isError } = useUser();
+
 
   // useEffect(() => {
   //   if (!isLoading && !isAuthenticated) {
@@ -37,6 +41,7 @@ export default function DashboardPage() {
     return <DashboardSkeleton />
   }
 
+  console.log("useruseruseruser", user)
 
   return (
     <div className="flex flex-col">
