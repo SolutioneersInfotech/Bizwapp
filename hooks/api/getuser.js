@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 const fetchUser = async () => {
   const res = await fetch('https://bizwapp-backend-2.onrender.com/api/auth/me', {
     method: 'GET',
-    credentials: 'include', // sends cookies (important)
+    credentials: 'include', 
   });
 
   if (!res.ok) {
@@ -18,8 +18,8 @@ const useUser = () => {
   return useQuery({
     queryKey: ['user'],
     queryFn: fetchUser,
-    retry: false, // optional: don't retry on fail
-    staleTime: 5 * 60 * 1000, // cache for 5 mins
+    retry: false, 
+    staleTime: 5 * 60 * 1000, 
   });
 };
 

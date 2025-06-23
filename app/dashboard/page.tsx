@@ -17,7 +17,13 @@ export default function DashboardPage() {
   const { isAuthenticated, isLoading } = useAuth()
   const { analytics, refreshAnalytics } = useAnalytics()
 
-    const { data: user, isError } = useUser();
+    const { data, isError } = useUser();
+
+    useEffect(() => {
+    if (data?.user) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
+  }, [data]);
 
 
   // useEffect(() => {
@@ -41,7 +47,7 @@ export default function DashboardPage() {
     return <DashboardSkeleton />
   }
 
-  console.log("useruseruseruser", user)
+  console.log("useruseruseruser", data?.user)
 
   return (
     <div className="flex flex-col">
