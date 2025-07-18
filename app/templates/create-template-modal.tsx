@@ -90,7 +90,7 @@ export default function CreateTemplateModal({
   onOpenChange, 
   onSubmit,
 }: CreateTemplateModalProps) {  
-    const { toast } = useToast();
+    // const { toast } = useToast();
 
   const [activeTab, setActiveTab] = useState<"visual" | "json">("visual");
   const [template, setTemplate] = useState<TemplateData>({
@@ -180,27 +180,27 @@ export default function CreateTemplateModal({
     mutate(jsonInput, {
       onSuccess: (response) => {
         if (response.status === "PENDING" || response.status === "APPROVED") {
-          toast.success(`✅ Your submitted Template is ${response.status}`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-          });
+          // toast.success(`✅ Your submitted Template is ${response.status}`, {
+          //   position: "bottom-right",
+          //   autoClose: 5000,
+          //   hideProgressBar: false,
+          //   closeOnClick: false,
+          //   pauseOnHover: true,
+          //   draggable: true,
+          //   progress: undefined,
+          //   theme: "colored",
+          // });
         } else {
-          toast.error(`ℹ️ Template status: ${response.status}`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-          });
+          // toast.error(`ℹ️ Template status: ${response.status}`, {
+          //   position: "bottom-right",
+          //   autoClose: 5000,
+          //   hideProgressBar: false,
+          //   closeOnClick: false,
+          //   pauseOnHover: true,
+          //   draggable: true,
+          //   progress: undefined,
+          //   theme: "colored",
+          // });
         }
       },
       onError: (err) => {
@@ -215,15 +215,15 @@ export default function CreateTemplateModal({
           err?.message || // fallback for thrown Error objects
           "Something went wrong!";
 
-        toast.error(`❌ Error: ${errorMessage}`, {
-          position: "bottom-right",
-          autoClose: 6000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "colored",
-        });
+        // toast.error(`❌ Error: ${errorMessage}`, {
+        //   position: "bottom-right",
+        //   autoClose: 6000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   theme: "colored",
+        // });
       },
     });
     onSubmit(template);
@@ -293,12 +293,12 @@ export default function CreateTemplateModal({
 
   console.log("lllllllllll", isLoading)
 
-  if(isLoading){
-    toast({
-          title: "Template is Sending",
-          description: `Successfully imported  contacts.`,
-        });
-  }
+  // if(isLoading){
+  //   toast({
+  //         title: "Template is Sending",
+  //         description: `Successfully imported  contacts.`,
+  //       });
+  // }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

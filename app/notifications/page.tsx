@@ -620,7 +620,7 @@ const mockNotifications: Notification[] = [
     type: "info",
     title: "New Feature Available",
     message:
-      "We've added bulk messaging capabilities to your account. Now you can send messages to multiple contacts at once, saving you time and effort.",
+      "We've added  message sending capabilities to your account. Now you can send messages to multiple contacts at once, saving you time and effort.",
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
     read: true,
   },

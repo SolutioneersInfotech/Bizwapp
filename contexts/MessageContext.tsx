@@ -138,13 +138,13 @@ export const MessageProvider = ({ children }: { children: React.ReactNode }) => 
       }
 
       toast({
-        title: "Bulk messages sent",
+        title: " messages sent",
         description: `Successfully sent messages to ${recipients.length} recipients.`,
       })
     } catch (error) {
-      console.error("Error sending bulk messages:", error)
+      console.error("Error sending  messages:", error)
       toast({
-        title: "Failed to send bulk messages",
+        title: "Failed to send  messages",
         description: "There was an error sending your messages. Please try again.",
         variant: "destructive",
       })

@@ -217,7 +217,7 @@ export default function ConversationsPage() {
     isError,
     isPending,
     data,
-  } = usePostData(`https://api.bizwapp.com/api/auth/send-template`);
+  } = usePostData(`http://localhost:5001/api/auth/send-template`);
 
   const handleSendBulkMessage = async () => {
     setIsSendingTemplates(true);
@@ -274,6 +274,8 @@ export default function ConversationsPage() {
           (t) => t.templateName === selectedBulkTemplate
         );
 
+        // const template = "hello_world"
+
         if (!template) return;
 
         for (const contact of contactsToSend) {
@@ -281,7 +283,7 @@ export default function ConversationsPage() {
             userId,
             to: contact.phoneNumber,
             templateName: selectedBulkTemplate,
-            languageCode: "en", 
+            languageCode: "en_US", 
           });
         }
 
@@ -470,13 +472,13 @@ export default function ConversationsPage() {
     }
   };
 
-  if (authLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
+  // if (authLoading) {
+  //   return (
+  //     <div className="flex h-screen items-center justify-center">
+  //       Loading...
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -489,12 +491,12 @@ export default function ConversationsPage() {
             <Dialog open={bulkMessageOpen} onOpenChange={setBulkMessageOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
-                  Bulk Message
+                  Send Message
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle>Send Bulk Message</DialogTitle>
+                  <DialogTitle>Send Message</DialogTitle>
                   <DialogDescription>
                     Send a message to multiple contacts at once.
                   </DialogDescription>
@@ -529,7 +531,7 @@ export default function ConversationsPage() {
                           <SelectValue placeholder="Choose a template" />
                         </SelectTrigger>
                         <SelectContent>
-                          {separatedTexts.map((template) => (
+                          {separatedTexts?.map((template) => (
                             <SelectItem
                               key={template.templateName}
                               value={template.templateName}
@@ -537,6 +539,11 @@ export default function ConversationsPage() {
                               {template.templateName}
                             </SelectItem>
                           ))}
+                          {/* <SelectItem
+                          value="hello_world"
+                          >
+                          hello_world
+                          </SelectItem> */}
                         </SelectContent>
                       </Select>
 
@@ -863,7 +870,7 @@ const conversations = [
     name: "James Wilson",
     initials: "JW",
     avatar: "/placeholder.svg?height=40&width=40",
-    lastMessage: "Is there a discount for bulk orders?",
+    lastMessage: "Is there a discount for  orders?",
     time: "1d",
     unread: 0,
     phone: "+1999000111",

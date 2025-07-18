@@ -52,7 +52,7 @@ export const whatsappApi = {
       const promises = recipients.map((recipient) => whatsappApi.sendTextMessage(phoneNumberId, recipient, message))
       return Promise.all(promises)
     } catch (error) {
-      console.error("Error sending bulk messages:", error)
+      console.error("Error sending  messages:", error)
       throw error
     }
   },

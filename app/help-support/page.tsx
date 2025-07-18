@@ -306,7 +306,7 @@ const pickerRef = useRef<HTMLInputElement>(null);
 
                     <Card className="overflow-hidden">
                       <CardHeader className="p-4">
-                        <CardTitle className="text-base">Bulk Messaging Strategies</CardTitle>
+                        <CardTitle className="text-base"> Message Sending Strategies</CardTitle>
                       </CardHeader>
                       <CardContent className="p-4 pt-0">
                         <p className="text-sm text-muted-foreground">
