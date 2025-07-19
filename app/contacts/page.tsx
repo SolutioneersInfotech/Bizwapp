@@ -61,6 +61,7 @@ import useUpdateContact from "../../hooks/api/usePutData";
 import ContactForm from "@/components/ui/contactForm";
 import { DialogPortal } from "@radix-ui/react-dialog";
 import { Spinner } from "@/components/ui/spinner";
+import useDelete from "@/hooks/api/useDelete";
 
 export default function ContactsPage() {
   const { toast } = useToast();
@@ -589,11 +590,19 @@ const finalPayload = contactsToSend.length > 0 ? contactsToSend : contactsToSend
 
   console.log("contactIdToDelete", contactIdToDelete);
 
+    const { deleteItem} = useDelete(`https://api.bizwapp.com/api/auth/deleteContact/${contactIdToDelete}`);
+
+
   const handleDelete = async (contactId) => {
     console.log("contactId", contactId);
     setContactIdToDelete(contactId);
     const confirmed = window.confirm("Are you sure you want to delete?");
-    if (confirmed) {
+    if (!confirmed) return;
+
+    const result = await deleteItem();
+    if (result) {
+      console.log("Deleted successfully:", result);
+      // Optionally refetch your contacts here
     }
   };
 

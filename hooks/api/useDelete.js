@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-const useDelete = (endpoint) => {
+const useDelete = (baseUrl) => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<null | string>(null);
+  const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
   const deleteItem = async (id) => {
@@ -11,12 +11,12 @@ const useDelete = (endpoint) => {
     setSuccess(false);
 
     try {
-      const response = await fetch(`${endpoint}/${id}`, {
+      const response = await fetch(`${baseUrl}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // if you use cookies
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -38,3 +38,4 @@ const useDelete = (endpoint) => {
 };
 
 export default useDelete;
+ 
