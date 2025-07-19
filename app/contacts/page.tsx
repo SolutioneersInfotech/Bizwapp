@@ -352,7 +352,7 @@ export default function ContactsPage() {
   };
 
   const { mutate, isError, data } = usePostData(
-    `http://localhost:5001/api/auth/addContact/${userId}`
+    `https://018a6feb0e54.ngrok-free.app/api/auth/addContact/${userId}`
   );
 
   // Handle import confirmation
