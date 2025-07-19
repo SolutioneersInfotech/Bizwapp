@@ -175,47 +175,50 @@ export default function ContactsPage() {
   }, []); // ← no need to depend on state in dependency array
 
   const handleContactPicker = async () => {
-  try {
-    if (!("contacts" in navigator) || !navigator.contacts?.select) {
-      alert("Contact Picker API is not supported on this device/browser.");
-      return;
+    try {
+      if (!("contacts" in navigator) || !navigator.contacts?.select) {
+        alert("Contact Picker API is not supported on this device/browser.");
+        return;
+      }
+
+      const contacts = await navigator.contacts.select(
+        ["name", "email", "tel"],
+        {
+          multiple: true,
+        }
+      );
+
+      const formattedContacts = contacts.map((contact, index) => {
+        const name = contact.name?.[0] || "Unknown";
+        const email = contact.email?.[0] || "";
+        const phone = contact.tel?.[0] || "";
+
+        const initials = name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2);
+
+        return {
+          id: Date.now() + index,
+          name,
+          initials,
+          email,
+          phone,
+          avatar: "/placeholder.svg?height=32&width=32",
+          tags: ["Imported"],
+          lastContact: "Never",
+          status: "Active",
+        };
+      });
+
+      console.log("Formatted Contacts:", formattedContacts);
+      setSelectedContacts(formattedContacts); // Or your desired state
+    } catch (error) {
+      console.error("Contact pick failed", error);
     }
-
-    const contacts = await navigator.contacts.select(["name", "email", "tel"], {
-      multiple: true,
-    });
-
-    const formattedContacts = contacts.map((contact, index) => {
-      const name = contact.name?.[0] || "Unknown";
-      const email = contact.email?.[0] || "";
-      const phone = contact.tel?.[0] || "";
-
-      const initials = name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
-
-      return {
-        id: Date.now() + index,
-        name,
-        initials,
-        email,
-        phone,
-        avatar: "/placeholder.svg?height=32&width=32",
-        tags: ["Imported"],
-        lastContact: "Never",
-        status: "Active",
-      };
-    });
-
-    console.log("Formatted Contacts:", formattedContacts);
-    setSelectedContacts(formattedContacts); // Or your desired state
-  } catch (error) {
-    console.error("Contact pick failed", error);
-  }
-};
+  };
 
   // const {
   //   data: getContacts,
@@ -684,9 +687,9 @@ export default function ContactsPage() {
                             {selectedContacts.map((contact, index) => (
                               <li key={index} className="text-muted-foreground">
                                 <span className="font-medium">
-                                  {contact.name?.[0] || "Unnamed"}
+                                  {contact.name || "Unnamed"}
                                 </span>{" "}
-                                – <span>{contact.tel?.[0] || "No number"}</span>
+                                – <span>{contact.phone || "No number"}</span>
                               </li>
                             ))}
                           </ul>
@@ -743,9 +746,16 @@ export default function ContactsPage() {
                   </Button>
                   <Button
                     onClick={handleImportConfirm}
-                    disabled={importedContacts.length === 0 && selectedContacts.length ===0}
+                    disabled={
+                      importedContacts.length === 0 &&
+                      selectedContacts.length === 0
+                    }
                   >
-                    Import {importedContacts.length ? importedContacts.length : selectedContacts.length} Contacts
+                    Import{" "}
+                    {importedContacts.length
+                      ? importedContacts.length
+                      : selectedContacts.lengthy}{" "}
+                    Contacts
                   </Button>
                 </DialogFooter>
               </DialogContent>
