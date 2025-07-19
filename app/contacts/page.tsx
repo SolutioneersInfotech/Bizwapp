@@ -386,8 +386,10 @@ export default function ContactsPage() {
     const contactsToSendFromMobile = selectedContacts.map(
       ({ id, ...contact }) => contact
     );
-    alert(`contactsToSendFromMobile  ${contactsToSendFromMobile}`)
-    mutate(contactsToSend ? contactsToSend : contactsToSendFromMobile , {
+alert(`contactsToSendFromMobile: ${JSON.stringify(contactsToSendFromMobile, null, 2)}`)
+const finalPayload = contactsToSend.length > 0 ? contactsToSend : contactsToSendFromMobile;
+
+    mutate(finalPayload , {
       onSuccess: (data) => {
         toast({
           title: "Success",
