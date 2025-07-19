@@ -357,7 +357,7 @@ export default function ContactsPage() {
 
   // Handle import confirmation
   const handleImportConfirm = () => {
-    if (importedContacts.length === 0) {
+    if (importedContacts.length === 0 && selectedContacts.length === 0) {
       toast({
         title: "No Contacts to Import",
         description: "Please upload a file with contacts first.",
@@ -369,18 +369,24 @@ export default function ContactsPage() {
     setFilteredContacts((prevContacts) => [
       ...prevContacts,
       ...importedContacts,
+      ...selectedContacts,
     ]);
 
     // Add imported contacts to the contacts list
-    setContacts((prevContacts) => [...prevContacts, ...importedContacts]);
+    setContacts((prevContacts) => [...prevContacts, ...importedContacts , ...selectedContacts]);
 
     // Reset imported contacts
     setImportedContacts([]);
+    setSelectedContacts([])
 
     const contactsToSend = importedContacts.map(
       ({ id, ...contact }) => contact
     );
-    mutate(contactsToSend, {
+
+    const contactsToSendFromMobile = selectedContacts.map(
+      ({ id, ...contact }) => contact
+    );
+    mutate(contactsToSend ? contactsToSend : contactsToSendFromMobile , {
       onSuccess: (data) => {
         toast({
           title: "Success",
@@ -754,7 +760,7 @@ export default function ContactsPage() {
                     Import{" "}
                     {importedContacts.length
                       ? importedContacts.length
-                      : selectedContacts.lengthy}{" "}
+                      : selectedContacts.length}{" "}
                     Contacts
                   </Button>
                 </DialogFooter>
