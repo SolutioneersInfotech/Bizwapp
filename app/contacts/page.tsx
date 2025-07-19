@@ -353,7 +353,7 @@ export default function ContactsPage() {
   };
 
   const { mutate, isError, data } = usePostData(
-    `https://018a6feb0e54.ngrok-free.app/api/auth/addContact/${userId}`
+    `https://bizwapp-backend-2.onrender.com/api/auth/addContact/${userId}`
   );
 
   // Handle import confirmation
