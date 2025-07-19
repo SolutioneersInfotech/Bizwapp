@@ -386,6 +386,7 @@ export default function ContactsPage() {
     const contactsToSendFromMobile = selectedContacts.map(
       ({ id, ...contact }) => contact
     );
+    alert(`contactsToSendFromMobile  ${contactsToSendFromMobile}`)
     mutate(contactsToSend ? contactsToSend : contactsToSendFromMobile , {
       onSuccess: (data) => {
         toast({
@@ -396,6 +397,7 @@ export default function ContactsPage() {
         queryClient.invalidateQueries({ queryKey: ["contacts"] });
       },
       onError: (error) => {
+        alert(`ggggggg ${error}`);
         toast({
           title: "Error",
           description: error.error || "Something went wrong!", // ✅ Show error message
