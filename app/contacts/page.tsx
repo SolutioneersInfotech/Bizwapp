@@ -125,6 +125,10 @@ export default function ContactsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [filteredContacts, setFilteredContacts] = useState(contacts);
+    const [isMobileWithContactSupport, setIsMobileWithContactSupport] = useState(false);
+      const [selectedContacts, setSelectedContacts] = useState([]);
+
+
 
   // Import dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -167,6 +171,31 @@ export default function ContactsPage() {
       }
 
   }, []);
+
+useEffect(() => {
+  const isMobile = window.innerWidth <= 768;
+  setIsMobileWithContactSupport(isMobile); // just based on screen size
+}, []); // ← no need to depend on state in dependency array
+
+const handleContactPicker = async () => {
+  try {
+    if (!("contacts" in navigator) || !navigator.contacts?.select) {
+      alert("Contact Picker API is not supported on this device/browser.");
+      return;
+    }
+
+    const contacts = await navigator.contacts.select(["name", "email", "tel"], {
+      multiple: true,
+    });
+
+    console.log("Selected contacts:", contacts);
+    setSelectedContacts(contacts);
+  } catch (error) {
+    console.error("Contact pick failed", error);
+  }
+};
+
+
 
   // const {
   //   data: getContacts,
@@ -538,6 +567,8 @@ console.log("contactdata", contactArray)
   
   queryClient.invalidateQueries({ queryKey: ['contacts'] });
 
+  console.log("isMobileWithContactSupport", isMobileWithContactSupport)
+
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-4 p-3 pt-3 md:p-8">
@@ -547,7 +578,8 @@ console.log("contactdata", contactArray)
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 gap-1">
-                  <Download className="h-3.5 w-3.5" />
+                  <Upload className="h-3.5 w-3.5" />
+                  
                   <span>Export</span>
                 </Button>
               </DialogTrigger>
@@ -576,7 +608,7 @@ console.log("contactdata", contactArray)
             <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 gap-1">
-                  <Upload className="h-3.5 w-3.5" />
+                  <Download className="h-3.5 w-3.5" />
                   <span>Import</span>
                 </Button>
               </DialogTrigger>
@@ -605,6 +637,40 @@ console.log("contactdata", contactArray)
                     <Button onClick={() => fileInputRef.current.click()}>
                       Click here to import CSV/XLSX file
                     </Button>
+
+     <div className="w-full mt-6">
+  {isMobileWithContactSupport && (
+    <div className="flex justify-center mb-4">
+      <Button
+        variant="secondary"
+        className="gap-2 px-4 py-2 rounded-lg shadow-sm"
+        onClick={handleContactPicker}
+      >
+        <span role="img" aria-label="contacts">
+          📇
+        </span>
+        <span>Select Contacts from Phone</span>
+      </Button>
+    </div>
+  )}
+
+  {selectedContacts.length > 0 && (
+    <div className="border border-muted rounded-lg p-4 bg-muted/30">
+      <h4 className="text-sm font-semibold mb-2 text-muted-foreground">
+        Selected Contacts:
+      </h4>
+      <ul className="text-sm space-y-1">
+        {selectedContacts.map((contact, index) => (
+          <li key={index} className="text-muted-foreground">
+            <span className="font-medium">{contact.name?.[0] || "Unnamed"}</span> –{" "}
+            <span>{contact.tel?.[0] || "No number"}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
                   </div>
 
                   {importedContacts.length > 0 && (
