@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import {  useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -125,10 +125,9 @@ export default function ContactsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [filteredContacts, setFilteredContacts] = useState(contacts);
-    const [isMobileWithContactSupport, setIsMobileWithContactSupport] = useState(false);
-      const [selectedContacts, setSelectedContacts] = useState([]);
-
-
+  const [isMobileWithContactSupport, setIsMobileWithContactSupport] =
+    useState(false);
+  const [selectedContacts, setSelectedContacts] = useState([]);
 
   // Import dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -155,29 +154,27 @@ export default function ContactsPage() {
     email: "",
   });
 
-  const [userId , setUserId ] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [mounted, setMounted] = useState(false);
-  const [contactIdToDelete , setContactIdToDelete] = useState(null);
+  const [contactIdToDelete, setContactIdToDelete] = useState(null);
 
   const queryClient = useQueryClient();
 
-
   useEffect(() => {
     setMounted(true);
-      const userData = JSON.parse(localStorage.getItem('user'));
-      if (userData) {
-        const id = userData.id || userData.user?._id || null;
-        setUserId(id);
-      }
-
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      const id = userData.id || userData.user?._id || null;
+      setUserId(id);
+    }
   }, []);
 
-useEffect(() => {
-  const isMobile = window.innerWidth <= 768;
-  setIsMobileWithContactSupport(isMobile); // just based on screen size
-}, []); // ← no need to depend on state in dependency array
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    setIsMobileWithContactSupport(isMobile); // just based on screen size
+  }, []); // ← no need to depend on state in dependency array
 
-const handleContactPicker = async () => {
+  const handleContactPicker = async () => {
   try {
     if (!("contacts" in navigator) || !navigator.contacts?.select) {
       alert("Contact Picker API is not supported on this device/browser.");
@@ -188,14 +185,37 @@ const handleContactPicker = async () => {
       multiple: true,
     });
 
-    console.log("Selected contacts:", contacts);
-    setSelectedContacts(contacts);
+    const formattedContacts = contacts.map((contact, index) => {
+      const name = contact.name?.[0] || "Unknown";
+      const email = contact.email?.[0] || "";
+      const phone = contact.tel?.[0] || "";
+
+      const initials = name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+
+      return {
+        id: Date.now() + index,
+        name,
+        initials,
+        email,
+        phone,
+        avatar: "/placeholder.svg?height=32&width=32",
+        tags: ["Imported"],
+        lastContact: "Never",
+        status: "Active",
+      };
+    });
+
+    console.log("Formatted Contacts:", formattedContacts);
+    setSelectedContacts(formattedContacts); // Or your desired state
   } catch (error) {
     console.error("Contact pick failed", error);
   }
 };
-
-
 
   // const {
   //   data: getContacts,
@@ -205,10 +225,10 @@ const handleContactPicker = async () => {
   // } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
 
   const {
-    data : getContacts,
+    data: getContacts,
     loading,
     error,
-    refetch
+    refetch,
   } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
 
   const updateContactMutation = useUpdateContact();
@@ -364,7 +384,7 @@ const handleContactPicker = async () => {
           description: data.message,
         });
         console.log("Success:", data);
-        queryClient.invalidateQueries({ queryKey: ['contacts'] });
+        queryClient.invalidateQueries({ queryKey: ["contacts"] });
       },
       onError: (error) => {
         toast({
@@ -489,34 +509,34 @@ const handleContactPicker = async () => {
     setNewContact({ ...newContact, [e.target.name]: e.target.value });
   };
 
-  const { mutate: addContactMutate, status } = usePostData(`https://api.bizwapp.com/api/auth/addContact/${userId}`);
+  const { mutate: addContactMutate, status } = usePostData(
+    `https://api.bizwapp.com/api/auth/addContact/${userId}`
+  );
   const isLoading = status === "pending";
-
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const contactArray = [newContact];
-console.log("contactdata", contactArray)
-    addContactMutate(contactArray,{
-
-      onSuccess:(data) =>{
-        console.log("data" , data);
-        queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    console.log("contactdata", contactArray);
+    addContactMutate(contactArray, {
+      onSuccess: (data) => {
+        console.log("data", data);
+        queryClient.invalidateQueries({ queryKey: ["contacts"] });
         toast({
           title: "Success",
           description: data.message,
         });
         setAddContactDialogOpen(false);
       },
-      onError:(error)=>{
+      onError: (error) => {
         console.log("error", error);
         toast({
           title: "Error",
           description: error.error || "Enter unique email or Phone Number!",
         });
-      }
-    })
+      },
+    });
   };
 
   // Handle form submission
@@ -554,32 +574,33 @@ console.log("contactdata", contactArray)
     setIsDialogOpen(false);
   };
 
-  console.log("contactIdToDelete", contactIdToDelete)
+  console.log("contactIdToDelete", contactIdToDelete);
 
-
-  const handleDelete = async (contactId)=>{
-    console.log("contactId", contactId)
-    setContactIdToDelete(contactId)
-   const confirmed = window.confirm("Are you sure you want to delete?");
+  const handleDelete = async (contactId) => {
+    console.log("contactId", contactId);
+    setContactIdToDelete(contactId);
+    const confirmed = window.confirm("Are you sure you want to delete?");
     if (confirmed) {
-    } 
-  }
-  
-  queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    }
+  };
 
-  console.log("isMobileWithContactSupport", isMobileWithContactSupport)
+  queryClient.invalidateQueries({ queryKey: ["contacts"] });
+
+  console.log("isMobileWithContactSupport", isMobileWithContactSupport);
 
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-4 p-3 pt-3 md:p-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-3xl font-bold tracking-tight ml-8 md:m-0">Contacts</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 className="text-3xl font-bold tracking-tight ml-8 md:m-0">
+            Contacts
+          </h2>
           <div className="flex items-center gap-2">
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 gap-1">
                   <Upload className="h-3.5 w-3.5" />
-                  
+
                   <span>Export</span>
                 </Button>
               </DialogTrigger>
@@ -638,39 +659,40 @@ console.log("contactdata", contactArray)
                       Click here to import CSV/XLSX file
                     </Button>
 
-     <div className="w-full mt-6">
-  {isMobileWithContactSupport && (
-    <div className="flex justify-center mb-4">
-      <Button
-        variant="secondary"
-        className="gap-2 px-4 py-2 rounded-lg shadow-sm"
-        onClick={handleContactPicker}
-      >
-        <span role="img" aria-label="contacts">
-          📇
-        </span>
-        <span>Select Contacts from Phone</span>
-      </Button>
-    </div>
-  )}
+                    <div className="w-full mt-6">
+                      {isMobileWithContactSupport && (
+                        <div className="flex justify-center mb-4">
+                          <Button
+                            variant="secondary"
+                            className="gap-2 px-4 py-2 rounded-lg shadow-sm"
+                            onClick={handleContactPicker}
+                          >
+                            <span role="img" aria-label="contacts">
+                              📇
+                            </span>
+                            <span>Select Contacts from Phone</span>
+                          </Button>
+                        </div>
+                      )}
 
-  {selectedContacts.length > 0 && (
-    <div className="border border-muted rounded-lg p-4 bg-muted/30">
-      <h4 className="text-sm font-semibold mb-2 text-muted-foreground">
-        Selected Contacts:
-      </h4>
-      <ul className="text-sm space-y-1">
-        {selectedContacts.map((contact, index) => (
-          <li key={index} className="text-muted-foreground">
-            <span className="font-medium">{contact.name?.[0] || "Unnamed"}</span> –{" "}
-            <span>{contact.tel?.[0] || "No number"}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )}
-</div>
-
+                      {selectedContacts.length > 0 && (
+                        <div className="border border-muted rounded-lg p-4 bg-muted/30">
+                          <h4 className="text-sm font-semibold mb-2 text-muted-foreground">
+                            Selected Contacts:
+                          </h4>
+                          <ul className="text-sm space-y-1">
+                            {selectedContacts.map((contact, index) => (
+                              <li key={index} className="text-muted-foreground">
+                                <span className="font-medium">
+                                  {contact.name?.[0] || "Unnamed"}
+                                </span>{" "}
+                                – <span>{contact.tel?.[0] || "No number"}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {importedContacts.length > 0 && (
@@ -721,9 +743,9 @@ console.log("contactdata", contactArray)
                   </Button>
                   <Button
                     onClick={handleImportConfirm}
-                    disabled={importedContacts.length === 0}
+                    disabled={importedContacts.length === 0 && selectedContacts.length ===0}
                   >
-                    Import {importedContacts.length} Contacts
+                    Import {importedContacts.length ? importedContacts.length : selectedContacts.length} Contacts
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -900,7 +922,11 @@ console.log("contactdata", contactArray)
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem className="text-destructive focus:text-destructive">
                                     <Trash className="mr-2 h-4 w-4" />
-                                    <span onClick={()=>handleDelete(contact._id)}>Delete</span>
+                                    <span
+                                      onClick={() => handleDelete(contact._id)}
+                                    >
+                                      Delete
+                                    </span>
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
