@@ -377,7 +377,7 @@ export default function ContactsPage() {
 
     // Reset imported contacts
     setImportedContacts([]);
-    setSelectedContacts([])
+    // setSelectedContacts([])
 
     const contactsToSend = importedContacts.map(
       ({ id, ...contact }) => contact
