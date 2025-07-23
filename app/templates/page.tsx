@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,6 +33,7 @@ import  CreateTemplateModal  from "../templates/create-template-modal"
 import { useWhatsAppTemplates} from '../../hooks/api/getTemplate.js';
 import { Spinner } from "../../components/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
+import mapTwilioToMetaFormat from '../../hooks/api/mapTwilioToMetaFormat'
 
 export default function TemplatesPage() {
 
@@ -64,14 +65,15 @@ export default function TemplatesPage() {
   const { data: whatsappTemplates , isLoading } = useWhatsAppTemplates();
 const [filteredTemplates, setFilteredTemplates] = useState([]);
 
+  const mapped = useMemo(() => {
+    return mapTwilioToMetaFormat(whatsappTemplates);
+  }, [whatsappTemplates]);
+
+  useEffect(() => {
+    setFilteredTemplates(mapped.data);
+  }, [mapped]);
 
 
-
-useEffect(() => {
-  if (whatsappTemplates) {
-    setFilteredTemplates(whatsappTemplates.data); 
-  }
-}, [whatsappTemplates]);
 
 useEffect(() => {
   if (!whatsappTemplates?.data) return;
@@ -220,7 +222,7 @@ useEffect(() => {
     setDeleteDialogOpen(true)
   }
 
-  console.log("isLoading", isLoading)
+  console.log("filteredTemplates", filteredTemplates)
 
 queryClient.invalidateQueries({ queryKey: ['whatsappTemplates'] });
 
@@ -335,7 +337,7 @@ queryClient.invalidateQueries({ queryKey: ['whatsappTemplates'] });
                       <CardDescription>{template.components[1]?.text}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
-                      <div className="mb-4 rounded-md border p-3 text-sm">{template.content}</div>
+                      <div className="mb-4 rounded-md  p-3 text-sm">{template.content}</div>
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />

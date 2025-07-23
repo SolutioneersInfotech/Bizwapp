@@ -1,6 +1,6 @@
 const mapTwilioToMetaFormat = (twilioTemplates) => {
   return {
-    data: twilioTemplates.templates.map((template) => {
+    data: twilioTemplates?.templates.map((template) => {
       const types = template.types;
       const textBody = types["twilio/text"]?.body || types["whatsapp/authentication"]?.body || "";
 
