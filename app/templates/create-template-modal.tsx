@@ -291,7 +291,6 @@ export default function CreateTemplateModal({
     }
   };
 
-  console.log("lllllllllll", isLoading)
 
   // if(isLoading){
   //   toast({

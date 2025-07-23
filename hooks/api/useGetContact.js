@@ -8,7 +8,7 @@ const fetchContacts = async (url) => {
   return response.json();
 };
 
-const useGetContacts = (url) => {
+const useGetContacts = (url , enabled) => {
   const {
     data,
     isLoading,
@@ -18,6 +18,7 @@ const useGetContacts = (url) => {
   } = useQuery({
     queryKey: ['contacts', url],
     queryFn: () => fetchContacts(url),
+    enabled: !!enabled,
   });
 
   return {

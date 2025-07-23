@@ -72,6 +72,7 @@ import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatArea";
 import axios from "axios";
 import usePostData from "@/hooks/api/usePostData";
+import { log } from "console";
 
 export default function ConversationsPage() {
   const router = useRouter();
@@ -92,6 +93,7 @@ export default function ConversationsPage() {
   const [bulkMessage, setBulkMessage] = useState("");
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+  const [separatedTexts, setSeparatedTexts] = useState(null);
 
   const [bulkMessageTab, setBulkMessageTab] = useState("text");
   const [selectedBulkTemplate, setSelectedBulkTemplate] = useState("");
@@ -106,7 +108,7 @@ export default function ConversationsPage() {
   const [conversation, setConversation] = useState([]);
   const [webhookMessages, setWebhookMessages] = useState([]);
   const [conversationHistory, setConversationHistory] = useState<any[]>([]);
-  const conversationRef = useRef<any[]>([]); 
+  const conversationRef = useRef<any[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileView, setMobileView] = useState<"conversations" | "chat">(
     "conversations"
@@ -118,22 +120,29 @@ export default function ConversationsPage() {
   const [userId, setUserId] = useState(null);
   const [template, setTemplate] = useState({});
   const [imagesend, setImageSend] = useState("");
-  const fileInputRef = useRef();
+  const fileInputRef = useRef(null);
   const [isSendingTemplates, setIsSendingTemplates] = useState(false);
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (userData) {
-      const id = userData.id || userData.user?._id || null;
+    const fetchUser = async()=>{
+      const userData = await localStorage.getItem("user");
+      const parsedUser = await JSON.parse(userData)
+      const id = parsedUser.id || parsedUser.user?._id || null;
       setUserId(id);
     }
+    fetchUser()
   }, []);
 
-  const { data: getAllConversation } = useGetAllConversation(userId);
+  useEffect(()=>{
+    console.log("userId", userId);
+     
+  },[userId])
+
+  const { data: getAllConversation } = useGetAllConversation(userId , {enabled: !!userId});
 
   useEffect(() => {
     setConversationHistory(getAllConversation?.conversations);
-  });
+  }, [getAllConversation?.conversations]);
 
   const { data: messageHistory } = useMessageHistory(selectedPhone);
 
@@ -174,7 +183,7 @@ export default function ConversationsPage() {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
+  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`, !!userId);
 
   useEffect(() => {
     setContact(getContacts);
@@ -198,16 +207,86 @@ export default function ConversationsPage() {
     setUniqueConversations(unique);
   }, [conversationHistory]);
 
-  const separatedTexts = Array.isArray(whatsappTemplates?.data)
-    ? whatsappTemplates.data.map((template) => {
+  // const separatedTexts = Array.isArray(whatsappTemplates?.data)
+  //   ? whatsappTemplates.data.map((template) => {
+  //       return {
+  //         templateName: template.name,
+  //         texts: template.components
+  //           .filter((component) => component.text)
+  //           .map((component) => component.text),
+  //       };
+  //     })
+  //   : [];
+
+  // For showing Twilio Template
+
+
+  const mapTwilioToMetaFormat = (twilioTemplates) => {
+    if (!twilioTemplates?.templates?.length) {
+      return { data: [], paging: { cursors: { before: null, after: null } } };
+    }
+
+    return {
+      data: twilioTemplates.templates.map((template) => {
+        const { friendly_name, sid, language, types } = template;
+
+        const textBody =
+          types?.["twilio/text"]?.body ||
+          types?.["whatsapp/authentication"]?.body ||
+          "No body available";
+
         return {
-          templateName: template.name,
-          texts: template.components
-            .filter((component) => component.text)
-            .map((component) => component.text),
+          id: sid,
+          name: friendly_name,
+          previous_category: "UTILITY",
+          category: "UTILITY",
+          parameter_format: "POSITIONAL",
+          status: "APPROVED",
+          language: language || "en",
+          components: [
+            {
+              type: "HEADER",
+              format: "TEXT",
+              text: friendly_name,
+            },
+            {
+              type: "BODY",
+              text: textBody,
+            },
+            {
+              type: "FOOTER",
+              text: "Sent via Twilio",
+            },
+            {
+              type: "BUTTONS",
+              buttons: [
+                { type: "QUICK_REPLY", text: "Track Order" },
+                { type: "QUICK_REPLY", text: "Contact Support" },
+              ],
+            },
+          ],
         };
-      })
-    : [];
+      }),
+      paging: {
+        cursors: {
+          before: "MAZDZD",
+          after: "MjQZD",
+        },
+      },
+    };
+  };
+  const mapped = useMemo(() => {
+    return mapTwilioToMetaFormat(whatsappTemplates);
+  }, [whatsappTemplates]);
+
+  useEffect(() => {
+    setSeparatedTexts(mapped.data);
+  }, [mapped]);
+
+  useEffect(()=>
+    console.log("separatedTexts", separatedTexts)
+  ,[separatedTexts])
+  
 
   const { mutate, isPending: isPendingSendWhatsAppMessage } =
     useSendWhatsAppMessage();
@@ -217,9 +296,13 @@ export default function ConversationsPage() {
     isError,
     isPending,
     data,
-  } = usePostData(`http://localhost:5001/api/auth/send-template`);
+  } = usePostData(`https://bizwapp-backend-2.onrender.com/api/auth/send-twilio-messages`);
+  
 
   const handleSendBulkMessage = async () => {
+
+    console.log("selectedBulkTemplate",selectedBulkTemplate)
+    
     setIsSendingTemplates(true);
     if (
       bulkMessageTab === "text" &&
@@ -262,7 +345,8 @@ export default function ConversationsPage() {
         mutate({
           userId: userId,
           contacts: contactsToSend,
-          message: messageToSend,
+          // message: messageToSend,
+          id: separatedTexts.id,
         });
         toast({
           title: "Message sent to selected user.",
@@ -276,14 +360,17 @@ export default function ConversationsPage() {
 
         // const template = "hello_world"
 
-        if (!template) return;
-
+        // if (!template) return;
+        console.log('selectedBulkTemplate', selectedBulkTemplate)
         for (const contact of contactsToSend) {
+          let contactArray = [contact.phoneNumber]
           sendTemplateMutate({
             userId,
-            to: contact.phoneNumber,
-            templateName: selectedBulkTemplate,
-            languageCode: "en_US", 
+            // to: contact.phoneNumber,
+            numbers: contactArray,
+            // templateName: selectedBulkTemplate,
+            // languageCode: "en_US",
+             id: selectedBulkTemplate?.id
           });
         }
 
@@ -424,7 +511,7 @@ export default function ConversationsPage() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "preset"); 
+    formData.append("upload_preset", "preset");
 
     try {
       const response = await axios.post(
@@ -533,41 +620,35 @@ export default function ConversationsPage() {
                         <SelectContent>
                           {separatedTexts?.map((template) => (
                             <SelectItem
-                              key={template.templateName}
-                              value={template.templateName}
+                              key={template.name}
+                              value={template}
                             >
-                              {template.templateName}
+                              {template.name}
                             </SelectItem>
                           ))}
-                          {/* <SelectItem
-                          value="hello_world"
-                          >
-                          hello_world
-                          </SelectItem> */}
                         </SelectContent>
                       </Select>
 
                       {selectedBulkTemplate && (
                         <div className="mt-2 rounded-md border p-3 text-sm space-y-1">
-                          {separatedTexts
+                          {/* {separatedTexts
                             .find(
                               (t) => t.templateName === selectedBulkTemplate
                             )
                             ?.texts.map((text, index) => (
                               <div key={index}>{text}</div>
-                            ))}
-                        </div>
-                      )}
+                            ))} */}
 
-                      {selectedBulkTemplate && (
-                        <div className="mt-2 rounded-md border p-3 text-sm">
-                          {
-                            templates.find((t) => t.id === selectedBulkTemplate)
-                              ?.content
-                          }
+                            {separatedTexts
+                            ?.find(
+                              (t) => t.name === selectedBulkTemplate.name
+                            )
+                            ?.components?.find((c)=>c.type === "BODY").text} 
                         </div>
                       )}
                     </div>
+
+
                     {/* <button className="w-full px-4 py-2 rounded hover:bg-green-600 hover:text-white transition bg-white-700 text-green-600 border border-green-600" onClick={handleButtonClick}>
                 Select Image File
               </button>

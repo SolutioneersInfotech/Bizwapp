@@ -13,7 +13,7 @@ const useSendWhatsAppMessage = () => {
   return useMutation<any, Error, SendMessageParams>({
     mutationFn:async ({ contacts, message , userId }: SendMessageParams) => {
       console.log('Sending message...', { contacts, message , userId });
-      const response = await fetch('http://localhost:5001/api/auth/SendingBulkContacts', {
+      const response = await fetch('https://bizwapp-backend-2.onrender.com/api/auth/SendingBulkContacts', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

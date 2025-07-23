@@ -210,8 +210,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setMessage((prev) => [...prev, messageToSend]);
   }, [template.content])
 
-  console.log("template.contenttemplate.content", template.content)
-
 
   const { mutate, isLoading, data } = useSendWhatsAppMessage();
 

@@ -22,7 +22,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
   onClose,
   isLoading,
 }) => {
-  console.log("hhhhh", isLoading)
   return (
     <DialogContent>
       <DialogHeader>

@@ -10,10 +10,11 @@ const getAllConversation = async(userId)=>{
     return response.json();
 }
 
-const useGetAllConversation =(userId)=>{
+const useGetAllConversation =(userId , enabled )=>{
     return useQuery({
         queryKey:["conversation" , userId],
         queryFn: () => getAllConversation(userId),
+        enabled: enabled && !!userId,
     })
 }
 
