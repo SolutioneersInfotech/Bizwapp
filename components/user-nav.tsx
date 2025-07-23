@@ -53,12 +53,9 @@ export function UserNav() {
       setUser(parsedUser);
     }
   },[])
-
-  console.log("user",user);
   
   const initials = `${user?.firstName?.[0] || " "}${user?.lastName?.[0] || "" }`
 
-  console.log("initials",initials)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

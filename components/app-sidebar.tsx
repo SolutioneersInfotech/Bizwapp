@@ -103,18 +103,14 @@ export function AppSidebar() {
   const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact`);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("hello")
     e.preventDefault();
-    console.log("New Contactjkkj:", newContact);
     const contactWithUserId = { ...newContact }
     const contactArray = [contactWithUserId];
     mutation.mutate(contactArray, {
       onSuccess: (data) => {
         console.log(data);
-        alert(data["message"]);
       },
       onError: (data) => {
-        alert(data["message"]);
       },
     });
     setIsDialogOpen(false);
