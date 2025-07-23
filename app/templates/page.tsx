@@ -272,7 +272,7 @@ queryClient.invalidateQueries({ queryKey: ['whatsappTemplates'] });
               <div className="flex justify-center items-center py-8">
                 <Spinner size={40} className="text-green-600" />
               </div>
-            ) : filteredTemplates.length === 0 ? (
+            ) : filteredTemplates?.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <div className="rounded-full bg-muted p-3 mb-4">
                   <Search className="h-6 w-6 text-muted-foreground" />
@@ -288,7 +288,7 @@ queryClient.invalidateQueries({ queryKey: ['whatsappTemplates'] });
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredTemplates.map((template) => (
+                {filteredTemplates?.map((template) => (
                   <Card key={template.id} className="overflow-hidden">
                     <CardHeader className="p-4 pb-2">
                       <div className="flex items-center justify-between">

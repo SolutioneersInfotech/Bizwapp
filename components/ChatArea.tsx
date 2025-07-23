@@ -345,7 +345,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
               ) : (
                 sortedMessages.map((message) => (
                   <div
-                    key={message._id}
+                    key={message.timestamp}
                     className={`flex ${
                       message.direction === "outbound"
                         ? "justify-end"
