@@ -221,13 +221,6 @@ export default function ContactsPage() {
     }
   };
 
-  // const {
-  //   data: getContacts,
-  //   loading,
-  //   error,
-  //   refetch
-  // } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
-
   const {
     data: getContacts,
     loading,
@@ -374,7 +367,11 @@ export default function ContactsPage() {
     ]);
 
     // Add imported contacts to the contacts list
-    setContacts((prevContacts) => [...prevContacts, ...importedContacts , ...selectedContacts]);
+    setContacts((prevContacts) => [
+      ...prevContacts,
+      ...importedContacts,
+      ...selectedContacts,
+    ]);
 
     // Reset imported contacts
     setImportedContacts([]);
@@ -387,9 +384,10 @@ export default function ContactsPage() {
     const contactsToSendFromMobile = selectedContacts.map(
       ({ id, ...contact }) => contact
     );
-const finalPayload = contactsToSend.length > 0 ? contactsToSend : contactsToSendFromMobile;
+    const finalPayload =
+      contactsToSend.length > 0 ? contactsToSend : contactsToSendFromMobile;
 
-    mutate(finalPayload , {
+    mutate(finalPayload, {
       onSuccess: (data) => {
         toast({
           title: "Success",
@@ -588,8 +586,9 @@ const finalPayload = contactsToSend.length > 0 ? contactsToSend : contactsToSend
 
   console.log("contactIdToDelete", contactIdToDelete);
 
-    const { deleteItem} = useDelete(`https://api.bizwapp.com/api/auth/deleteContact/${contactIdToDelete}`);
-
+  const { deleteItem } = useDelete(
+    `https://api.bizwapp.com/api/auth/deleteContact/${contactIdToDelete}`
+  );
 
   const handleDelete = async (contactId) => {
     console.log("contactId", contactId);
@@ -607,6 +606,8 @@ const finalPayload = contactsToSend.length > 0 ? contactsToSend : contactsToSend
   queryClient.invalidateQueries({ queryKey: ["contacts"] });
 
   console.log("isMobileWithContactSupport", isMobileWithContactSupport);
+
+  console.log("getContacts", getContacts);
 
   return (
     <div className="flex flex-col">

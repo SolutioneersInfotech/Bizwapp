@@ -83,6 +83,8 @@ export function AppSidebar() {
   const [newChatPhone, setNewChatPhone] = useState("");
   const [newChatMessage, setNewChatMessage] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [userId, setUserId] = useState(null);
+
 
   const [newContact, setNewContact] = useState({
     name: "",
@@ -90,6 +92,13 @@ export function AppSidebar() {
     email: "",
   });
 
+    useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      const id = userData.id || userData.user?._id || null;
+      setUserId(id);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -100,7 +109,7 @@ export function AppSidebar() {
   };
 
 
-  const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact`);
+  const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact/${userId}`);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

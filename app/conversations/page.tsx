@@ -183,7 +183,7 @@ export default function ConversationsPage() {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`, !!userId);
+  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
 
   useEffect(() => {
     setContact(getContacts);
@@ -345,7 +345,7 @@ export default function ConversationsPage() {
         mutate({
           userId: userId,
           contacts: contactsToSend,
-          // message: messageToSend,
+          message: messageToSend,
           id: separatedTexts.id,
         });
         toast({
