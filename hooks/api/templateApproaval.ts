@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-const API_URL = "https://graph.facebook.com/v18.0/1150758433763562/message_templates";
+const API_URL = `https://graph.facebook.com/v18.0/${process.env.NEXT_PUBLIC_TEST_META_APP_ID}/message_templates`;
 
 interface TemplateData {
     name: string;

@@ -1,20 +1,32 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import Link from "next/link"
-import { ArrowLeft, Shield, Eye, Lock, Users, Globe, FileText, Mail } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  Shield,
+  Eye,
+  Lock,
+  Users,
+  Globe,
+  FileText,
+  Mail,
+} from "lucide-react";
 
 export default function PrivacyPolicyPage() {
-  const lastUpdated = "December 15, 2024"
+  const lastUpdated = "December 15, 2024";
 
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex flex-col items-start mb-8">
-          <Link href="/" className="text-sm text-primary hover:underline mb-4 flex items-center gap-2">
+          <Link
+            href="/"
+            className="text-sm text-primary hover:underline mb-4 flex items-center gap-2"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Link>
@@ -24,7 +36,9 @@ export default function PrivacyPolicyPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Privacy Policy</h1>
-              <p className="text-muted-foreground">Last updated: {lastUpdated}</p>
+              <p className="text-muted-foreground">
+                Last updated: {lastUpdated}
+              </p>
             </div>
           </div>
         </div>
@@ -39,14 +53,18 @@ export default function PrivacyPolicyPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Welcome to <strong>BizWapp</strong> ("we," "our," or "us"). We are committed to protecting your privacy
-              and ensuring the security of your personal information. This Privacy Policy explains how we collect,
-              use, disclose, and safeguard your information when you use our WhatsApp Business API integration platform
-              and related services.
+              Welcome to <strong>BizWapp</strong> ("we," "our," or "us"). We are
+              committed to protecting your privacy and ensuring the security of
+              your personal information. This Privacy Policy explains how we
+              collect, use, disclose, and safeguard your information when you
+              use our WhatsApp Business API integration platform and related
+              services.
             </p>
             <p>
-              By using BizWapp’s services, you agree to the collection and use of information in accordance with this
-              Privacy Policy. If you do not agree with our policies and practices, please do not use our services.
+              By using BizWapp’s services, you agree to the collection and use
+              of information in accordance with this Privacy Policy. If you do
+              not agree with our policies and practices, please do not use our
+              services.
             </p>
           </CardContent>
         </Card>
@@ -61,12 +79,61 @@ export default function PrivacyPolicyPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-3">Personal Information</h3>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Account Information:</strong> Name, email address, phone number, business name, and business category</li>
-                <li><strong>Authentication Data:</strong> WhatsApp Business Account ID, Phone Number ID, and access tokens</li>
-                <li><strong>Business Information:</strong> Company website, business description, and verification documents</li>
-                <li><strong>Contact Information:</strong> Customer contact details including phone numbers and names</li>
+              <h3 className="text-2xl font-bold mb-4 text-gray-800">
+                Personal Information
+              </h3>
+              <ul className="space-y-4">
+                <li className="text-gray-700 leading-relaxed">
+                  <span className="font-semibold text-gray-900">
+                    Facebook Platform Data:
+                  </span>{" "}
+                  When you use{" "}
+                  <span className="font-medium text-blue-600">BizWapp</span>{" "}
+                  through Login or other Meta integration, we collect your
+                  public profile information (name, profile picture), email
+                  address, and page-related data necessary to manage WhatsApp
+                  Business accounts. This data is handled in accordance with
+                  Facebook's Platform Terms and used solely to provide and
+                  improve our services.
+                </li>
+                <li className="text-gray-700 leading-relaxed">
+                  <span className="font-semibold text-gray-900">
+                    Facebook Data Use:
+                  </span>{" "}
+                  We access and use Facebook Platform Data in accordance with
+                  Meta's policies, including to authenticate users, manage
+                  WhatsApp Business accounts, and facilitate message delivery.
+                  We do not sell or misuse Facebook data in any way. This data
+                  is only shared with Meta as required for WhatsApp Business API
+                  operations.
+                </li>
+                <li className="text-gray-700 leading-relaxed">
+                  <span className="font-semibold text-gray-900">
+                    Account Information:
+                  </span>{" "}
+                  Name, email address, phone number, business name, and business
+                  category.
+                </li>
+                <li className="text-gray-700 leading-relaxed">
+                  <span className="font-semibold text-gray-900">
+                    Authentication Data:
+                  </span>{" "}
+                  WhatsApp Business Account ID, Phone Number ID, and access
+                  tokens.
+                </li>
+                <li className="text-gray-700 leading-relaxed">
+                  <span className="font-semibold text-gray-900">
+                    Business Information:
+                  </span>{" "}
+                  Company website, business description, and verification
+                  documents.
+                </li>
+                <li className="text-gray-700 leading-relaxed">
+                  <span className="font-semibold text-gray-900">
+                    Contact Information:
+                  </span>{" "}
+                  Customer contact details including phone numbers and names.
+                </li>
               </ul>
             </div>
 
@@ -85,7 +152,9 @@ export default function PrivacyPolicyPage() {
             <Separator />
 
             <div>
-              <h3 className="text-lg font-semibold mb-3">Technical Information</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                Technical Information
+              </h3>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li>IP addresses and device information</li>
                 <li>Browser type and version</li>
@@ -111,7 +180,9 @@ export default function PrivacyPolicyPage() {
               <div className="space-y-3">
                 <h4 className="font-semibold">Service Provision</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>Facilitate WhatsApp Business API integration via BizWapp</li>
+                  <li>
+                    Facilitate WhatsApp Business API integration via BizWapp
+                  </li>
                   <li>Process and deliver messages</li>
                   <li>Manage your account and preferences</li>
                   <li>Provide customer support</li>
@@ -168,13 +239,15 @@ export default function PrivacyPolicyPage() {
               <div>
                 <h4 className="font-semibold mb-2">With Meta/WhatsApp</h4>
                 <p className="text-sm">
-                  For WhatsApp Business API functionality, including verification and message delivery.
+                  For WhatsApp Business API functionality, including
+                  verification and message delivery.
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Service Providers</h4>
                 <p className="text-sm">
-                  We partner with third-party vendors for cloud hosting, analytics, and support services.
+                  We partner with third-party vendors for cloud hosting,
+                  analytics, and support services.
                 </p>
               </div>
               <div>
@@ -186,7 +259,8 @@ export default function PrivacyPolicyPage() {
               <div>
                 <h4 className="font-semibold mb-2">Business Transfers</h4>
                 <p className="text-sm">
-                  In case of acquisition or merger, your data may be transferred to the new entity.
+                  In case of acquisition or merger, your data may be transferred
+                  to the new entity.
                 </p>
               </div>
             </div>
@@ -224,7 +298,8 @@ export default function PrivacyPolicyPage() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              However, no system is 100% secure. Use BizWapp at your own discretion.
+              However, no system is 100% secure. Use BizWapp at your own
+              discretion.
             </p>
           </CardContent>
         </Card>
@@ -236,10 +311,20 @@ export default function PrivacyPolicyPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li><strong>Account Data:</strong> Retained while account is active, deleted after 30 days of deactivation</li>
-              <li><strong>Messages:</strong> Stored for up to 90 days</li>
-              <li><strong>Analytics:</strong> Retained indefinitely in anonymized form</li>
-              <li><strong>Legal:</strong> Retained as required by law</li>
+              <li>
+                <strong>Account Data:</strong> Retained while account is active,
+                deleted after 30 days of deactivation
+              </li>
+              <li>
+                <strong>Messages:</strong> Stored for up to 90 days
+              </li>
+              <li>
+                <strong>Analytics:</strong> Retained indefinitely in anonymized
+                form
+              </li>
+              <li>
+                <strong>Legal:</strong> Retained as required by law
+              </li>
             </ul>
           </CardContent>
         </Card>
@@ -293,7 +378,10 @@ export default function PrivacyPolicyPage() {
             <CardTitle>Children's Privacy</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p>BizWapp is not intended for children under 13. We do not knowingly collect data from minors.</p>
+            <p>
+              BizWapp is not intended for children under 13. We do not knowingly
+              collect data from minors.
+            </p>
           </CardContent>
         </Card>
 
@@ -338,9 +426,12 @@ export default function PrivacyPolicyPage() {
               <div>
                 <h4 className="font-semibold">Address</h4>
                 <p className="text-sm">
-                  solutioneers Infotech<br />
-                  Indira Nagar<br />
-                  Lucknow , Uttar Pradesh<br />
+                  solutioneers Infotech
+                  <br />
+                  Indira Nagar
+                  <br />
+                  Lucknow , Uttar Pradesh
+                  <br />
                   India
                 </p>
               </div>
@@ -362,5 +453,5 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

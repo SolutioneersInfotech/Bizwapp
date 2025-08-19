@@ -42,7 +42,7 @@ type formData = {
   phone: string;
   email: string;
   password: string;
-}
+};
 
 type Provider = "Google" | "Facebook" | "GitHub" | "LinkedIn";
 
@@ -50,7 +50,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [phase, setPhase] = useState(1);
   const [error, setError] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -62,7 +62,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { mutate, isError, data } = usePostData<formData >(
+  const { mutate, isError, data } = usePostData<formData>(
     "https://api.bizwapp.com/api/auth/signup"
   );
 
@@ -121,34 +121,36 @@ export default function SignupPage() {
   const { toast } = useToast();
 
   const handleSigUp = () => {
+    console.log(("hsbhjsbvhsdbv"));
+    
     setError("");
 
     if (!validatePhase1()) {
-      return; 
+      return;
     }
 
     setIsLoading(true);
 
-    // mutate(formData, {
-    //   onSuccess: (data) => {
-    //     toast({
-    //       title: "Success",
-    //       description: data.message,
-    //     });
-    //     console.log("Success:", data);
-    //     const user = { ...data.user, token: data.token };
-    //     localStorage.setItem("user", JSON.stringify(user));
-    //     router.push("/dashboard");
-    //   },
-    //   onError: (error) => {
-    //     setIsLoading(false);
-    //     toast({
-    //       title: "Error",
-    //       description: error.message || "Something went wrong!",
-    //     });
-    //     console.error("Error:", error.message);
-    //   },
-    // });
+    mutate(formData, {
+      onSuccess: (data) => {
+        toast({
+          title: "Success",
+          description: data.message,
+        });
+        console.log("Success:", data);
+        const user = { ...data.user, token: data.token };
+        localStorage.setItem("user", JSON.stringify(user));
+        router.push("/dashboard");
+      },
+      onError: (error) => {
+        setIsLoading(false);
+        toast({
+          title: "Error",
+          description: error.message || "Something went wrong!",
+        });
+        console.error("Error:", error.message);
+      },
+    });
     setError("");
     // if (validatePhase1()) {
     //   setPhase(2)
@@ -156,16 +158,16 @@ export default function SignupPage() {
 
     sessionStorage.setItem("signupFormData", JSON.stringify(formData));
 
-
     console.log(
       "process.env.NEXT_PUBLIC_META_APP_ID:",
       process.env.NEXT_PUBLIC_META_APP_ID
     );
 
-const metaOAuthURL =`https://www.facebook.com/v19.0/dialog/oauth?client_id=${process.env.NEXT_PUBLIC_META_APP_ID}&redirect_uri=https://bizwapp.com/meta/callback&state=secureRandom123&scope=email,public_profile`;
+    // const metaOAuthURL = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${process.env.NEXT_PUBLIC_META_APP_ID}&redirect_uri=https://bizwapp.com/meta/callback&state=secureRandom123&scope=email,public_profile`;
+//     const metaOAuthURL = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${process.env.NEXT_PUBLIC_META_APP_ID}&redirect_uri=https://bizwapp.com/meta/callback&state=SOME_RANDOM_STRING&scope=whatsapp_business_management,business_management
+// `;
 
-window.location.href = metaOAuthURL;
-
+//     window.location.href = metaOAuthURL;
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -302,8 +304,7 @@ window.location.href = metaOAuthURL;
                     className="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground"
                     onClick={() => setShowPassword((prev) => !prev)}
                     tabIndex={-1}
-                  >
-                  </button>
+                  ></button>
                 </div>
 
                 <Button type="button" className="w-full" onClick={handleSigUp}>
