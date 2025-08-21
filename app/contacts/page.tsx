@@ -394,7 +394,7 @@ export default function ContactsPage() {
           description: data.message,
         });
         console.log("Success:", data);
-        queryClient.invalidateQueries({ queryKey: ["contacts"] });
+        queryClient.invalidateQueries({ queryKey: ["contacts", `https://api.bizwapp.com/api/auth/getContacts/${userId}`] });
       },
       onError: (error) => {
         toast({
@@ -532,7 +532,7 @@ export default function ContactsPage() {
     addContactMutate(contactArray, {
       onSuccess: (data) => {
         console.log("data", data);
-        queryClient.invalidateQueries({ queryKey: ["contacts"] });
+        queryClient.invalidateQueries({ queryKey: ["contacts", `https://api.bizwapp.com/api/auth/getContacts/${userId}`] });
         toast({
           title: "Success",
           description: data.message,
@@ -603,7 +603,7 @@ export default function ContactsPage() {
     }
   };
 
-  queryClient.invalidateQueries({ queryKey: ["contacts"] });
+queryClient.invalidateQueries({ queryKey: ["contacts", `https://api.bizwapp.com/api/auth/getContacts/${userId}`] });
 
   console.log("isMobileWithContactSupport", isMobileWithContactSupport);
 
