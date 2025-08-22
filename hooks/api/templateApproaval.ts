@@ -19,6 +19,10 @@ interface TemplateData {
    
     
     const accessToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN;
+    console.log("accessToken", accessToken);
+    console.log("process.env.NEXT_PUBLIC_WABA_ID", process.env.NEXT_PUBLIC_WABA_ID);
+    
+    
     return useMutation({
       mutationFn: async (jsonInput: TemplateData) => {
       const response = await fetch(API_URL, {
