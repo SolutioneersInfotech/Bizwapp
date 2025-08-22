@@ -93,7 +93,6 @@ export default function ConversationsPage() {
   const [bulkMessage, setBulkMessage] = useState("");
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
-  const [separatedTexts, setSeparatedTexts] = useState(null);
 
   const [bulkMessageTab, setBulkMessageTab] = useState("text");
   const [selectedBulkTemplate, setSelectedBulkTemplate] = useState("");
@@ -207,16 +206,16 @@ export default function ConversationsPage() {
     setUniqueConversations(unique);
   }, [conversationHistory]);
 
-  // const separatedTexts = Array.isArray(whatsappTemplates?.data)
-  //   ? whatsappTemplates.data.map((template) => {
-  //       return {
-  //         templateName: template.name,
-  //         texts: template.components
-  //           .filter((component) => component.text)
-  //           .map((component) => component.text),
-  //       };
-  //     })
-  //   : [];
+  const separatedTexts = Array.isArray(whatsappTemplates?.data)
+    ? whatsappTemplates.data.map((template) => {
+        return {
+          templateName: template.name,
+          texts: template.components
+            .filter((component) => component.text)
+            .map((component) => component.text),
+        };
+      })
+    : [];
 
   // For showing Twilio Template
 
@@ -275,13 +274,13 @@ export default function ConversationsPage() {
       },
     };
   };
-  const mapped = useMemo(() => {
-    return mapTwilioToMetaFormat(whatsappTemplates);
-  }, [whatsappTemplates]);
+  // const mapped = useMemo(() => {
+  //   return mapTwilioToMetaFormat(whatsappTemplates);
+  // }, [whatsappTemplates]);
 
-  useEffect(() => {
-    setSeparatedTexts(mapped.data);
-  }, [mapped]);
+  // useEffect(() => {
+  //   setSeparatedTexts(mapped.data);
+  // }, [mapped]);
 
   useEffect(()=>
     console.log("separatedTexts", separatedTexts)
@@ -296,7 +295,7 @@ export default function ConversationsPage() {
     isError,
     isPending,
     data,
-  } = usePostData(`https://bizwapp-backend-2.onrender.com/api/auth/send-twilio-messages`);
+  } = usePostData(`http://localhost:5001/api/auth/send-template`);
   
 
   const handleSendBulkMessage = async () => {
@@ -368,7 +367,7 @@ export default function ConversationsPage() {
             userId,
             // to: contact.phoneNumber,
             numbers: contactArray,
-            // templateName: selectedBulkTemplate,
+            templateName: selectedBulkTemplate,
             // languageCode: "en_US",
              id: selectedBulkTemplate?.id
           });
@@ -567,6 +566,12 @@ export default function ConversationsPage() {
   //   );
   // }
 
+  console.log("separatedTexts", separatedTexts);
+
+  console.log("selectedBulkTemplate", selectedBulkTemplate);
+  
+  
+
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
       {/* Conversations Panel (Left Sidebar) */}
@@ -620,10 +625,10 @@ export default function ConversationsPage() {
                         <SelectContent>
                           {separatedTexts?.map((template) => (
                             <SelectItem
-                              key={template.name}
-                              value={template}
+                              key={template.templateName}
+                              value={template.templateName}
                             >
-                              {template.name}
+                              {template.templateName}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -631,19 +636,19 @@ export default function ConversationsPage() {
 
                       {selectedBulkTemplate && (
                         <div className="mt-2 rounded-md border p-3 text-sm space-y-1">
-                          {/* {separatedTexts
+                          {separatedTexts
                             .find(
                               (t) => t.templateName === selectedBulkTemplate
                             )
                             ?.texts.map((text, index) => (
                               <div key={index}>{text}</div>
-                            ))} */}
+                            ))}
 
-                            {separatedTexts
+                            {/* {separatedTexts
                             ?.find(
                               (t) => t.name === selectedBulkTemplate.name
                             )
-                            ?.components?.find((c)=>c.type === "BODY").text} 
+                            ?.components?.find((c)=>c.type === "BODY").text}  */}
                         </div>
                       )}
                     </div>

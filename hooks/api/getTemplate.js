@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-// const API_URL = "http://localhost:5001/api/auth/getAllTemplates";
-const API_URL = "https://bizwapp-backend-2.onrender.com/api/auth/get-twilio-template";
-// const ACCESS_TOKEN = "EAAJdfKsroxoBO39zxdb5Ge9l0qTYXmUZCQn7J3ZBb5YbVZAfZAvu3N2P5GKjZCsF4zoEmhYM77Aovj2yzbj70revHFc1ESQSZCEOUWWN9N3u0fE7Wrpc63Lrx7fHzZCpoPSNo6zru2CkNx7iITnIlZBV4diOy73ijROalTu5mVlK8BTB7ewob4nUIFc6"; // Store in .env file
+const API_URL = "http://api.bizwapp.com/api/auth/getAllTemplates";
+// const API_URL = "https://bizwapp-backend-2.onrender.com/api/auth/get-twilio-template";
 
 const fetchTemplates = async () => {
   const response = await fetch(API_URL, {

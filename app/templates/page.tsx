@@ -65,13 +65,8 @@ export default function TemplatesPage() {
   const { data: whatsappTemplates , isLoading } = useWhatsAppTemplates();
 const [filteredTemplates, setFilteredTemplates] = useState([]);
 
-  const mapped = useMemo(() => {
-    return mapTwilioToMetaFormat(whatsappTemplates);
-  }, [whatsappTemplates]);
 
-  useEffect(() => {
-    setFilteredTemplates(mapped.data);
-  }, [mapped]);
+
 
 
 
