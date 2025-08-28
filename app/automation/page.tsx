@@ -52,7 +52,7 @@ export default function AutomationPage() {
       setTemplate(whatsappTemplates?.data)
     },[whatsappTemplates]);
 
-    const { mutate } = usePostData('http://localhost:5001/api/auth/add-google-sheet-contacts-send-temp');
+    const { mutate } = usePostData('https://api.bizwapp.com/api/auth/add-google-sheet-contacts-send-temp');
 
      useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
