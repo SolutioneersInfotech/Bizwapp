@@ -60,7 +60,7 @@ const mainMenuItems = [
     url: "/contacts",
   },
   {
-    title: "Automate Your Message Sending",
+    title: "Automate",
     icon: Zap,
     url: "/automation",
   },
