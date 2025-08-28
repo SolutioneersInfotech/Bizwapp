@@ -20,10 +20,14 @@ export default function DashboardPage() {
     const { data, isError } = useUser();
 
     useEffect(() => {
+      console.log("datadatadatadatadatadatadata", data);
+      
     if (data?.user) {
       localStorage.setItem('user', JSON.stringify(data.user));
     }
   }, [data]);
+
+  // console.log("datadatadatadatadatadatadata", data);
 
 
   // useEffect(() => {
