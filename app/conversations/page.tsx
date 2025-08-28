@@ -123,21 +123,22 @@ export default function ConversationsPage() {
   const [isSendingTemplates, setIsSendingTemplates] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async()=>{
+    const fetchUser = async () => {
       const userData = await localStorage.getItem("user");
-      const parsedUser = await JSON.parse(userData)
+      const parsedUser = await JSON.parse(userData);
       const id = parsedUser.id || parsedUser.user?._id || null;
       setUserId(id);
-    }
-    fetchUser()
+    };
+    fetchUser();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log("userId", userId);
-     
-  },[userId])
+  }, [userId]);
 
-  const { data: getAllConversation } = useGetAllConversation(userId , {enabled: !!userId});
+  const { data: getAllConversation } = useGetAllConversation(userId, {
+    enabled: !!userId,
+  });
 
   useEffect(() => {
     setConversationHistory(getAllConversation?.conversations);
@@ -219,7 +220,6 @@ export default function ConversationsPage() {
 
   // For showing Twilio Template
 
-
   const mapTwilioToMetaFormat = (twilioTemplates) => {
     if (!twilioTemplates?.templates?.length) {
       return { data: [], paging: { cursors: { before: null, after: null } } };
@@ -282,10 +282,10 @@ export default function ConversationsPage() {
   //   setSeparatedTexts(mapped.data);
   // }, [mapped]);
 
-  useEffect(()=>
-    console.log("separatedTexts", separatedTexts)
-  ,[separatedTexts])
-  
+  useEffect(
+    () => console.log("separatedTexts", separatedTexts),
+    [separatedTexts]
+  );
 
   const { mutate, isPending: isPendingSendWhatsAppMessage } =
     useSendWhatsAppMessage();
@@ -297,14 +297,9 @@ export default function ConversationsPage() {
     data,
   } = usePostData(`https://api.bizwapp.com/api/auth/send-template`);
 
-
-
-  
-
   const handleSendBulkMessage = async () => {
+    console.log("selectedBulkTemplate", selectedBulkTemplate);
 
-    console.log("selectedBulkTemplate",selectedBulkTemplate)
-    
     setIsSendingTemplates(true);
     if (
       bulkMessageTab === "text" &&
@@ -363,16 +358,16 @@ export default function ConversationsPage() {
         // const template = "hello_world"
 
         // if (!template) return;
-        console.log('selectedBulkTemplate', selectedBulkTemplate)
+        console.log("selectedBulkTemplate", selectedBulkTemplate);
         for (const contact of contactsToSend) {
-          let contactArray = [contact.phoneNumber]
+          let contactArray = [contact.phoneNumber];
           sendTemplateMutate({
             userId,
             // to: contact.phoneNumber,
             numbers: contactArray,
             templateName: selectedBulkTemplate,
             // languageCode: "en_US",
-             id: selectedBulkTemplate?.id
+            id: selectedBulkTemplate?.id,
           });
         }
 
@@ -572,8 +567,6 @@ export default function ConversationsPage() {
   console.log("separatedTexts", separatedTexts);
 
   console.log("selectedBulkTemplate", selectedBulkTemplate);
-  
-  
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col md:flex-row">
@@ -647,7 +640,7 @@ export default function ConversationsPage() {
                               <div key={index}>{text}</div>
                             ))}
 
-                            {/* {separatedTexts
+                          {/* {separatedTexts
                             ?.find(
                               (t) => t.name === selectedBulkTemplate.name
                             )
@@ -655,7 +648,6 @@ export default function ConversationsPage() {
                         </div>
                       )}
                     </div>
-
 
                     {/* <button className="w-full px-4 py-2 rounded hover:bg-green-600 hover:text-white transition bg-white-700 text-green-600 border border-green-600" onClick={handleButtonClick}>
                 Select Image File
