@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 
 const API_URL = `https://graph.facebook.com/v18.0/${process.env.NEXT_PUBLIC_WABA_ID}/message_templates`;
-
+ 
 interface TemplateData {
     name: string;
     category: "MARKETING" | "TRANSACTIONAL" | "UTILITY"; // Adjust categories as needed

@@ -11,6 +11,7 @@ import {
   Search,
   Bell,
   HelpCircle,
+  Zap
 } from "lucide-react";
 
 import {
@@ -57,6 +58,11 @@ const mainMenuItems = [
     title: "Contacts",
     icon: Users,
     url: "/contacts",
+  },
+  {
+    title: "Automate Your Message Sending",
+    icon: Zap,
+    url: "/automation",
   },
   {
     title: "Templates",

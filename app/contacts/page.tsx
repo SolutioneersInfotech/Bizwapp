@@ -124,11 +124,15 @@ export default function ContactsPage() {
   ]);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [googleSheetLink, setGoogleSheetLink] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [filteredContacts, setFilteredContacts] = useState(contacts);
   const [isMobileWithContactSupport, setIsMobileWithContactSupport] =
     useState(false);
   const [selectedContacts, setSelectedContacts] = useState([]);
+  const [importMode, setImportMode] = useState('immediate');
+  const [intervalValue, setIntervalValue] = useState(10);
+  const [intervalUnit, setIntervalUnit] = useState('minutes');
 
   // Import dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -291,9 +295,10 @@ export default function ContactsPage() {
         // Format the data
         const formattedContacts = jsonData.map((row, index) => {
           const name =
-            row.name || row.Name || row.NAME || `Contact ${index + 1}`;
+            row.name || row.Name || row.NAME || row['Full Name']  || `Contact ${index + 1}`;
           const phone =
             row.phone ||
+            row['Phone Number']
             row.Phone ||
             row.PHONE ||
             row.phoneNumber ||
@@ -549,6 +554,8 @@ export default function ContactsPage() {
     });
   };
 
+  
+
   // Handle form submission
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -608,6 +615,45 @@ queryClient.invalidateQueries({ queryKey: ["contacts", `https://api.bizwapp.com/
   console.log("isMobileWithContactSupport", isMobileWithContactSupport);
 
   console.log("getContacts", getContacts);
+
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/1shXa0s0lLN8PTRXvQksDKoRw_jKmn_EAZTi2WcrO4gw/export?format=csv";
+
+// fetch(sheetUrl)
+//   .then(res => res.text())
+//   .then(csv => {
+//     console.log("hvdshjvshhsddvhvshjvshsdhskk",csv);
+//   });
+
+async function fetchSheetData() {
+  const sheetId = "YOUR_SHEET_ID"; // यहां अपना sheetId डालो
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+  try {
+    const response = await fetch(url);
+    const text = await response.text();
+
+    // Google Sheet JSONP format में देता है, इसलिए साफ करना पड़ेगा
+    const json = JSON.parse(text.substr(47).slice(0, -2));
+
+    const rows = json.table.rows;
+
+    // Data निकालना (Full Name, Phone Number, Email)
+    const result = rows.map(row => {
+      return {
+        fullName: row.c[0]?.v || "",   // मान लो पहला column = Full Name
+        phone: row.c[1]?.v || "",      // दूसरा column = Phone Number
+        email: row.c[2]?.v || ""       // तीसरा column = Email
+      };
+    });
+
+    console.log(result);
+  } catch (err) {
+    console.error("Error fetching sheet data", err);
+  }
+}
+
+fetchSheetData();
+
 
   return (
     <div className="flex flex-col">
@@ -679,6 +725,78 @@ queryClient.invalidateQueries({ queryKey: ["contacts", `https://api.bizwapp.com/
                     <Button onClick={() => fileInputRef.current.click()}>
                       Click here to import CSV/XLSX file
                     </Button>
+
+     <div className="w-full mt-6 flex flex-col items-center">
+  {/* Google Sheet Input */}
+  <div className="w-full max-w-md flex flex-col gap-3">
+    <input
+      type="url"
+      placeholder="Paste your Google Sheet link here"
+      className="border border-green-600 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-400"
+      value={googleSheetLink}
+      onChange={(e) => setGoogleSheetLink(e.target.value)}
+    />
+    <Button
+      variant="secondary"
+      className="w-full"
+      // onClick={handleGoogleSheetImport}
+    >
+      Import from Google Sheet
+    </Button>
+  </div>
+
+  {/* Import Mode Radios */}
+  <div className="w-full max-w-md mt-6 flex flex-col gap-3">
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        name="importMode"
+        value="immediate"
+        checked={importMode === 'immediate'}
+        onChange={(e) => setImportMode(e.target.value)}
+        className="accent-green-600"
+      />
+      <span className="text-gray-700">Immediate add contacts when added in Google Sheet</span>
+    </label>
+
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        name="importMode"
+        value="scheduled"
+        checked={importMode === 'scheduled'}
+        onChange={(e) => setImportMode(e.target.value)}
+        className="accent-green-600"
+      />
+      <span className="text-gray-700">Give time frequency to add contacts</span>
+    </label>
+  </div>
+
+  {/* Scheduled Interval Inputs */}
+  {importMode === 'scheduled' && (
+    <div className="w-full max-w-md mt-4 flex items-center gap-3">
+      <input
+        type="number"
+        min={1}
+        value={intervalValue}
+        onChange={(e) => setIntervalValue(Number(e.target.value))}
+        className="border rounded-lg p-2 w-24 text-center focus:outline-none focus:ring-2 focus:ring-green-400"
+      />
+
+      <select
+        value={intervalUnit}
+        onChange={(e) => setIntervalUnit(e.target.value)}
+        className="border rounded-lg p-2 flex-1 focus:outline-none focus:ring-2 focus:ring-green-400"
+      >
+        <option value="minutes">Minutes</option>
+        <option value="hours">Hours</option>
+        <option value="days">Days</option>
+      </select>
+    </div>
+  )}
+</div>
+
+
 
                     <div className="w-full mt-6">
                       {isMobileWithContactSupport && (
