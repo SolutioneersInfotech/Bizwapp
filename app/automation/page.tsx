@@ -427,7 +427,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -460,6 +460,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useWhatsAppTemplates } from "@/hooks/api/getTemplate"
+import usePostData from "@/hooks/api/usePostData"
 
 interface AutomationFormData {
   googleSheetUrl: string
@@ -493,6 +495,10 @@ export default function AutomationPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("create")
+    const [template , setTemplate] = useState(null);
+      const [userId , setUserId] = useState(null);
+
+
 
   // Mock existing configurations
   const [automationConfigs, setAutomationConfigs] = useState<AutomationConfig[]>([
@@ -535,15 +541,24 @@ export default function AutomationPage() {
       lastRun: "2024-01-12T08:30:00Z",
       messagesSent: 78,
     },
-  ])
+  ]);
 
-  // Mock template data
-  const templates = [
-    { id: "template1", name: "Welcome Message", description: "Greeting for new contacts" },
-    { id: "template2", name: "Follow-up Message", description: "Follow-up after initial contact" },
-    { id: "template3", name: "Promotional Message", description: "Product promotion template" },
-    { id: "template4", name: "Support Message", description: "Customer support template" },
-  ]
+      const { data: whatsappTemplates } = useWhatsAppTemplates();
+
+    useEffect(()=>{
+      setTemplate(whatsappTemplates?.data)
+    },[whatsappTemplates]);
+
+        const { mutate } = usePostData('http://localhost:5001/api/auth/add-google-sheet-contacts-send-temp');
+
+     useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      const id = userData.id || userData.user?._id || null;
+      setUserId(id);
+    }
+  }, []);
+
 
   const validateForm = (): boolean => {
     const newErrors: Partial<AutomationFormData> = {}
@@ -585,7 +600,8 @@ export default function AutomationPage() {
 
     try {
       const payload = {
-        googleSheetUrl: formData.googleSheetUrl,
+        userId,
+        sheetUrl: formData.googleSheetUrl,
         mode: formData.mode,
         ...(formData.mode === "frequency" && {
           interval: {
@@ -597,7 +613,32 @@ export default function AutomationPage() {
         createdAt: new Date().toISOString(),
       }
 
-      console.log("Submitting automation config:", payload)
+      console.log("Submitting automation config:", payload);
+
+        // const payload = {
+//         userId,
+//         sheetUrl: formData.googleSheetUrl,
+//         mode: formData.mode,
+//         ...(formData.mode === "frequency" && {
+//           interval: {
+//             number: formData.intervalNumber,
+//             unit: formData.intervalUnit,
+//           },
+//         }),
+//         templateName: formData.templateName,
+//         createdAt: new Date().toISOString(),
+//       }
+
+      mutate(payload , {
+        onSuccess(data){
+          console.log("success" , data);
+          
+        },
+        onError(err){
+          console.log('Error' ,err);
+          
+        }
+      });
 
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -892,7 +933,7 @@ export default function AutomationPage() {
                           <SelectValue placeholder="Select a template" />
                         </SelectTrigger>
                         <SelectContent>
-                          {templates.map((template) => (
+                          {template?.map((template) => (
                             <SelectItem key={template.id} value={template.name}>
                               <div className="flex flex-col">
                                 <span className="font-medium">{template.name}</span>
