@@ -60,7 +60,9 @@ import usePostData from "@/hooks/api/usePostData";
 import { useDeleteGoogleSheet } from "../../hooks/api/useDeleteGoogleSheet";
 import { useQueryClient } from "@tanstack/react-query";
 import convertIntervalToForm from "../../lib/convertIntervalToForm";
-import useUpdateData, { useUpdateGoogleSheet } from "../../hooks/api/useUpdateGoogleSheet";
+import useUpdateData, {
+  useUpdateGoogleSheet,
+} from "../../hooks/api/useUpdateGoogleSheet";
 
 interface AutomationFormData {
   configName: String;
@@ -79,7 +81,7 @@ interface AutomationConfig extends AutomationFormData {
   mode: "immediate" | "frequency";
   intervalNumber: number;
   intervalUnit: "minutes" | "hours" | "days";
-  templateName: string;  
+  templateName: string;
   status: "active" | "paused" | "stopped";
   createdAt: string;
   lastRun?: string;
@@ -106,13 +108,14 @@ export default function AutomationPage() {
   const [activeTab, setActiveTab] = useState("create");
   const [template, setTemplate] = useState<any[] | null>(null);
   const [userId, setUserId] = useState(null);
-  const [googleSheets, setGoogleSheets] = useState<AutomationConfig[] | null>(null);
+  const [googleSheets, setGoogleSheets] = useState<AutomationConfig[] | null>(
+    null
+  );
 
   // Mock existing configurations
   const [automationConfigs, setAutomationConfigs] = useState<
     AutomationConfig[]
-  >([
-  ]);
+  >([]);
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
 
@@ -176,8 +179,7 @@ export default function AutomationPage() {
     return googleSheetRegex.test(url);
   };
 
-    const { mutate: updateSheet } = useUpdateGoogleSheet();
-
+  const { mutate: updateSheet } = useUpdateGoogleSheet();
 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("nbkhbkjsdbjnsj");
@@ -235,7 +237,7 @@ export default function AutomationPage() {
           }),
           templateName: formData.templateName,
           createdAt: new Date().toISOString(),
-          status: "active"
+          status: "active",
         };
 
         console.log("Submitting automation config:", payload);
@@ -804,13 +806,14 @@ export default function AutomationPage() {
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm text-muted-foreground">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    <div className="inline-flex size-6 aspect-square shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base  leading-none">
                       1
                     </div>
                     <p>Connect your Google Sheet with contact information</p>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    <div className="inline-flex size-6 aspect-square shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base  leading-none">
                       2
                     </div>
                     <p>
@@ -818,14 +821,16 @@ export default function AutomationPage() {
                       intervals)
                     </p>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    <div className="inline-flex size-6 aspect-square shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base  leading-none">
                       3
                     </div>
                     <p>Select the message template to send</p>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    <div className="inline-flex size-6 aspect-square shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base leading-none">
                       4
                     </div>
                     <p>Messages are automatically sent to new contacts</p>
