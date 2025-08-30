@@ -220,13 +220,13 @@ export default function ConversationsPage() {
 
   // For showing Twilio Template
 
-  const mapTwilioToMetaFormat = (twilioTemplates) => {
+  const mapTwilioToMetaFormat = (twilioTemplates : any) => {
     if (!twilioTemplates?.templates?.length) {
       return { data: [], paging: { cursors: { before: null, after: null } } };
     }
 
     return {
-      data: twilioTemplates.templates.map((template) => {
+      data: twilioTemplates.templates.map((template : any) => {
         const { friendly_name, sid, language, types } = template;
 
         const textBody =

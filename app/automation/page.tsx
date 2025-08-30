@@ -67,7 +67,7 @@ interface AutomationFormData {
   googleSheetUrl: string;
   mode: "immediate" | "frequency";
   intervalNumber: number;
-  intervalUnit: "minutes" | "hours" | "days";
+  intervalUnit: "minutes" | "hours" | "days" | "seconds";
   templateName: string;
 }
 
@@ -75,6 +75,11 @@ interface AutomationConfig extends AutomationFormData {
   configName: String;
   id: string;
   name: string;
+  googleSheetUrl: string;
+  mode: "immediate" | "frequency";
+  intervalNumber: number;
+  intervalUnit: "minutes" | "hours" | "days";
+  templateName: string;  
   status: "active" | "paused" | "stopped";
   createdAt: string;
   lastRun?: string;
@@ -107,48 +112,6 @@ export default function AutomationPage() {
   const [automationConfigs, setAutomationConfigs] = useState<
     AutomationConfig[]
   >([
-    {
-      id: "auto-1",
-      name: "Welcome Campaign",
-      googleSheetUrl:
-        "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
-      mode: "immediate",
-      intervalNumber: 1,
-      intervalUnit: "hours",
-      templateName: "Welcome Message",
-      status: "active",
-      createdAt: "2024-01-15T10:30:00Z",
-      lastRun: "2024-01-20T14:22:00Z",
-      messagesSent: 45,
-    },
-    {
-      id: "auto-2",
-      name: "Follow-up Sequence",
-      googleSheetUrl:
-        "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
-      mode: "frequency",
-      intervalNumber: 2,
-      intervalUnit: "days",
-      templateName: "Follow-up Message",
-      status: "paused",
-      createdAt: "2024-01-10T09:15:00Z",
-      lastRun: "2024-01-18T11:45:00Z",
-      messagesSent: 23,
-    },
-    {
-      id: "auto-3",
-      name: "Promotional Blast",
-      googleSheetUrl:
-        "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
-      mode: "frequency",
-      intervalNumber: 6,
-      intervalUnit: "hours",
-      templateName: "Promotional Message",
-      status: "stopped",
-      createdAt: "2024-01-05T16:20:00Z",
-      lastRun: "2024-01-12T08:30:00Z",
-      messagesSent: 78,
-    },
   ]);
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
