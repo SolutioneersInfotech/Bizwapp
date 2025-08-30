@@ -104,9 +104,9 @@ export default function AutomationPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("create");
-  const [template, setTemplate] = useState(null);
+  const [template, setTemplate] = useState<any[] | null>(null);
   const [userId, setUserId] = useState(null);
-  const [googleSheets, setGoogleSheets] = useState(null);
+  const [googleSheets, setGoogleSheets] = useState<AutomationConfig[] | null>(null);
 
   // Mock existing configurations
   const [automationConfigs, setAutomationConfigs] = useState<
@@ -235,6 +235,7 @@ export default function AutomationPage() {
           }),
           templateName: formData.templateName,
           createdAt: new Date().toISOString(),
+          status: "active"
         };
 
         console.log("Submitting automation config:", payload);
@@ -446,7 +447,7 @@ export default function AutomationPage() {
           </TabsTrigger>
           <TabsTrigger value="manage" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            Manage Automations ({automationConfigs.length})
+            Manage Automations ({googleSheets?.length ?? 0})
           </TabsTrigger>
         </TabsList>
 
