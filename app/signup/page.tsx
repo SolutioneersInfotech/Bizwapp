@@ -354,7 +354,7 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 grid grid-cols-2 gap-3">
+                <div className="mt-6 w-full">
                   <Button
                     variant="outline"
                     onClick={() => handleSocialSignup("Google")}
@@ -363,7 +363,7 @@ export default function SignupPage() {
                     <FcGoogle className="mr-2 h-4 w-4" />
                     Google
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="outline"
                     onClick={() => handleSocialSignup("Facebook")}
                     className="w-full"
@@ -386,7 +386,7 @@ export default function SignupPage() {
                   >
                     <Linkedin className="mr-2 h-4 w-4 text-blue-700" />
                     LinkedIn
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             )}
