@@ -110,7 +110,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-  window.location.href = 'https://bizwapp-backend-2.onrender.com/api/auth/auth/google';
+  window.location.href = 'https://bizwapp-backend-production.up.railway.app/api/auth/auth/google';
 };
   
 const handleFacebookLogin = () => {
