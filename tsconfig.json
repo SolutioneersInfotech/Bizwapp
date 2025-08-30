@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "hooks/api/useSendWhatsAppMessage .ts", "app/whatsapp_api_credentials", "hooks/api/useDelete.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "hooks/api/useSendWhatsAppMessage .ts", "app/whatsapp_api_credentials", "hooks/api/useDelete.js", "hooks/api/useUpdateGoogleSheet.js"],
   "exclude": ["node_modules"]
 }
