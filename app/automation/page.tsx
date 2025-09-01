@@ -80,7 +80,7 @@ interface AutomationConfig extends AutomationFormData {
   mode: "immediate" | "frequency";
   intervalNumber: number;
   intervalUnit: "minutes" | "hours" | "days";
-  templateName: string;  
+  templateName: string;
   status: "active" | "paused" | "stopped";
   createdAt: string;
   lastRun?: string;
@@ -105,9 +105,11 @@ export default function AutomationPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("create");
-  const [template, setTemplate] = useState(null);
+  const [template, setTemplate] = useState<any[] | null>(null);
   const [userId, setUserId] = useState(null);
-  const [googleSheets, setGoogleSheets] = useState(null);
+  const [googleSheets, setGoogleSheets] = useState<AutomationConfig[] | null>(
+    null
+  );
 
   // Mock existing configurations
   const [automationConfigs, setAutomationConfigs] = useState<
@@ -176,8 +178,7 @@ export default function AutomationPage() {
     return googleSheetRegex.test(url);
   };
 
-    const { mutate: updateSheet } = useUpdateGoogleSheet();
-
+  const { mutate: updateSheet } = useUpdateGoogleSheet();
 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("nbkhbkjsdbjnsj");
@@ -235,6 +236,7 @@ export default function AutomationPage() {
           }),
           templateName: formData.templateName,
           createdAt: new Date().toISOString(),
+          status: "active",
         };
 
         console.log("Submitting automation config:", payload);
@@ -450,7 +452,7 @@ export default function AutomationPage() {
           </TabsTrigger>
           <TabsTrigger value="manage" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            Manage Automations ({automationConfigs.length})
+            Manage Automations ({googleSheets?.length ?? 0})
           </TabsTrigger>
         </TabsList>
 
@@ -807,13 +809,14 @@ export default function AutomationPage() {
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm text-muted-foreground">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    <div className="inline-flex size-6 aspect-square shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base  leading-none">
                       1
                     </div>
                     <p>Connect your Google Sheet with contact information</p>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    <div className="inline-flex size-6 aspect-square shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base  leading-none">
                       2
                     </div>
                     <p>
@@ -821,14 +824,16 @@ export default function AutomationPage() {
                       intervals)
                     </p>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    <div className="inline-flex size-6 aspect-square shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base  leading-none">
                       3
                     </div>
                     <p>Select the message template to send</p>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    <div className="inline-flex size-6 aspect-square shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base leading-none">
                       4
                     </div>
                     <p>Messages are automatically sent to new contacts</p>
