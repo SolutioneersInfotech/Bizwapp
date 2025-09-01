@@ -109,8 +109,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
       // }, [currentContact, selectedContact]);
 
   const handleContactSelect = (contact: Contact, phone, name) => {
-    console.log("checking.");
-    console.log("contact , phone ,name  " , contact, phone, name )
 
     if (isMobile) setMobileView('chat');
 
@@ -120,6 +118,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
     // setCurrentContact(contact);
     setSelectedPhone(phone);
   };
+
     
   return (
     <div className="p-4">
@@ -154,7 +153,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
         <TabsContent
           value={activeTab}
-          className="mt-4 space-y-2 max-h-[calc(100vh-130px)] overflow-y-auto pr-2 md:max-h-[500px]"
+          className="mt-4 space-y-2 max-h-[calc(100vh-130px)] overflow-y-auto  md:max-h-[500px] scrollbar-thin"
         >
           {loading ? (
             <div className="flex justify-center items-center py-8">
@@ -251,7 +250,7 @@ function ConversationItem({
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
-            <p className="font-medium truncate">{conversation.phoneNumber}</p>
+            <p className="font-medium truncate">{conversation.name ? conversation.name : conversation.phoneNumber}</p>
             <p className="text-xs text-muted-foreground">{conversation.time}</p>
           </div>
           <p className="text-xs text-muted-foreground truncate">

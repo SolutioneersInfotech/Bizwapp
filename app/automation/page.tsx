@@ -61,6 +61,7 @@ import { useDeleteGoogleSheet } from "../../hooks/api/useDeleteGoogleSheet";
 import { useQueryClient } from "@tanstack/react-query";
 import convertIntervalToForm from "../../lib/convertIntervalToForm";
 import useUpdateData, { useUpdateGoogleSheet } from "../../hooks/api/useUpdateGoogleSheet";
+import usePutData from "@/hooks/api/usePutData";
 
 interface AutomationFormData {
   configName: String;
@@ -112,10 +113,9 @@ export default function AutomationPage() {
   const [automationConfigs, setAutomationConfigs] = useState<
     AutomationConfig[]
   >([
-  ]);
+  ]);  
 
   const { data: whatsappTemplates } = useWhatsAppTemplates();
-
   useEffect(() => {
     setTemplate(whatsappTemplates?.data);
   }, [whatsappTemplates]);
@@ -354,9 +354,13 @@ export default function AutomationPage() {
     }
   };
 
+    // const { mutate: updateUser, isLoading } = usePutData(`http://localhost:5001/change-google-config-status/${}`)
+
+
   const toggleStatus = async (id: string, newStatus: "active" | "paused") => {
     try {
       // Simulate API call
+      updateUser({ name: "Aryan", email: "aryan@example.com" })
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       setAutomationConfigs((prev) =>
