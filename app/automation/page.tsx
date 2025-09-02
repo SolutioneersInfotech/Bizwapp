@@ -136,7 +136,7 @@ export default function AutomationPage() {
 
   console.log("userId", userId);
 
-  const { data: googleSheetsData } = usePrefetchQuery(
+  const { data: googleSheetsData , refetch} = usePrefetchQuery(
     "googleSheets",
     `https://api.bizwapp.com/api/auth/get-google-sheet-info/${userId}`
   );
@@ -215,6 +215,7 @@ export default function AutomationPage() {
           {
             onSuccess: () => {
               console.log("✅ Updated successfully!");
+              refetch()
               setSubmitStatus("success");
             },
             onError: () => {
@@ -244,6 +245,7 @@ export default function AutomationPage() {
         mutate(payload, {
           onSuccess(data) {
             console.log("success", data);
+            refetch();
           },
           onError(err) {
             console.log("Error", err);
