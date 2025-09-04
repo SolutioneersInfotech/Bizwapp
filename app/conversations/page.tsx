@@ -144,7 +144,7 @@ export default function ConversationsPage() {
     setConversationHistory(getAllConversation?.conversations);
   }, [getAllConversation?.conversations]);
 
-  const { data: messageHistory } = useMessageHistory(selectedPhone);
+  const { data: messageHistory } = useMessageHistory(userId ,selectedPhone);
 
   useEffect(() => {
     setMessage(messageHistory?.data || []);

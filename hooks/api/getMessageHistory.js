@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
 const fetchMessageHistory = async ({ queryKey }) => {
-  const [, phoneNumber] = queryKey;
+  const [,userId ,  phoneNumber] = queryKey;
 
-  const response = await fetch(`https://api.bizwapp.com/api/auth/gettingConversations/${phoneNumber}`, {
+  const response = await fetch(`https://api.bizwapp.com/api/auth/gettingConversations/${userId}/${phoneNumber}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -17,11 +17,11 @@ const fetchMessageHistory = async ({ queryKey }) => {
   return response.json();
 };
 
-const useMessageHistory = (phoneNumber) => {
+const useMessageHistory = (userId , phoneNumber) => {
   return useQuery({
-    queryKey: ["messageHistory", phoneNumber],
+    queryKey: ["messageHistory", userId, phoneNumber], // ✅ userId bhi add karo
     queryFn: fetchMessageHistory,
-    enabled: !!phoneNumber, // optional: only run if phoneNumber is available
+    enabled: !!userId && !!phoneNumber, // ✅ Dono required hain
     staleTime: 0,
   });
 };

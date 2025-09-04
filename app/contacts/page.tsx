@@ -62,6 +62,8 @@ import ContactForm from "@/components/ui/contactForm";
 import { DialogPortal } from "@radix-ui/react-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import useDelete from "@/hooks/api/useDelete";
+import { Checkbox } from "@/components/ui/checkbox";
+import deleteMultipleContacts from "../../hooks/api/deleteMultipleContacts"
 
 export default function ContactsPage() {
   const { toast } = useToast();
@@ -130,9 +132,11 @@ export default function ContactsPage() {
   const [isMobileWithContactSupport, setIsMobileWithContactSupport] =
     useState(false);
   const [selectedContacts, setSelectedContacts] = useState([]);
-  const [importMode, setImportMode] = useState('immediate');
+  const [importMode, setImportMode] = useState("immediate");
   const [intervalValue, setIntervalValue] = useState(10);
-  const [intervalUnit, setIntervalUnit] = useState('minutes');
+  const [intervalUnit, setIntervalUnit] = useState("minutes");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
 
   // Import dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -162,6 +166,12 @@ export default function ContactsPage() {
   const [userId, setUserId] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [contactIdToDelete, setContactIdToDelete] = useState(null);
+  const [tickedContacts, setTickedContacts] = useState([]);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+
+
+  const [selectAll, setSelectAll] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -295,11 +305,13 @@ export default function ContactsPage() {
         // Format the data
         const formattedContacts = jsonData.map((row, index) => {
           const name =
-            row.name || row.Name || row.NAME || row['Full Name']  || `Contact ${index + 1}`;
-          const phone =
-            row.phone ||
-            row['Phone Number']
-            row.Phone ||
+            row.name ||
+            row.Name ||
+            row.NAME ||
+            row["Full Name"] ||
+            `Contact ${index + 1}`;
+          const phone = row.phone || row["Phone Number"];
+          row.Phone ||
             row.PHONE ||
             row.phoneNumber ||
             row.PhoneNumber ||
@@ -399,7 +411,12 @@ export default function ContactsPage() {
           description: data.message,
         });
         console.log("Success:", data);
-        queryClient.invalidateQueries({ queryKey: ["contacts", `https://api.bizwapp.com/api/auth/getContacts/${userId}`] });
+        queryClient.invalidateQueries({
+          queryKey: [
+            "contacts",
+            `https://api.bizwapp.com/api/auth/getContacts/${userId}`,
+          ],
+        });
       },
       onError: (error) => {
         toast({
@@ -537,7 +554,12 @@ export default function ContactsPage() {
     addContactMutate(contactArray, {
       onSuccess: (data) => {
         console.log("data", data);
-        queryClient.invalidateQueries({ queryKey: ["contacts", `https://api.bizwapp.com/api/auth/getContacts/${userId}`] });
+        queryClient.invalidateQueries({
+          queryKey: [
+            "contacts",
+            `https://api.bizwapp.com/api/auth/getContacts/${userId}`,
+          ],
+        });
         toast({
           title: "Success",
           description: data.message,
@@ -553,8 +575,6 @@ export default function ContactsPage() {
       },
     });
   };
-
-  
 
   // Handle form submission
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -610,50 +630,86 @@ export default function ContactsPage() {
     }
   };
 
-queryClient.invalidateQueries({ queryKey: ["contacts", `https://api.bizwapp.com/api/auth/getContacts/${userId}`] });
+  queryClient.invalidateQueries({
+    queryKey: [
+      "contacts",
+      `https://api.bizwapp.com/api/auth/getContacts/${userId}`,
+    ],
+  });
+
+  const handleBulkDelete = async () => {
+    if (tickedContacts.length === 0) return;
+
+  setIsDeleteDialogOpen(true);
+
+
+    setIsDeleting(true);
+  };
+
+  const confirmBulkDelete = async () => {
+  try {
+    const result = await deleteMultipleContacts(tickedContacts);
+    
+    // Success message
+    toast.success(result.message);
+    
+    // Clear selection and refresh data
+    setSelectedContacts([]);
+    setSelectAll(false);    
+  } catch (error) {
+    console.error("Delete error:", error);
+    toast.error("Failed to delete contacts");
+  } finally {
+    // Dialog close karo
+    setIsDeleteDialogOpen(false);
+    setContactsToDelete([]);
+        setTickedContacts([]);
+
+  }
+};
 
   console.log("isMobileWithContactSupport", isMobileWithContactSupport);
 
   console.log("getContacts", getContacts);
 
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/1shXa0s0lLN8PTRXvQksDKoRw_jKmn_EAZTi2WcrO4gw/export?format=csv";
+  const sheetUrl =
+    "https://docs.google.com/spreadsheets/d/1shXa0s0lLN8PTRXvQksDKoRw_jKmn_EAZTi2WcrO4gw/export?format=csv";
 
-// fetch(sheetUrl)
-//   .then(res => res.text())
-//   .then(csv => {
-//     console.log("hvdshjvshhsddvhvshjvshsdhskk",csv);
-//   });
+  // fetch(sheetUrl)
+  //   .then(res => res.text())
+  //   .then(csv => {
+  //     console.log("hvdshjvshhsddvhvshjvshsdhskk",csv);
+  //   });
 
-async function fetchSheetData() {
-  const sheetId = "YOUR_SHEET_ID"; // यहां अपना sheetId डालो
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+  async function fetchSheetData() {
+    const sheetId = "YOUR_SHEET_ID"; // यहां अपना sheetId डालो
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-  try {
-    const response = await fetch(url);
-    const text = await response.text();
+    try {
+      const response = await fetch(url);
+      const text = await response.text();
 
-    // Google Sheet JSONP format में देता है, इसलिए साफ करना पड़ेगा
-    const json = JSON.parse(text.substr(47).slice(0, -2));
+      // Google Sheet JSONP format में देता है, इसलिए साफ करना पड़ेगा
+      const json = JSON.parse(text.substr(47).slice(0, -2));
 
-    const rows = json.table.rows;
+      const rows = json.table.rows;
 
-    // Data निकालना (Full Name, Phone Number, Email)
-    const result = rows.map(row => {
-      return {
-        fullName: row.c[0]?.v || "",   // मान लो पहला column = Full Name
-        phone: row.c[1]?.v || "",      // दूसरा column = Phone Number
-        email: row.c[2]?.v || ""       // तीसरा column = Email
-      };
-    });
+      // Data निकालना (Full Name, Phone Number, Email)
+      const result = rows.map((row) => {
+        return {
+          fullName: row.c[0]?.v || "", // मान लो पहला column = Full Name
+          phone: row.c[1]?.v || "", // दूसरा column = Phone Number
+          email: row.c[2]?.v || "", // तीसरा column = Email
+        };
+      });
 
-    console.log(result);
-  } catch (err) {
-    console.error("Error fetching sheet data", err);
+      console.log(result);
+    } catch (err) {
+      console.error("Error fetching sheet data", err);
+    }
   }
-}
 
-fetchSheetData();
-
+  fetchSheetData();
 
   return (
     <div className="flex flex-col">
@@ -726,77 +782,81 @@ fetchSheetData();
                       Click here to import CSV/XLSX file
                     </Button>
 
-     <div className="w-full mt-6 flex flex-col items-center">
-  {/* Google Sheet Input */}
-  <div className="w-full max-w-md flex flex-col gap-3">
-    <input
-      type="url"
-      placeholder="Paste your Google Sheet link here"
-      className="border border-green-600 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-400"
-      value={googleSheetLink}
-      onChange={(e) => setGoogleSheetLink(e.target.value)}
-    />
-    <Button
-      variant="secondary"
-      className="w-full"
-      // onClick={handleGoogleSheetImport}
-    >
-      Import from Google Sheet
-    </Button>
-  </div>
+                    <div className="w-full mt-6 flex flex-col items-center">
+                      {/* Google Sheet Input */}
+                      <div className="w-full max-w-md flex flex-col gap-3">
+                        <input
+                          type="url"
+                          placeholder="Paste your Google Sheet link here"
+                          className="border border-green-600 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-400"
+                          value={googleSheetLink}
+                          onChange={(e) => setGoogleSheetLink(e.target.value)}
+                        />
+                        <Button
+                          variant="secondary"
+                          className="w-full"
+                          // onClick={handleGoogleSheetImport}
+                        >
+                          Import from Google Sheet
+                        </Button>
+                      </div>
 
-  {/* Import Mode Radios */}
-  <div className="w-full max-w-md mt-6 flex flex-col gap-3">
-    <label className="flex items-center gap-2">
-      <input
-        type="radio"
-        name="importMode"
-        value="immediate"
-        checked={importMode === 'immediate'}
-        onChange={(e) => setImportMode(e.target.value)}
-        className="accent-green-600"
-      />
-      <span className="text-gray-700">Immediate add contacts when added in Google Sheet</span>
-    </label>
+                      {/* Import Mode Radios */}
+                      <div className="w-full max-w-md mt-6 flex flex-col gap-3">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="importMode"
+                            value="immediate"
+                            checked={importMode === "immediate"}
+                            onChange={(e) => setImportMode(e.target.value)}
+                            className="accent-green-600"
+                          />
+                          <span className="text-gray-700">
+                            Immediate add contacts when added in Google Sheet
+                          </span>
+                        </label>
 
-    <label className="flex items-center gap-2">
-      <input
-        type="radio"
-        name="importMode"
-        value="scheduled"
-        checked={importMode === 'scheduled'}
-        onChange={(e) => setImportMode(e.target.value)}
-        className="accent-green-600"
-      />
-      <span className="text-gray-700">Give time frequency to add contacts</span>
-    </label>
-  </div>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="importMode"
+                            value="scheduled"
+                            checked={importMode === "scheduled"}
+                            onChange={(e) => setImportMode(e.target.value)}
+                            className="accent-green-600"
+                          />
+                          <span className="text-gray-700">
+                            Give time frequency to add contacts
+                          </span>
+                        </label>
+                      </div>
 
-  {/* Scheduled Interval Inputs */}
-  {importMode === 'scheduled' && (
-    <div className="w-full max-w-md mt-4 flex items-center gap-3">
-      <input
-        type="number"
-        min={1}
-        value={intervalValue}
-        onChange={(e) => setIntervalValue(Number(e.target.value))}
-        className="border rounded-lg p-2 w-24 text-center focus:outline-none focus:ring-2 focus:ring-green-400"
-      />
+                      {/* Scheduled Interval Inputs */}
+                      {importMode === "scheduled" && (
+                        <div className="w-full max-w-md mt-4 flex items-center gap-3">
+                          <input
+                            type="number"
+                            min={1}
+                            value={intervalValue}
+                            onChange={(e) =>
+                              setIntervalValue(Number(e.target.value))
+                            }
+                            className="border rounded-lg p-2 w-24 text-center focus:outline-none focus:ring-2 focus:ring-green-400"
+                          />
 
-      <select
-        value={intervalUnit}
-        onChange={(e) => setIntervalUnit(e.target.value)}
-        className="border rounded-lg p-2 flex-1 focus:outline-none focus:ring-2 focus:ring-green-400"
-      >
-        <option value="minutes">Minutes</option>
-        <option value="hours">Hours</option>
-        <option value="days">Days</option>
-      </select>
-    </div>
-  )}
-</div>
-
-
+                          <select
+                            value={intervalUnit}
+                            onChange={(e) => setIntervalUnit(e.target.value)}
+                            className="border rounded-lg p-2 flex-1 focus:outline-none focus:ring-2 focus:ring-green-400"
+                          >
+                            <option value="minutes">Minutes</option>
+                            <option value="hours">Hours</option>
+                            <option value="days">Days</option>
+                          </select>
+                        </div>
+                      )}
+                    </div>
 
                     <div className="w-full mt-6">
                       {isMobileWithContactSupport && (
@@ -917,8 +977,79 @@ fetchSheetData();
                 isLoading={isLoading}
               />
             </Dialog>
+            <div>
+      {/* Bulk Actions Toolbar */}
+      {tickedContacts.length > 0 && (
+        <div className=" flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleBulkDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-500 hover:text-white text-white py-1 px-4"
+            >
+              {
+              // isDeleting 
+              false 
+              ? (
+                <Spinner size={16} className="mr-2" />
+              ) : (
+                <Trash className="h-4 w-4 mr-2" />
+              )}
+              Delete Selected
+            </Button>
           </div>
         </div>
+      )}
+
+    </div>
+          </div>
+          
+        </div>
+
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete {tickedContacts.length} contact(s)?
+            This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="max-h-60 overflow-y-auto">
+          <h4 className="text-sm font-medium mb-2">Contacts to be deleted:</h4>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            {getContacts?.contacts
+              ?.filter(contact => tickedContacts.includes(contact._id))
+              .map(contact => (
+                <li key={contact._id} className="flex items-center gap-2">
+                  • {contact.name} - {contact.phone}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        
+        <DialogFooter className="sm:justify-end gap-2">
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={() => setIsDeleteDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="button" 
+            variant="destructive"
+            onClick={confirmBulkDelete}
+          >
+            Delete {tickedContacts.length} Contact(s)
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
@@ -961,6 +1092,24 @@ fetchSheetData();
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-[50px]">
+                        <Checkbox
+                          checked={selectAll}
+                          onCheckedChange={(checked) => {
+                            setSelectAll(checked);
+                            if (checked) {
+                              setTickedContacts(
+                                getContacts?.contacts?.map(
+                                  (contact) => contact._id
+                                ) || []
+                              );
+                            } else {
+                              setTickedContacts([]);
+                            }
+                          }}
+                        />
+                         {/* <span className="ml-2">{tickedContacts.length ==0 ? "" :  tickedContacts.length}</span> */}
+                      </TableHead>
                       <TableHead className="w-[250px]">Name</TableHead>
                       <TableHead>Phone</TableHead>
                       <TableHead>Tags</TableHead>
@@ -972,7 +1121,7 @@ fetchSheetData();
                   <TableBody>
                     {loading ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center">
+                        <TableCell colSpan={7} className="text-center">
                           <div className="flex justify-center w-full">
                             <Spinner size={40} className="text-green-600" />
                           </div>
@@ -987,6 +1136,24 @@ fetchSheetData();
                     ) : (
                       getContacts?.contacts?.map((contact) => (
                         <TableRow key={contact._id}>
+                          <TableCell>
+                            <Checkbox
+                              checked={tickedContacts.includes(contact._id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setTickedContacts((prev) => [
+                                    ...prev,
+                                    contact._id,
+                                  ]);
+                                } else {
+                                  setTickedContacts((prev) =>
+                                    prev.filter((id) => id !== contact._id)
+                                  );
+                                  setSelectAll(false);
+                                }
+                              }}
+                            />
+                          </TableCell>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
