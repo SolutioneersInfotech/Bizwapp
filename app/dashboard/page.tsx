@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,23 +11,26 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/contexts/AuthContext"
 import { useAnalytics } from "@/contexts/AnalyticsContext"
 import useUser from "../../hooks/api/getuser"
+import getUserStats from "../../hooks/api/getAnalytics"
 
 export default function DashboardPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading } = useAuth()
-  const { analytics, refreshAnalytics } = useAnalytics()
+  const { analytics, refreshAnalytics } = useAnalytics();
+    const [stats, setStats] = useState(null);
+      const [userId, setUserId] = useState(null);
+
+
 
     const { data, isError } = useUser();
 
     useEffect(() => {
-      console.log("datadatadatadatadatadatadata", data);
       
     if (data?.user) {
       localStorage.setItem('user', JSON.stringify(data.user));
     }
   }, [data]);
 
-  // console.log("datadatadatadatadatadatadata", data);
 
 
   // useEffect(() => {
@@ -40,6 +43,35 @@ export default function DashboardPage() {
   // }, [isLoading, isAuthenticated, router])
 
   //Add a separate effect for refreshing analytics only once
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await localStorage.getItem("user");
+      const parsedUser = await JSON.parse(userData);
+      const id = parsedUser.id || parsedUser.user?._id || null;
+      setUserId(id);
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await getUserStats(userId);
+        setStats(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    if (userId) {
+      fetchStats();
+    }
+  }, [userId]);
+
+  console.log("stats", stats);
+  
+
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       refreshAnalytics()
@@ -51,7 +83,6 @@ export default function DashboardPage() {
     return <DashboardSkeleton />
   }
 
-  console.log("useruseruseruser", data?.user)
 
   return (
     <div className="flex flex-col">
@@ -80,7 +111,7 @@ export default function DashboardPage() {
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.totalSent.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">{stats?.overview?.totalMessages}</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -96,7 +127,7 @@ export default function DashboardPage() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">1,429</div>
+                  <div className="text-2xl font-bold">{stats?.overview?.totalContacts}</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -112,7 +143,7 @@ export default function DashboardPage() {
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.deliveryRate.toFixed(1)}%</div>
+                  <div className="text-2xl font-bold">{stats?.rates?.deliveryRate}%</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -128,7 +159,7 @@ export default function DashboardPage() {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.readRate.toFixed(1)}%</div>
+                  <div className="text-2xl font-bold">{stats?.rates?.readRate}%</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-red-500 flex items-center">
                       <ArrowDownRight className="mr-1 h-3 w-3" />
