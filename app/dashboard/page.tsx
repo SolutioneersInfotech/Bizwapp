@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useAnalytics } from "@/contexts/AnalyticsContext"
 import useUser from "../../hooks/api/getuser"
 import getUserStats from "../../hooks/api/getAnalytics"
+import { Spinner } from "@/components/ui/spinner"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -111,7 +112,7 @@ export default function DashboardPage() {
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.overview?.totalMessages}</div>
+                  <div className="text-2xl font-bold">{stats ?  stats?.overview?.totalMessages : <Spinner size={16} className="mr-2" />}</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -127,7 +128,7 @@ export default function DashboardPage() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.overview?.totalContacts}</div>
+                  <div className="text-2xl font-bold">{stats ? stats?.overview?.totalContacts : <Spinner size={16} className="mr-2" /> }</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -143,7 +144,7 @@ export default function DashboardPage() {
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.rates?.deliveryRate}%</div>
+                  <div className="text-2xl font-bold">{stats ? `${stats?.rates?.deliveryRate} %` :<Spinner size={16} className="mr-2" /> }</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -159,7 +160,7 @@ export default function DashboardPage() {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.rates?.readRate}%</div>
+                  <div className="text-2xl font-bold">{stats ? `${stats?.rates?.readRate} %` : <Spinner size={16} className="mr-2" />}</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-red-500 flex items-center">
                       <ArrowDownRight className="mr-1 h-3 w-3" />
