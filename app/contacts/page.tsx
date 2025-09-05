@@ -651,6 +651,9 @@ export default function ContactsPage() {
     const result = await deleteMultipleContacts(tickedContacts);
     
     // Success message
+     setTickedContacts([]);
+    setIsDeleting(false);
+
     toast.success(result.message);
     
     // Clear selection and refresh data
@@ -658,11 +661,13 @@ export default function ContactsPage() {
     setSelectAll(false);    
   } catch (error) {
     console.error("Delete error:", error);
+    setIsDeleting(false);
     toast.error("Failed to delete contacts");
   } finally {
     // Dialog close karo
     setIsDeleteDialogOpen(false);
     setContactsToDelete([]);
+    setIsDeleting(false);
         setTickedContacts([]);
 
   }
