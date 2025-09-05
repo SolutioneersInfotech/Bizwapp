@@ -13,6 +13,8 @@ import { useAnalytics } from "@/contexts/AnalyticsContext"
 import useUser from "../../hooks/api/getuser"
 import getUserStats from "../../hooks/api/getAnalytics"
 import { Spinner } from "@/components/ui/spinner"
+import Link from "next/link"
+import getLatestMessages from "../../hooks/api/getRecentConversations"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -20,6 +22,9 @@ export default function DashboardPage() {
   const { analytics, refreshAnalytics } = useAnalytics();
     const [stats, setStats] = useState(null);
       const [userId, setUserId] = useState(null);
+       const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
 
 
 
@@ -31,6 +36,23 @@ export default function DashboardPage() {
       localStorage.setItem('user', JSON.stringify(data.user));
     }
   }, [data]);
+
+   useEffect(() => {
+    const fetchLatestMessages = async () => {
+      try {
+        const response = await getLatestMessages(userId);
+        setMessages(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      fetchLatestMessages();
+    }
+  }, [userId]);
 
 
 
@@ -70,7 +92,6 @@ export default function DashboardPage() {
     }
   }, [userId]);
 
-  console.log("stats", stats);
   
 
   useEffect(() => {
@@ -83,6 +104,10 @@ export default function DashboardPage() {
   if (isLoading) {
     return <DashboardSkeleton />
   }
+
+   
+
+    console.log("messages", messages);
 
 
   return (
@@ -191,7 +216,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentConversations.map((conversation) => (
+                    {messages.map((conversation) => (
                       <div key={conversation.id} className="flex items-center gap-4">
                         <Avatar>
                           <AvatarImage src={conversation.avatar} />
@@ -212,8 +237,11 @@ export default function DashboardPage() {
                         </Badge>
                       </div>
                     ))}
-                    <Button variant="ghost" className="w-full justify-center">
+                    <Button variant="ghost" className="w-full justify-center" >
+                      <Link href="/conversations">
                       View All Conversations
+                      </Link>
+                      
                       <ChevronRight className="ml-1 h-4 w-4" />
                     </Button>
                   </div>
