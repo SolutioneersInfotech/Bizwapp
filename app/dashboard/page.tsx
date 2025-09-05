@@ -216,7 +216,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {messages.map((conversation) => (
+                    {messages.length > 0 ? messages.map((conversation) => (
                       <div key={conversation.id} className="flex items-center gap-4">
                         <Avatar>
                           <AvatarImage src={conversation.avatar} />
@@ -236,7 +236,9 @@ export default function DashboardPage() {
                           {conversation.status}
                         </Badge>
                       </div>
-                    ))}
+                    )) : <div className="flex justify-center items-center py-8">
+          <Spinner size={40} className="text-green-600" />
+        </div>}
                     <Button variant="ghost" className="w-full justify-center" >
                       <Link href="/conversations">
                       View All Conversations
