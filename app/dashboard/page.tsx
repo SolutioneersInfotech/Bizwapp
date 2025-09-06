@@ -127,7 +127,7 @@ export default function DashboardPage() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList className="flex flex-wrap gap-2 mb-12 md:mb-0">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            {/* <TabsTrigger value="analytics">Analytics</TabsTrigger> */}
             <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
