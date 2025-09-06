@@ -383,17 +383,6 @@ function EngagementChart({ data = [] }) {
   )
 
   return (
-    <div className="flex h-full w-full items-end gap-2 pl-4 pt-4">
-      {chartData.map((item, i) => {
-        const sentHeight = item.sent
-          ? (item.sent / 100) * 70 + 30
-          : Math.floor(Math.random() * 70) + 30;
-        const deliveredHeight = item.delivered
-          ? (item.delivered / item.sent) * sentHeight
-          : sentHeight - 10;
-        const readHeight = item.read
-          ? (item.read / item.delivered) * deliveredHeight
-          : deliveredHeight - 20;
     <div className="flex w-full flex-col">
       {/* Chart */}
       <div className="flex h-64 items-end gap-4 px-6 pt-4">
@@ -401,30 +390,6 @@ function EngagementChart({ data = [] }) {
           const sentHeight = (item.sent / maxValue) * 100
           const deliveredHeight = (item.delivered / maxValue) * 100
 
-        return (
-          <div key={i} className="relative flex h-full flex-1 flex-col">
-            <div
-              className="absolute bottom-0 w-full rounded-md bg-primary/30"
-              style={{ height: `${sentHeight}%` }}
-            />
-            <div
-              className="absolute bottom-0 w-full rounded-md bg-primary/50"
-              style={{ height: `${deliveredHeight}%` }}
-            />
-            <div
-              className="absolute bottom-0 w-full rounded-md bg-primary"
-              style={{ height: `${readHeight}%` }}
-            />
-            <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
-              {item.date
-                ? new Date(item.date).toLocaleDateString("en-US", {
-                    month: "short",
-                  })
-                : `M${i + 1}`}
-            </div>
-          </div>
-        );
-      })}
           return (
             <div
               key={i}
@@ -461,16 +426,17 @@ function EngagementChart({ data = [] }) {
       <div className="mt-8 flex justify-center gap-6 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded-sm bg-primary/70" />
-          Delivery Rate
+          Sent
         </div>
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded-sm bg-primary" />
-          Response Rate
+          Delivered
         </div>
       </div>
     </div>
-  );
+  )
 }
+
 
 
 function DashboardSkeleton() {
