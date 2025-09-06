@@ -1,57 +1,117 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { MessageSquare, Users, CheckCircle, Clock, ArrowUpRight, ArrowDownRight, ChevronRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useAuth } from "@/contexts/AuthContext"
-import { useAnalytics } from "@/contexts/AnalyticsContext"
-import useUser from "../../hooks/api/getuser"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  MessageSquare,
+  Users,
+  CheckCircle,
+  Clock,
+  ArrowUpRight,
+  ArrowDownRight,
+  ChevronRight,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAnalytics } from "@/contexts/AnalyticsContext";
+import useUser from "../../hooks/api/getuser";
+import getUserStats from "../../hooks/api/getAnalytics";
+import { Spinner } from "@/components/ui/spinner";
+import Link from "next/link";
+import getLatestMessages from "../../hooks/api/getRecentConversations";
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuth()
-  const { analytics, refreshAnalytics } = useAnalytics()
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+  const { analytics, refreshAnalytics } = useAnalytics();
+  const [stats, setStats] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const { data, isError } = useUser();
+  const { data, isError } = useUser();
 
-    useEffect(() => {
-      console.log("datadatadatadatadatadatadata", data);
-      
+  useEffect(() => {
     if (data?.user) {
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.user));
     }
   }, [data]);
 
-  // console.log("datadatadatadatadatadatadata", data);
+  useEffect(() => {
+    const fetchLatestMessages = async () => {
+      try {
+        const response = await getLatestMessages(userId);
+        setMessages(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (userId) {
+      fetchLatestMessages();
+    }
+  }, [userId]);
 
   // useEffect(() => {
   //   if (!isLoading && !isAuthenticated) {
   //     router.push("/login")
   //   }
 
-    // Only refresh analytics on initial mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Only refresh analytics on initial mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [isLoading, isAuthenticated, router])
 
   //Add a separate effect for refreshing analytics only once
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await localStorage.getItem("user");
+      const parsedUser = await JSON.parse(userData);
+      const id = parsedUser.id || parsedUser.user?._id || null;
+      setUserId(id);
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await getUserStats(userId);
+        setStats(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    if (userId) {
+      fetchStats();
+    }
+  }, [userId]);
+
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      refreshAnalytics()
+      refreshAnalytics();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, isLoading])
+  }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
-    return <DashboardSkeleton />
+    return <DashboardSkeleton />;
   }
 
-  console.log("useruseruseruser", data?.user)
+  console.log("messages", messages);
 
   return (
     <div className="flex flex-col">
@@ -59,8 +119,8 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
           <div className="flex items-center space-x-2">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              New Conversation
+            <MessageSquare className="mr-2 h-4 w-4" />
+            New Conversation
           </div>
         </div>
 
@@ -76,11 +136,19 @@ export default function DashboardPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card className="w-full overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-all hover:shadow-md">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Messages</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Messages
+                  </CardTitle>
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.totalSent.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {stats ? (
+                      stats?.overview?.totalMessages
+                    ) : (
+                      <Spinner size={16} className="mr-2" />
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -92,11 +160,19 @@ export default function DashboardPage() {
 
               <Card className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-all hover:shadow-md">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Contacts</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Active Contacts
+                  </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">1,429</div>
+                  <div className="text-2xl font-bold">
+                    {stats ? (
+                      stats?.overview?.totalContacts
+                    ) : (
+                      <Spinner size={16} className="mr-2" />
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -108,11 +184,19 @@ export default function DashboardPage() {
 
               <Card className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-all hover:shadow-md">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Delivery Rate</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Delivery Rate
+                  </CardTitle>
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.deliveryRate.toFixed(1)}%</div>
+                  <div className="text-2xl font-bold">
+                    {stats ? (
+                      `${stats?.rates?.deliveryRate} %`
+                    ) : (
+                      <Spinner size={16} className="mr-2" />
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -124,11 +208,19 @@ export default function DashboardPage() {
 
               <Card className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-all hover:shadow-md">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Read Rate</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Read Rate
+                  </CardTitle>
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.readRate.toFixed(1)}%</div>
+                  <div className="text-2xl font-bold">
+                    {stats ? (
+                      `${stats?.rates?.readRate} %`
+                    ) : (
+                      <Spinner size={16} className="mr-2" />
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-red-500 flex items-center">
                       <ArrowDownRight className="mr-1 h-3 w-3" />
@@ -143,7 +235,9 @@ export default function DashboardPage() {
               <Card className="col-span-4 overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
                 <CardHeader>
                   <CardTitle>Message Analytics</CardTitle>
-                  <CardDescription>Message delivery and response rates over time</CardDescription>
+                  <CardDescription>
+                    Message delivery and response rates over time
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <div className="h-[300px] w-full">
@@ -152,47 +246,81 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="col-span-3 overflow-hidden rounded-xl border bg-card text-card-foreground shadow mb-2">
+              <Card className="col-span-3 flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow mb-2">
+                {/* Header */}
                 <CardHeader>
                   <CardTitle>Recent Conversations</CardTitle>
-                  <CardDescription>Your most recent customer interactions</CardDescription>
+                  <CardDescription>
+                    Your most recent customer interactions
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+
+                {/* Scrollable Messages Area */}
+                <CardContent className="flex-1 overflow-y-auto">
                   <div className="space-y-4">
-                    {recentConversations.map((conversation) => (
-                      <div key={conversation.id} className="flex items-center gap-4">
-                        <Avatar>
-                          <AvatarImage src={conversation.avatar} />
-                          <AvatarFallback>{conversation.initials}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium leading-none">{conversation.name}</p>
-                            <p className="text-xs text-muted-foreground">{conversation.time}</p>
-                          </div>
-                          <p className="text-xs text-muted-foreground line-clamp-1">{conversation.message}</p>
-                        </div>
-                        <Badge
-                          variant={conversation.status === "New" ? "default" : "outline"}
-                          className={conversation.status === "New" ? "bg-primary text-primary-foreground" : ""}
+                    {messages.length > 0 ? (
+                      messages.map((conversation) => (
+                        <div
+                          key={conversation.id}
+                          className="flex items-center gap-4"
                         >
-                          {conversation.status}
-                        </Badge>
+                          <Avatar>
+                            <AvatarImage src={conversation.avatar} />
+                            <AvatarFallback>
+                              {conversation.initials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium leading-none">
+                                {conversation.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {conversation.time}
+                              </p>
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-1">
+                              {conversation.message}
+                            </p>
+                          </div>
+                          <Badge
+                            variant={
+                              conversation.status === "New"
+                                ? "default"
+                                : "outline"
+                            }
+                            className={
+                              conversation.status === "New"
+                                ? "bg-primary text-primary-foreground"
+                                : ""
+                            }
+                          >
+                            {conversation.status}
+                          </Badge>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex justify-center items-center py-8">
+                        <Spinner size={40} className="text-green-600" />
                       </div>
-                    ))}
-                    <Button variant="ghost" className="w-full justify-center">
-                      View All Conversations
-                      <ChevronRight className="ml-1 h-4 w-4" />
-                    </Button>
+                    )}
                   </div>
                 </CardContent>
+
+                {/* Sticky Footer */}
+                <div className="border-t px-4 py-2">
+                  <Button variant="ghost" className="w-full justify-center">
+                    <Link href="/conversations">View All Conversations</Link>
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </div>
               </Card>
             </div>
           </TabsContent>
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
 
 // function EngagementChart({ data = [] }) {
@@ -255,6 +383,17 @@ function EngagementChart({ data = [] }) {
   )
 
   return (
+    <div className="flex h-full w-full items-end gap-2 pl-4 pt-4">
+      {chartData.map((item, i) => {
+        const sentHeight = item.sent
+          ? (item.sent / 100) * 70 + 30
+          : Math.floor(Math.random() * 70) + 30;
+        const deliveredHeight = item.delivered
+          ? (item.delivered / item.sent) * sentHeight
+          : sentHeight - 10;
+        const readHeight = item.read
+          ? (item.read / item.delivered) * deliveredHeight
+          : deliveredHeight - 20;
     <div className="flex w-full flex-col">
       {/* Chart */}
       <div className="flex h-64 items-end gap-4 px-6 pt-4">
@@ -262,6 +401,30 @@ function EngagementChart({ data = [] }) {
           const sentHeight = (item.sent / maxValue) * 100
           const deliveredHeight = (item.delivered / maxValue) * 100
 
+        return (
+          <div key={i} className="relative flex h-full flex-1 flex-col">
+            <div
+              className="absolute bottom-0 w-full rounded-md bg-primary/30"
+              style={{ height: `${sentHeight}%` }}
+            />
+            <div
+              className="absolute bottom-0 w-full rounded-md bg-primary/50"
+              style={{ height: `${deliveredHeight}%` }}
+            />
+            <div
+              className="absolute bottom-0 w-full rounded-md bg-primary"
+              style={{ height: `${readHeight}%` }}
+            />
+            <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
+              {item.date
+                ? new Date(item.date).toLocaleDateString("en-US", {
+                    month: "short",
+                  })
+                : `M${i + 1}`}
+            </div>
+          </div>
+        );
+      })}
           return (
             <div
               key={i}
@@ -306,7 +469,7 @@ function EngagementChart({ data = [] }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 
@@ -324,7 +487,10 @@ function DashboardSkeleton() {
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-32 bg-muted rounded animate-pulse"></div>
+              <div
+                key={i}
+                className="h-32 bg-muted rounded animate-pulse"
+              ></div>
             ))}
           </div>
 
@@ -335,7 +501,7 @@ function DashboardSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const recentConversations = [
@@ -375,5 +541,4 @@ const recentConversations = [
     time: "3h ago",
     status: "Replied",
   },
-]
-
+];
