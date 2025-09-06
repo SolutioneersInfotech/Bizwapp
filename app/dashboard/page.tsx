@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,49 +11,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/contexts/AuthContext"
 import { useAnalytics } from "@/contexts/AnalyticsContext"
 import useUser from "../../hooks/api/getuser"
-import getUserStats from "../../hooks/api/getAnalytics"
-import { Spinner } from "@/components/ui/spinner"
-import Link from "next/link"
-import getLatestMessages from "../../hooks/api/getRecentConversations"
 
 export default function DashboardPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading } = useAuth()
-  const { analytics, refreshAnalytics } = useAnalytics();
-    const [stats, setStats] = useState(null);
-      const [userId, setUserId] = useState(null);
-       const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-
-
+  const { analytics, refreshAnalytics } = useAnalytics()
 
     const { data, isError } = useUser();
 
     useEffect(() => {
+      console.log("datadatadatadatadatadatadata", data);
       
     if (data?.user) {
       localStorage.setItem('user', JSON.stringify(data.user));
     }
   }, [data]);
 
-   useEffect(() => {
-    const fetchLatestMessages = async () => {
-      try {
-        const response = await getLatestMessages(userId);
-        setMessages(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userId) {
-      fetchLatestMessages();
-    }
-  }, [userId]);
-
+  // console.log("datadatadatadatadatadatadata", data);
 
 
   // useEffect(() => {
@@ -66,34 +40,6 @@ export default function DashboardPage() {
   // }, [isLoading, isAuthenticated, router])
 
   //Add a separate effect for refreshing analytics only once
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userData = await localStorage.getItem("user");
-      const parsedUser = await JSON.parse(userData);
-      const id = parsedUser.id || parsedUser.user?._id || null;
-      setUserId(id);
-    };
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await getUserStats(userId);
-        setStats(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    if (userId) {
-      fetchStats();
-    }
-  }, [userId]);
-
-  
-
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       refreshAnalytics()
@@ -105,10 +51,7 @@ export default function DashboardPage() {
     return <DashboardSkeleton />
   }
 
-   
-
-    console.log("messages", messages);
-
+  console.log("useruseruseruser", data?.user)
 
   return (
     <div className="flex flex-col">
@@ -137,7 +80,7 @@ export default function DashboardPage() {
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats ?  stats?.overview?.totalMessages : <Spinner size={16} className="mr-2" />}</div>
+                  <div className="text-2xl font-bold">{analytics.totalSent.toLocaleString()}</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -153,7 +96,7 @@ export default function DashboardPage() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats ? stats?.overview?.totalContacts : <Spinner size={16} className="mr-2" /> }</div>
+                  <div className="text-2xl font-bold">1,429</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -169,7 +112,7 @@ export default function DashboardPage() {
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats ? `${stats?.rates?.deliveryRate} %` :<Spinner size={16} className="mr-2" /> }</div>
+                  <div className="text-2xl font-bold">{analytics.deliveryRate.toFixed(1)}%</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-500 flex items-center">
                       <ArrowUpRight className="mr-1 h-3 w-3" />
@@ -185,7 +128,7 @@ export default function DashboardPage() {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats ? `${stats?.rates?.readRate} %` : <Spinner size={16} className="mr-2" />}</div>
+                  <div className="text-2xl font-bold">{analytics.readRate.toFixed(1)}%</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-red-500 flex items-center">
                       <ArrowDownRight className="mr-1 h-3 w-3" />
@@ -216,7 +159,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {messages.length > 0 ? messages.map((conversation) => (
+                    {recentConversations.map((conversation) => (
                       <div key={conversation.id} className="flex items-center gap-4">
                         <Avatar>
                           <AvatarImage src={conversation.avatar} />
@@ -236,14 +179,9 @@ export default function DashboardPage() {
                           {conversation.status}
                         </Badge>
                       </div>
-                    )) : <div className="flex justify-center items-center py-8">
-          <Spinner size={40} className="text-green-600" />
-        </div>}
-                    <Button variant="ghost" className="w-full justify-center" >
-                      <Link href="/conversations">
+                    ))}
+                    <Button variant="ghost" className="w-full justify-center">
                       View All Conversations
-                      </Link>
-                      
                       <ChevronRight className="ml-1 h-4 w-4" />
                     </Button>
                   </div>
@@ -257,6 +195,48 @@ export default function DashboardPage() {
   )
 }
 
+// function EngagementChart({ data = [] }) {
+//   // If no data, show sample data
+//   const chartData =
+//     data && data.length > 0
+//       ? data
+//       : Array.from({ length: 12 }).map((_, i) => ({
+//           date: `2023-${(i + 1).toString().padStart(2, "0")}-01`,
+//           sent: Math.floor(Math.random() * 100) + 50,
+//           delivered: Math.floor(Math.random() * 80) + 40,
+//           read: Math.floor(Math.random() * 60) + 30,
+//         }))
+
+//   return (
+//     <div className="flex h-full w-full items-end gap-2 pl-4 pt-4">
+//       {chartData.map((item, i) => {
+//         const sentHeight = item.sent ? (item.sent / 100) * 70 + 30 : Math.floor(Math.random() * 70) + 30
+//         const deliveredHeight = item.delivered ? (item.delivered / item.sent) * sentHeight : sentHeight - 10
+//         const readHeight = item.read ? (item.read / item.delivered) * deliveredHeight : deliveredHeight - 20
+
+//         return (
+//           <div key={i} className="relative flex h-full flex-1 flex-col">
+            
+//             <div className="absolute bottom-0 w-full rounded-md bg-primary/30" style={{ height: `${sentHeight}%` }} />
+//             <div
+//               className="absolute bottom-0 w-full rounded-md bg-primary/50"
+//               style={{ height: `${deliveredHeight}%` }}
+//             />
+//             <div className="absolute bottom-0 w-full rounded-md bg-primary" style={{ height: `${readHeight}%` }} />
+//             <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
+//               {item.date ? new Date(item.date).toLocaleDateString("en-US", { month: "short" }) : `M${i + 1}`}
+//             </div>
+
+            
+//           </div>
+
+
+//         )
+//       })}
+//     </div>
+//   )
+// }
+
 function EngagementChart({ data = [] }) {
   // If no data, show sample data
   const chartData =
@@ -266,33 +246,69 @@ function EngagementChart({ data = [] }) {
           date: `2023-${(i + 1).toString().padStart(2, "0")}-01`,
           sent: Math.floor(Math.random() * 100) + 50,
           delivered: Math.floor(Math.random() * 80) + 40,
-          read: Math.floor(Math.random() * 60) + 30,
         }))
 
-  return (
-    <div className="flex h-full w-full items-end gap-2 pl-4 pt-4">
-      {chartData.map((item, i) => {
-        const sentHeight = item.sent ? (item.sent / 100) * 70 + 30 : Math.floor(Math.random() * 70) + 30
-        const deliveredHeight = item.delivered ? (item.delivered / item.sent) * sentHeight : sentHeight - 10
-        const readHeight = item.read ? (item.read / item.delivered) * deliveredHeight : deliveredHeight - 20
+  // Max value for scaling
+  const maxValue = Math.max(
+    ...chartData.map((d) => Math.max(d.sent, d.delivered)),
+    100
+  )
 
-        return (
-          <div key={i} className="relative flex h-full flex-1 flex-col">
-            <div className="absolute bottom-0 w-full rounded-md bg-primary/30" style={{ height: `${sentHeight}%` }} />
+  return (
+    <div className="flex w-full flex-col">
+      {/* Chart */}
+      <div className="flex h-64 items-end gap-4 px-6 pt-4">
+        {chartData.map((item, i) => {
+          const sentHeight = (item.sent / maxValue) * 100
+          const deliveredHeight = (item.delivered / maxValue) * 100
+
+          return (
             <div
-              className="absolute bottom-0 w-full rounded-md bg-primary/50"
-              style={{ height: `${deliveredHeight}%` }}
-            />
-            <div className="absolute bottom-0 w-full rounded-md bg-primary" style={{ height: `${readHeight}%` }} />
-            <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
-              {item.date ? new Date(item.date).toLocaleDateString("en-US", { month: "short" }) : `M${i + 1}`}
+              key={i}
+              className="relative flex h-full flex-1 flex-col items-center"
+            >
+              {/* Bars */}
+              <div className="flex w-full items-end justify-center gap-1 h-full">
+                <div
+                  className="w-3 rounded-md bg-primary/70"
+                  style={{ height: `${sentHeight}%` }}
+                  title={`Sent: ${item.sent}`}
+                />
+                <div
+                  className="w-3 rounded-md bg-primary"
+                  style={{ height: `${deliveredHeight}%` }}
+                  title={`Delivered: ${item.delivered}`}
+                />
+              </div>
+
+              {/* Month Label */}
+              <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
+                {item.date
+                  ? new Date(item.date).toLocaleDateString("en-US", {
+                      month: "short",
+                    })
+                  : `M${i + 1}`}
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
+
+      {/* Legends */}
+      <div className="mt-8 flex justify-center gap-6 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-sm bg-primary/70" />
+          Delivery Rate
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-sm bg-primary" />
+          Response Rate
+        </div>
+      </div>
     </div>
   )
 }
+
 
 function DashboardSkeleton() {
   return (
