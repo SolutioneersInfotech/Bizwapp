@@ -127,7 +127,7 @@ export default function DashboardPage() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList className="flex flex-wrap gap-2 mb-12 md:mb-0">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            {/* <TabsTrigger value="analytics">Analytics</TabsTrigger> */}
             <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
@@ -323,6 +323,48 @@ export default function DashboardPage() {
   );
 }
 
+// function EngagementChart({ data = [] }) {
+//   // If no data, show sample data
+//   const chartData =
+//     data && data.length > 0
+//       ? data
+//       : Array.from({ length: 12 }).map((_, i) => ({
+//           date: `2023-${(i + 1).toString().padStart(2, "0")}-01`,
+//           sent: Math.floor(Math.random() * 100) + 50,
+//           delivered: Math.floor(Math.random() * 80) + 40,
+//           read: Math.floor(Math.random() * 60) + 30,
+//         }))
+
+//   return (
+//     <div className="flex h-full w-full items-end gap-2 pl-4 pt-4">
+//       {chartData.map((item, i) => {
+//         const sentHeight = item.sent ? (item.sent / 100) * 70 + 30 : Math.floor(Math.random() * 70) + 30
+//         const deliveredHeight = item.delivered ? (item.delivered / item.sent) * sentHeight : sentHeight - 10
+//         const readHeight = item.read ? (item.read / item.delivered) * deliveredHeight : deliveredHeight - 20
+
+//         return (
+//           <div key={i} className="relative flex h-full flex-1 flex-col">
+            
+//             <div className="absolute bottom-0 w-full rounded-md bg-primary/30" style={{ height: `${sentHeight}%` }} />
+//             <div
+//               className="absolute bottom-0 w-full rounded-md bg-primary/50"
+//               style={{ height: `${deliveredHeight}%` }}
+//             />
+//             <div className="absolute bottom-0 w-full rounded-md bg-primary" style={{ height: `${readHeight}%` }} />
+//             <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
+//               {item.date ? new Date(item.date).toLocaleDateString("en-US", { month: "short" }) : `M${i + 1}`}
+//             </div>
+
+            
+//           </div>
+
+
+//         )
+//       })}
+//     </div>
+//   )
+// }
+
 function EngagementChart({ data = [] }) {
   // If no data, show sample data
   const chartData =
@@ -332,49 +374,70 @@ function EngagementChart({ data = [] }) {
           date: `2023-${(i + 1).toString().padStart(2, "0")}-01`,
           sent: Math.floor(Math.random() * 100) + 50,
           delivered: Math.floor(Math.random() * 80) + 40,
-          read: Math.floor(Math.random() * 60) + 30,
-        }));
+        }))
+
+  // Max value for scaling
+  const maxValue = Math.max(
+    ...chartData.map((d) => Math.max(d.sent, d.delivered)),
+    100
+  )
 
   return (
-    <div className="flex h-full w-full items-end gap-2 pl-4 pt-4">
-      {chartData.map((item, i) => {
-        const sentHeight = item.sent
-          ? (item.sent / 100) * 70 + 30
-          : Math.floor(Math.random() * 70) + 30;
-        const deliveredHeight = item.delivered
-          ? (item.delivered / item.sent) * sentHeight
-          : sentHeight - 10;
-        const readHeight = item.read
-          ? (item.read / item.delivered) * deliveredHeight
-          : deliveredHeight - 20;
+    <div className="flex w-full flex-col">
+      {/* Chart */}
+      <div className="flex h-64 items-end gap-4 px-6 pt-4">
+        {chartData.map((item, i) => {
+          const sentHeight = (item.sent / maxValue) * 100
+          const deliveredHeight = (item.delivered / maxValue) * 100
 
-        return (
-          <div key={i} className="relative flex h-full flex-1 flex-col">
+          return (
             <div
-              className="absolute bottom-0 w-full rounded-md bg-primary/30"
-              style={{ height: `${sentHeight}%` }}
-            />
-            <div
-              className="absolute bottom-0 w-full rounded-md bg-primary/50"
-              style={{ height: `${deliveredHeight}%` }}
-            />
-            <div
-              className="absolute bottom-0 w-full rounded-md bg-primary"
-              style={{ height: `${readHeight}%` }}
-            />
-            <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
-              {item.date
-                ? new Date(item.date).toLocaleDateString("en-US", {
-                    month: "short",
-                  })
-                : `M${i + 1}`}
+              key={i}
+              className="relative flex h-full flex-1 flex-col items-center"
+            >
+              {/* Bars */}
+              <div className="flex w-full items-end justify-center gap-1 h-full">
+                <div
+                  className="w-3 rounded-md bg-primary/70"
+                  style={{ height: `${sentHeight}%` }}
+                  title={`Sent: ${item.sent}`}
+                />
+                <div
+                  className="w-3 rounded-md bg-primary"
+                  style={{ height: `${deliveredHeight}%` }}
+                  title={`Delivered: ${item.delivered}`}
+                />
+              </div>
+
+              {/* Month Label */}
+              <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
+                {item.date
+                  ? new Date(item.date).toLocaleDateString("en-US", {
+                      month: "short",
+                    })
+                  : `M${i + 1}`}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          )
+        })}
+      </div>
+
+      {/* Legends */}
+      <div className="mt-8 flex justify-center gap-6 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-sm bg-primary/70" />
+          Sent
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-sm bg-primary" />
+          Delivered
+        </div>
+      </div>
     </div>
-  );
+  )
 }
+
+
 
 function DashboardSkeleton() {
   return (
