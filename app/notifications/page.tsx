@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
   CardContent,
@@ -44,6 +45,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import axios from "axios";
 
 // Define notification types
 type NotificationType = "message" | "system" | "alert" | "info";
@@ -75,6 +77,8 @@ export default function NotificationsPage() {
     useState<Notification | null>(null);
   const [notificationDetailsOpen, setNotificationDetailsOpen] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
 
   // Load mock notifications on mount
   useEffect(() => {
@@ -114,6 +118,34 @@ export default function NotificationsPage() {
 
     setFilteredNotifications(filtered);
   }, [notifications, activeTab, searchQuery]);
+
+   useEffect(() => {
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true); // 🔹 Start loading
+      const res = await axios.get("https://api.bizwapp.com/api/auth/notification");
+      const logs = res.data;
+
+      const formatted = logs.map((log: any) => ({
+        id: log._id,
+        type: "system",
+        title: log.title,
+        message: log.description,
+        timestamp: log.createdAt,
+        read: false,
+      }));
+
+      setNotifications(formatted);
+      setFilteredNotifications(formatted);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+    } finally {
+      setLoading(false); // 🔹 Stop loading
+    }
+  };
+
+  fetchNotifications();
+}, []);
 
   // Handle marking a notification as read
   const handleMarkAsRead = (id: string) => {
@@ -212,6 +244,9 @@ export default function NotificationsPage() {
       return `${days} day${days > 1 ? "s" : ""} ago`;
     }
   };
+
+  console.log("notifications" , notifications);
+  
 
   return (
     <div className="flex flex-col">
