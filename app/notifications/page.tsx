@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import clearNotification from "../../hooks/api/clearNotification";
 import {
   Search,
   Bell,
@@ -79,7 +80,7 @@ export default function NotificationsPage() {
   const [notificationDetailsOpen, setNotificationDetailsOpen] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [userId, setUserId] = useState(null);
 
   // Load mock notifications on mount
   // useEffect(() => {
@@ -120,33 +121,45 @@ export default function NotificationsPage() {
     setFilteredNotifications(filtered);
   }, [notifications, activeTab, searchQuery]);
 
-   useEffect(() => {
-  const fetchNotifications = async () => {
-    try {
-      setLoading(true); // 🔹 Start loading
-      const res = await axios.get("https://api.bizwapp.com/api/auth/notification");
-      const logs = res.data;
-
-      const formatted = logs.map((log: any) => ({
-        id: log._id,
-        type: "system",
-        title: log.title,
-        message: log.description,
-        timestamp: log.createdAt,
-        read: false,
-      }));
-
-      setNotifications(formatted);
-      setFilteredNotifications(formatted);
-    } catch (error) {
-      console.error("Error fetching logs:", error);
-    } finally {
-      setLoading(false); // 🔹 Stop loading
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      const id = userData.id || userData.user?._id || null;
+      setUserId(id);
     }
-  };
+  }, []);
 
-  fetchNotifications();
-}, []);
+  console.log("userId", userId);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        setLoading(true); // 🔹 Start loading
+        const res = await axios.get(
+          `https://api.bizwapp.com/api/auth/notification/${userId}`
+        );
+        const logs = res.data;
+
+        const formatted = logs.map((log: any) => ({
+          id: log._id,
+          type: "system",
+          title: log.title,
+          message: log.description,
+          timestamp: log.createdAt,
+          read: false,
+        }));
+
+        setNotifications(formatted);
+        setFilteredNotifications(formatted);
+      } catch (error) {
+        console.error("Error fetching logs:", error);
+      } finally {
+        setLoading(false); // 🔹 Stop loading
+      }
+    };
+
+    fetchNotifications();
+  }, [userId]);
 
   // Handle marking a notification as read
   const handleMarkAsRead = (id: string) => {
@@ -187,14 +200,21 @@ export default function NotificationsPage() {
   };
 
   // Handle clearing all notifications
-  const handleClearAllNotifications = () => {
-    setNotifications([]);
-    setClearConfirmOpen(false);
+  const handleClearAllNotifications = async () => {
+    try {
+      const result = await clearNotification(userId);
+      console.log("result", result);
+      setNotifications([]);
 
-    toast({
-      title: "All notifications cleared",
-      description: "All notifications have been removed.",
-    });
+      toast({
+        title: "All notifications cleared",
+        description: "All notifications have been removed.",
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    setClearConfirmOpen(false);
   };
 
   // Handle viewing notification details
@@ -246,17 +266,17 @@ export default function NotificationsPage() {
     }
   };
 
-  console.log("notifications" , notifications);
+  console.log("notifications", notifications);
 
   console.log("loading", loading);
-  
-  
 
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-4 p-4 pt-4 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-3xl font-bold tracking-tight pl-6">Notifications</h2>
+          <h2 className="text-3xl font-bold tracking-tight pl-6">
+            Notifications
+          </h2>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -353,14 +373,11 @@ export default function NotificationsPage() {
                     <div className="rounded-full bg-muted p-3 mb-4">
                       <Bell className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    {
-                      loading &&
+                    {loading && (
                       <div className="flex justify-center w-full">
-                                                  <Spinner size={40} className="text-green-600" />
-                                                </div>
-
-                      
-                    }
+                        <Spinner size={40} className="text-green-600" />
+                      </div>
+                    )}
                     <h3 className="text-lg font-medium">No notifications</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       {searchQuery
