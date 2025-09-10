@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import axios from "axios";
+import { Spinner } from "@/components/ui/spinner";
 
 // Define notification types
 type NotificationType = "message" | "system" | "alert" | "info";
@@ -81,10 +82,10 @@ export default function NotificationsPage() {
 
 
   // Load mock notifications on mount
-  useEffect(() => {
-    setNotifications(mockNotifications);
-    setFilteredNotifications(mockNotifications);
-  }, []);
+  // useEffect(() => {
+  //   setNotifications(mockNotifications);
+  //   setFilteredNotifications(mockNotifications);
+  // }, []);
 
   // Filter notifications based on active tab and search query
   useEffect(() => {
@@ -246,6 +247,9 @@ export default function NotificationsPage() {
   };
 
   console.log("notifications" , notifications);
+
+  console.log("loading", loading);
+  
   
 
   return (
@@ -349,6 +353,14 @@ export default function NotificationsPage() {
                     <div className="rounded-full bg-muted p-3 mb-4">
                       <Bell className="h-6 w-6 text-muted-foreground" />
                     </div>
+                    {
+                      loading &&
+                      <div className="flex justify-center w-full">
+                                                  <Spinner size={40} className="text-green-600" />
+                                                </div>
+
+                      
+                    }
                     <h3 className="text-lg font-medium">No notifications</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       {searchQuery
