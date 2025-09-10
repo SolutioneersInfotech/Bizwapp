@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Menu, PanelLeft, Search } from "lucide-react";
+import { Menu, PanelLeft, Search, Zap } from "lucide-react";
 import {
   Home,
   MessageSquare,
@@ -39,7 +39,7 @@ import usePostData from "@/hooks/api/usePostData";
 import { useEffect, useState } from "react";
 import NewChatDialog from "./newChat";
 import CreateTemplateModal from "@/app/templates/create-template-modal";
-import {  useQueryClient  } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 const mainMenuItems = [
   {
@@ -59,6 +59,7 @@ const mainMenuItems = [
     icon: Users,
     url: "/contacts",
   },
+  { title: "Automate", icon: Zap, url: "/automation" },
   {
     title: "Templates",
     icon: FileText,
@@ -82,7 +83,16 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const showSidebar = !["/", "/signup", "/login", "/privacy-policy" , "/terms-of-service" , "/help-support", "/data-deletion" , "/forgot-password"].includes(pathname);
+  const showSidebar = ![
+    "/",
+    "/signup",
+    "/login",
+    "/privacy-policy",
+    "/terms-of-service",
+    "/help-support",
+    "/data-deletion",
+    "/forgot-password",
+  ].includes(pathname);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newChatDialogOpen, setNewChatDialogOpen] = useState(false);
@@ -119,15 +129,15 @@ export default function ClientLayout({
     email: "",
   });
 
-   const [userId , setUserId]= useState(null);
-    
-      useEffect(()=>{
-        const userData = JSON.parse(localStorage.getItem('user'));
-        if (userData) {
-          const id = userData.id || userData.user?._id || null;
-          setUserId(id);
-        }
-      },[]);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      const id = userData.id || userData.user?._id || null;
+      setUserId(id);
+    }
+  }, []);
 
   const queryClient = useQueryClient();
 
@@ -150,19 +160,20 @@ export default function ClientLayout({
     }));
   };
 
-  const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact/${userId}`);
+  const mutation = usePostData(
+    `https://api.bizwapp.com/api/auth/addContact/${userId}`
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const contactArray = [newContact]
+    const contactArray = [newContact];
     // const contactWithUserId = { ...newContact , userId}
     // const contactArray = [contactWithUserId];
 
     mutation.mutate(contactArray, {
       onSuccess: (data) => {
         console.log(data);
-        queryClient.invalidateQueries({ queryKey: ['contacts'] });
-
+        queryClient.invalidateQueries({ queryKey: ["contacts"] });
       },
       onError: (data) => {
         alert(data["message"]);
@@ -190,12 +201,15 @@ export default function ClientLayout({
                   size="icon"
                   className="!p-1 !h-8 !w-8 mt-3 mt-[12px]"
                   onClick={() => setIsSidebarOpen(true)}
-                > 
-                  <PanelLeft />
+                >
+                  <PanelLeft className="h-12 w-12" />
                 </Button>
               </SheetTrigger>
 
-              <SheetContent side="left" className="h-full overflow-y-auto max-h-screen">
+              <SheetContent
+                side="left"
+                className="h-full overflow-y-auto max-h-screen"
+              >
                 <SidebarHeader className="flex flex-col gap-4">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
@@ -218,14 +232,14 @@ export default function ClientLayout({
                       WhatsApp Business
                     </span>
                   </div>
-                  <div className="relative">
+                  {/* <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="search"
                       placeholder="Search..."
                       className="w-full bg-background pl-8 pr-4"
                     />
-                  </div>
+                  </div> */}
                 </SidebarHeader>
                 <SidebarContent>
                   <SidebarGroup>

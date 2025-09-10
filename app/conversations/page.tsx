@@ -144,7 +144,7 @@ export default function ConversationsPage() {
     setConversationHistory(getAllConversation?.conversations);
   }, [getAllConversation?.conversations]);
 
-  const { data: messageHistory } = useMessageHistory(userId ,selectedPhone);
+  const { data: messageHistory } = useMessageHistory(userId, selectedPhone);
 
   useEffect(() => {
     setMessage(messageHistory?.data || []);
@@ -220,13 +220,13 @@ export default function ConversationsPage() {
 
   // For showing Twilio Template
 
-  const mapTwilioToMetaFormat = (twilioTemplates : any) => {
+  const mapTwilioToMetaFormat = (twilioTemplates: any) => {
     if (!twilioTemplates?.templates?.length) {
       return { data: [], paging: { cursors: { before: null, after: null } } };
     }
 
     return {
-      data: twilioTemplates.templates.map((template : any) => {
+      data: twilioTemplates.templates.map((template: any) => {
         const { friendly_name, sid, language, types } = template;
 
         const textBody =
@@ -295,7 +295,7 @@ export default function ConversationsPage() {
     isError,
     isPending,
     data,
-  } = usePostData(`https://api.bizwapp.com/api/auth/send-template`);
+  } = usePostData(`http://localhost:5001/api/auth/send-template`);
 
   const handleSendBulkMessage = async () => {
     console.log("selectedBulkTemplate", selectedBulkTemplate);
@@ -361,21 +361,32 @@ export default function ConversationsPage() {
         console.log("selectedBulkTemplate", selectedBulkTemplate);
         for (const contact of contactsToSend) {
           let contactArray = [contact.phoneNumber];
-          sendTemplateMutate({
-            userId,
-            // to: contact.phoneNumber,
-            numbers: contactArray,
-            templateName: selectedBulkTemplate,
-            // languageCode: "en_US",
-            id: selectedBulkTemplate?.id,
-          });
+          sendTemplateMutate(
+            {
+              userId,
+              // to: contact.phoneNumber,
+              numbers: contactArray,
+              templateName: selectedBulkTemplate,
+              // languageCode: "en_US",
+              id: selectedBulkTemplate?.id,
+            },
+            {
+              onSuccess: () => {
+                toast({
+                  title: "Bulk Template Sent",
+                  description: `Template sent to ${selectedContacts.length} contacts`,
+                });
+              },
+              onError: () => {
+                toast({
+                  title: "Error",
+                  description: "Failed to send bulk message",
+                  variant: "destructive",
+                });
+              },
+            }
+          );
         }
-
-        toast({
-          title: "Bulk Template Sent",
-          description: `Template sent to ${selectedContacts.length} contacts`,
-        });
-
         setBulkMessage("");
         setSelectedBulkTemplate("");
         setSelectedContacts([]);

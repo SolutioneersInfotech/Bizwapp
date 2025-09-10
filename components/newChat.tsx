@@ -36,42 +36,53 @@ const NewChatDialog: React.FC<NewChatDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Start New Chat</DialogTitle>
-          <DialogDescription>
-            Enter a phone number to start a new conversation
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              placeholder="Enter phone number with country code"
-              value={phone}
-              onChange={(e) => onPhoneChange(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              Include country code, e.g., +1234567890
-            </p>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="initial-message">Initial Message (Optional)</Label>
-            <Textarea
-              id="initial-message"
-              placeholder="Type your first message..."
-              value={message}
-              onChange={(e) => onMessageChange(e.target.value)}
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={onSubmit}>Start Chat</Button>
-        </DialogFooter>
-      </DialogContent>
+  <DialogHeader>
+    <DialogTitle>Start New Chat</DialogTitle>
+    <DialogDescription>
+      Enter a phone number to start a new conversation
+    </DialogDescription>
+  </DialogHeader>
+
+  {/* Warning Message */}
+  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-2 mb-2">
+  ⚠️ Note: Until the recipient initiates a conversation, only approved
+  templates can be sent. Free-form messages are restricted by Meta policy.
+</p>
+
+
+
+  <div className="grid gap-4 py-4">
+    <div className="grid gap-2">
+      <Label htmlFor="phone">Phone Number</Label>
+      <Input
+        id="phone"
+        placeholder="Enter phone number with country code"
+        value={phone}
+        onChange={(e) => onPhoneChange(e.target.value)}
+      />
+      <p className="text-xs text-muted-foreground">
+        Include country code, e.g., +1234567890
+      </p>
+    </div>
+    <div className="grid gap-2">
+      <Label htmlFor="initial-message">Initial Message (Optional)</Label>
+      <Textarea
+        id="initial-message"
+        placeholder="Type your first message..."
+        value={message}
+        onChange={(e) => onMessageChange(e.target.value)}
+      />
+    </div>
+  </div>
+
+  <DialogFooter>
+    <Button variant="outline" onClick={() => onOpenChange(false)}>
+      Cancel
+    </Button>
+    <Button onClick={onSubmit}>Start Chat</Button>
+  </DialogFooter>
+</DialogContent>
+
     </Dialog>
   );
 };

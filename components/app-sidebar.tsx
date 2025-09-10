@@ -11,7 +11,7 @@ import {
   Search,
   Bell,
   HelpCircle,
-  Zap
+  Zap,
 } from "lucide-react";
 
 import {
@@ -89,8 +89,7 @@ export function AppSidebar() {
   const [newChatPhone, setNewChatPhone] = useState("");
   const [newChatMessage, setNewChatMessage] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [userId, setUserId] = useState(null);
-
+  const [userId, setUserId] = useState(null);
 
   const [newContact, setNewContact] = useState({
     name: "",
@@ -98,7 +97,7 @@ export function AppSidebar() {
     email: "",
   });
 
-    useEffect(() => {
+  useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
     if (userData) {
       const id = userData.id || userData.user?._id || null;
@@ -114,19 +113,19 @@ export function AppSidebar() {
     }));
   };
 
-
-  const mutation = usePostData(`https://api.bizwapp.com/api/auth/addContact/${userId}`);
+  const mutation = usePostData(
+    `https://api.bizwapp.com/api/auth/addContact/${userId}`
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const contactWithUserId = { ...newContact }
+    const contactWithUserId = { ...newContact };
     const contactArray = [contactWithUserId];
     mutation.mutate(contactArray, {
       onSuccess: (data) => {
         console.log(data);
       },
-      onError: (data) => {
-      },
+      onError: (data) => {},
     });
     setIsDialogOpen(false);
     // You can add additional logic to save contact here
@@ -164,7 +163,7 @@ export function AppSidebar() {
   const handleEditTemplate = async () => {
     if (!editingTemplate) return;
 
-    console.log("new contact " , newContact)
+    console.log("new contact ", newContact);
 
     try {
       await updateTemplate(editingTemplate.id, {
@@ -315,16 +314,16 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="p-4">
         <div className="flex flex-col gap-2">
-          <Button variant="ghost" className="justify-start gap-2" >
+          <Button variant="ghost" className="justify-start gap-2">
             <Bell className="h-4 w-4" />
-            <Link href={'/notifications'}>
-            <span>Notifications</span>
+            <Link href={"/notifications"}>
+              <span>Notifications</span>
             </Link>
           </Button>
           <Button variant="ghost" className="justify-start gap-2">
             <HelpCircle className="h-4 w-4" />
-            <Link href={'/help-support'}>
-            <span>Help & Support</span>
+            <Link href={"/help-support"}>
+              <span>Help & Support</span>
             </Link>
           </Button>
         </div>
