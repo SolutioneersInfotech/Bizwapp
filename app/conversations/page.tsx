@@ -295,7 +295,7 @@ export default function ConversationsPage() {
     isError,
     isPending,
     data,
-  } = usePostData(`http://localhost:5001/api/auth/send-template`);
+  } = usePostData(`https://api.bizwapp.com/api/auth/send-template`);
 
   const handleSendBulkMessage = async () => {
     console.log("selectedBulkTemplate", selectedBulkTemplate);

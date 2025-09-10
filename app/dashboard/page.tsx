@@ -150,11 +150,17 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-green-500 flex items-center">
-                      <ArrowUpRight className="mr-1 h-3 w-3" />
-                      +12.5% from last month
-                    </span>
-                  </p>
+  <span
+    className={`${stats?.overview?.messagesGrowth >= 0 ? "text-green-500" : "text-red-500"} flex items-center`}
+  >
+    {stats?.overview?.messagesGrowth >= 0 ? (
+      <ArrowUpRight className="mr-1 h-3 w-3" />
+    ) : (
+      <ArrowDownRight className="mr-1 h-3 w-3" />
+    )}
+    {stats?.overview?.messagesGrowth}% from last month
+  </span>
+</p>
                 </CardContent>
               </Card>
 
@@ -174,11 +180,17 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-green-500 flex items-center">
-                      <ArrowUpRight className="mr-1 h-3 w-3" />
-                      +8.2% from last month
-                    </span>
-                  </p>
+  <span
+    className={`${stats?.overview?.contactsGrowth >= 0 ? "text-green-500" : "text-red-500"} flex items-center`}
+  >
+    {stats?.overview?.contactsGrowth >= 0 ? (
+      <ArrowUpRight className="mr-1 h-3 w-3" />
+    ) : (
+      <ArrowDownRight className="mr-1 h-3 w-3" />
+    )}
+    {stats?.overview?.contactsGrowth}% from last month
+  </span>
+</p>
                 </CardContent>
               </Card>
 
@@ -198,11 +210,17 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-green-500 flex items-center">
-                      <ArrowUpRight className="mr-1 h-3 w-3" />
-                      +2.3% from last month
-                    </span>
-                  </p>
+  <span
+    className={`${stats?.rates?.deliveryGrowth >= 0 ? "text-green-500" : "text-red-500"} flex items-center`}
+  >
+    {stats?.rates?.deliveryGrowth >= 0 ? (
+      <ArrowUpRight className="mr-1 h-3 w-3" />
+    ) : (
+      <ArrowDownRight className="mr-1 h-3 w-3" />
+    )}
+    {stats?.rates?.deliveryGrowth}% from last month
+  </span>
+</p>
                 </CardContent>
               </Card>
 
@@ -222,11 +240,17 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-red-500 flex items-center">
-                      <ArrowDownRight className="mr-1 h-3 w-3" />
-                      -1.2% from last month
-                    </span>
-                  </p>
+  <span
+    className={`${stats?.rates?.readGrowth >= 0 ? "text-green-500" : "text-red-500"} flex items-center`}
+  >
+    {stats?.rates?.readGrowth >= 0 ? (
+      <ArrowUpRight className="mr-1 h-3 w-3" />
+    ) : (
+      <ArrowDownRight className="mr-1 h-3 w-3" />
+    )}
+    {stats?.rates?.readGrowth}% from last month
+  </span>
+</p>
                 </CardContent>
               </Card>
             </div>
