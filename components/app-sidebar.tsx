@@ -39,6 +39,7 @@ import usePostData from "@/hooks/api/usePostData";
 import NewChatDialog from "../components/newChat";
 import CreateTemplateModal from "@/app/templates/create-template-modal";
 import { toast } from "react-toastify";
+import useSendWhatsAppMessage from "@/hooks/api/useSendWhatsAppMessage ";
 
 // Menu items
 const mainMenuItems = [
@@ -131,8 +132,17 @@ export function AppSidebar() {
     // You can add additional logic to save contact here
   };
 
+  const { mutate, isPending: isPendingSendWhatsAppMessage } =
+    useSendWhatsAppMessage();
+
   const handleStartNewChat = () => {
     console.log("New chat with", newChatPhone, newChatMessage);
+    let contactsToSend = [{phoneNumber: newChatPhone, name: ""}]
+    mutate({
+          userId: userId,
+          contacts: contactsToSend,
+          message: newChatMessage,
+        });
     setNewChatDialogOpen(false);
   };
 

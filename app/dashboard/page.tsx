@@ -149,18 +149,24 @@ export default function DashboardPage() {
                       <Spinner size={16} className="mr-2" />
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-  <span
-    className={`${stats?.overview?.messagesGrowth >= 0 ? "text-green-500" : "text-red-500"} flex items-center`}
-  >
-    {stats?.overview?.messagesGrowth >= 0 ? (
-      <ArrowUpRight className="mr-1 h-3 w-3" />
-    ) : (
-      <ArrowDownRight className="mr-1 h-3 w-3" />
-    )}
-    {stats?.overview?.messagesGrowth}% from last month
-  </span>
-</p>
+                  {stats?.overview?.messagesGrowth !== undefined && (
+                    <p className="text-xs text-muted-foreground">
+                      <span
+                        className={`${
+                          stats?.overview?.messagesGrowth >= 0
+                            ? "text-green-500"
+                            : "text-red-500"
+                        } flex items-center`}
+                      >
+                        {stats?.overview?.messagesGrowth >= 0 ? (
+                          <ArrowUpRight className="mr-1 h-3 w-3" />
+                        ) : (
+                          <ArrowDownRight className="mr-1 h-3 w-3" />
+                        )}
+                        {stats?.overview?.messagesGrowth}% from last month
+                      </span>
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -179,18 +185,24 @@ export default function DashboardPage() {
                       <Spinner size={16} className="mr-2" />
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-  <span
-    className={`${stats?.overview?.contactsGrowth >= 0 ? "text-green-500" : "text-red-500"} flex items-center`}
-  >
-    {stats?.overview?.contactsGrowth >= 0 ? (
-      <ArrowUpRight className="mr-1 h-3 w-3" />
-    ) : (
-      <ArrowDownRight className="mr-1 h-3 w-3" />
-    )}
-    {stats?.overview?.contactsGrowth}% from last month
-  </span>
-</p>
+                  {stats?.overview?.contactsGrowth !== undefined && (
+                    <p className="text-xs text-muted-foreground">
+                      <span
+                        className={`${
+                          stats?.overview?.contactsGrowth >= 0
+                            ? "text-green-500"
+                            : "text-red-500"
+                        } flex items-center`}
+                      >
+                        {stats?.overview?.contactsGrowth >= 0 ? (
+                          <ArrowUpRight className="mr-1 h-3 w-3" />
+                        ) : (
+                          <ArrowDownRight className="mr-1 h-3 w-3" />
+                        )}
+                        {stats?.overview?.contactsGrowth}% from last month
+                      </span>
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -209,18 +221,24 @@ export default function DashboardPage() {
                       <Spinner size={16} className="mr-2" />
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-  <span
-    className={`${stats?.rates?.deliveryGrowth >= 0 ? "text-green-500" : "text-red-500"} flex items-center`}
-  >
-    {stats?.rates?.deliveryGrowth >= 0 ? (
-      <ArrowUpRight className="mr-1 h-3 w-3" />
-    ) : (
-      <ArrowDownRight className="mr-1 h-3 w-3" />
-    )}
-    {stats?.rates?.deliveryGrowth}% from last month
-  </span>
-</p>
+                  {stats?.rates?.deliveryGrowth !== undefined && (
+                    <p className="text-xs text-muted-foreground">
+                      <span
+                        className={`${
+                          stats?.rates?.deliveryGrowth >= 0
+                            ? "text-green-500"
+                            : "text-red-500"
+                        } flex items-center`}
+                      >
+                        {stats?.rates?.deliveryGrowth >= 0 ? (
+                          <ArrowUpRight className="mr-1 h-3 w-3" />
+                        ) : (
+                          <ArrowDownRight className="mr-1 h-3 w-3" />
+                        )}
+                        {stats?.rates?.deliveryGrowth}% from last month
+                      </span>
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -239,18 +257,24 @@ export default function DashboardPage() {
                       <Spinner size={16} className="mr-2" />
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-  <span
-    className={`${stats?.rates?.readGrowth >= 0 ? "text-green-500" : "text-red-500"} flex items-center`}
-  >
-    {stats?.rates?.readGrowth >= 0 ? (
-      <ArrowUpRight className="mr-1 h-3 w-3" />
-    ) : (
-      <ArrowDownRight className="mr-1 h-3 w-3" />
-    )}
-    {stats?.rates?.readGrowth}% from last month
-  </span>
-</p>
+                  {stats?.rates?.readGrowth !== undefined && (
+                    <p className="text-xs text-muted-foreground">
+                      <span
+                        className={`${
+                          stats?.rates?.readGrowth >= 0
+                            ? "text-green-500"
+                            : "text-red-500"
+                        } flex items-center`}
+                      >
+                        {stats?.rates?.readGrowth >= 0 ? (
+                          <ArrowUpRight className="mr-1 h-3 w-3" />
+                        ) : (
+                          <ArrowDownRight className="mr-1 h-3 w-3" />
+                        )}
+                        {stats?.rates?.readGrowth}% from last month
+                      </span>
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -297,10 +321,17 @@ export default function DashboardPage() {
                           <div className="flex-1 space-y-1">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-medium leading-none">
-                                {conversation.name}
+                                {conversation.name
+                                  ? conversation.name
+                                  : conversation.phoneNumber}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {conversation.time}
+                                {new Date(
+                                  conversation.timestamp
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
                               </p>
                             </div>
                             <p className="text-xs text-muted-foreground line-clamp-1">
@@ -309,17 +340,17 @@ export default function DashboardPage() {
                           </div>
                           <Badge
                             variant={
-                              conversation.status === "New"
+                              conversation.unread === true
                                 ? "default"
                                 : "outline"
                             }
                             className={
-                              conversation.status === "New"
+                              conversation.unread === true
                                 ? "bg-primary text-primary-foreground"
                                 : ""
                             }
                           >
-                            {conversation.status}
+                            New
                           </Badge>
                         </div>
                       ))
@@ -368,7 +399,7 @@ export default function DashboardPage() {
 
 //         return (
 //           <div key={i} className="relative flex h-full flex-1 flex-col">
-            
+
 //             <div className="absolute bottom-0 w-full rounded-md bg-primary/30" style={{ height: `${sentHeight}%` }} />
 //             <div
 //               className="absolute bottom-0 w-full rounded-md bg-primary/50"
@@ -379,9 +410,7 @@ export default function DashboardPage() {
 //               {item.date ? new Date(item.date).toLocaleDateString("en-US", { month: "short" }) : `M${i + 1}`}
 //             </div>
 
-            
 //           </div>
-
 
 //         )
 //       })}
@@ -398,21 +427,21 @@ function EngagementChart({ data = [] }) {
           date: `2023-${(i + 1).toString().padStart(2, "0")}-01`,
           sent: Math.floor(Math.random() * 100) + 50,
           delivered: Math.floor(Math.random() * 80) + 40,
-        }))
+        }));
 
   // Max value for scaling
   const maxValue = Math.max(
     ...chartData.map((d) => Math.max(d.sent, d.delivered)),
     100
-  )
+  );
 
   return (
     <div className="flex w-full flex-col">
       {/* Chart */}
       <div className="flex h-64 items-end gap-4 px-6 pt-4">
         {chartData.map((item, i) => {
-          const sentHeight = (item.sent / maxValue) * 100
-          const deliveredHeight = (item.delivered / maxValue) * 100
+          const sentHeight = (item.sent / maxValue) * 100;
+          const deliveredHeight = (item.delivered / maxValue) * 100;
 
           return (
             <div
@@ -442,7 +471,7 @@ function EngagementChart({ data = [] }) {
                   : `M${i + 1}`}
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -458,10 +487,8 @@ function EngagementChart({ data = [] }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-
 
 function DashboardSkeleton() {
   return (

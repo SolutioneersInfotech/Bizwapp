@@ -40,6 +40,7 @@ import { useEffect, useState } from "react";
 import NewChatDialog from "./newChat";
 import CreateTemplateModal from "@/app/templates/create-template-modal";
 import { useQueryClient } from "@tanstack/react-query";
+import useSendWhatsAppMessage from "@/hooks/api/useSendWhatsAppMessage ";
 
 const mainMenuItems = [
   {
@@ -141,7 +142,17 @@ export default function ClientLayout({
 
   const queryClient = useQueryClient();
 
+  const { mutate, isPending: isPendingSendWhatsAppMessage } =
+    useSendWhatsAppMessage();
+
   const handleStartNewChat = () => {
+    console.log("New chat with", newChatPhone, newChatMessage);
+    let contactsToSend = [{phoneNumber: newChatPhone, name: ""}]
+    mutate({
+          userId: userId,
+          contacts: contactsToSend,
+          message: newChatMessage,
+        });
     setNewChatDialogOpen(false);
   };
 
