@@ -41,6 +41,7 @@ import NewChatDialog from "./newChat";
 import CreateTemplateModal from "@/app/templates/create-template-modal";
 import { useQueryClient } from "@tanstack/react-query";
 import useSendWhatsAppMessage from "@/hooks/api/useSendWhatsAppMessage ";
+import { useToast } from "@/hooks/use-toast";
 
 const mainMenuItems = [
   {
@@ -130,6 +131,9 @@ export default function ClientLayout({
     email: "",
   });
 
+      const { toast } = useToast();
+
+
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
@@ -142,6 +146,12 @@ export default function ClientLayout({
 
   const queryClient = useQueryClient();
 
+  const truncateText = (text: string, maxLength: number) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
+
+
   const { mutate, isPending: isPendingSendWhatsAppMessage } =
     useSendWhatsAppMessage();
 
@@ -152,7 +162,23 @@ export default function ClientLayout({
           userId: userId,
           contacts: contactsToSend,
           message: newChatMessage,
-        });
+        },
+            {
+              onSuccess: (data) => {
+                toast({
+                  title: `Message sent to ${newChatPhone}`,
+                  description: truncateText(newChatMessage, 40),
+                });
+                setNewChatDialogOpen(false);
+              },
+              onError: (error) => {
+                toast({
+                  title: "Failed to send message",
+                  description: error?.message || "Something went wrong ❌",
+                  variant: "destructive",
+                });
+              },
+            });
     setNewChatDialogOpen(false);
   };
 

@@ -38,8 +38,9 @@ import { useEffect, useState } from "react";
 import usePostData from "@/hooks/api/usePostData";
 import NewChatDialog from "../components/newChat";
 import CreateTemplateModal from "@/app/templates/create-template-modal";
-import { toast } from "react-toastify";
 import useSendWhatsAppMessage from "@/hooks/api/useSendWhatsAppMessage ";
+import { useToast } from "@/hooks/use-toast";
+
 
 // Menu items
 const mainMenuItems = [
@@ -98,6 +99,9 @@ export function AppSidebar() {
     email: "",
   });
 
+    const { toast } = useToast();
+
+
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
     if (userData) {
@@ -142,7 +146,24 @@ export function AppSidebar() {
           userId: userId,
           contacts: contactsToSend,
           message: newChatMessage,
+        }
+      ,
+    {
+      onSuccess: (data) => {
+        toast({
+          title: `Message sent to ${newChatPhone}`,
+          description: truncateText(newChatMessage, 40),
         });
+        setNewChatDialogOpen(false);
+      },
+      onError: (error) => {
+        toast({
+          title: "Failed to send message",
+          description: error?.message || "Something went wrong ❌",
+          variant: "destructive",
+        });
+      },
+    });
     setNewChatDialogOpen(false);
   };
 
@@ -199,6 +220,11 @@ export function AppSidebar() {
       });
     }
   };
+
+  const truncateText = (text: string, maxLength: number) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
   return (
     <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader className="flex flex-col gap-4  ">

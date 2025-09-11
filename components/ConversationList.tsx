@@ -5,45 +5,38 @@ import { Search, Plus } from "lucide-react";
 import { Spinner } from "../components/ui/spinner"; // Replace with your actual Spinner import
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu";
-  import {
-    Filter,
-    MoreVertical,
-    Paperclip,
-    Send,
-    Smile,
-    ImageIcon,
-    Mic,
-    Loader2,
-    CheckCircle,
-    Check,
-    Archive,
-    Trash2,
-    Bell,
-    BellOff,
-    UserPlus,
-    Tag,
-  } from "lucide-react";
-  import { Badge } from "@/components/ui/badge";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Filter,
+  MoreVertical,
+  Paperclip,
+  Send,
+  Smile,
+  ImageIcon,
+  Mic,
+  Loader2,
+  CheckCircle,
+  Check,
+  Archive,
+  Trash2,
+  Bell,
+  BellOff,
+  UserPlus,
+  Tag,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import useUpdateUnread from "@/hooks/api/updateUnreadStatus";
 import type { Contact, Message } from "@/lib/types";
 import useMessageHistory from "@/hooks/api/getMessageHistory";
-
-
 
 interface Conversation {
   _id: string;
@@ -97,20 +90,18 @@ const ConversationList: React.FC<ConversationListProps> = ({
   handleMuteConversation,
   setNewChatDialogOpen,
 }) => {
+  const [selectedName, setSelectedName] = useState<String | null>(null);
 
-    const [selectedName, setSelectedName] = useState<String | null>(null);
+  const { mutate: unreadStatus } = useUpdateUnread();
 
-    const { mutate: unreadStatus } = useUpdateUnread();
-    
-      // useEffect(() => {
-      //   if (currentContact && !selectedContact) {
-      //     setSelectedContact(currentContact);
-      //   }
-      // }, [currentContact, selectedContact]);
+  // useEffect(() => {
+  //   if (currentContact && !selectedContact) {
+  //     setSelectedContact(currentContact);
+  //   }
+  // }, [currentContact, selectedContact]);
 
   const handleContactSelect = (contact: Contact, phone, name) => {
-
-    if (isMobile) setMobileView('chat');
+    if (isMobile) setMobileView("chat");
 
     unreadStatus(phone);
     setSelectedName(name);
@@ -119,7 +110,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
     setSelectedPhone(phone);
   };
 
-    
   return (
     <div className="p-4">
       <div className="relative">
@@ -180,32 +170,34 @@ const ConversationList: React.FC<ConversationListProps> = ({
             </div>
           ) : (
             uniqueConversations.map((conversation) => (
-                <div
-                  key={conversation._id}
-                  className={conversation.unread ? "font-bold" : "font-light"}
-                >
-                  <ConversationItem
-                    conversation={conversation}
-                    isActive={selectedContact?._id === conversation._id}
-                    onSelect={() =>
-                      handleContactSelect(
-                        conversation,
-                        conversation.phoneNumber,
-                        conversation.name
-                      )
-                    }
-                    isSelected={selectedContacts.includes(conversation.phoneNumber)}
-                    onToggleSelect={() =>
-                      toggleContactSelection(conversation.phoneNumber)
-                    }
-                    selectionMode={bulkMessageOpen}
-                    onArchive={() => handleArchiveConversation(conversation)}
-                    onDelete={() => handleDeleteConversation(conversation)}
-                    onMute={() => handleMuteConversation(conversation)}
-                  />
-                </div>
-              ))
-              )}
+              <div
+                key={conversation._id}
+                className={conversation.unread ? "font-bold" : "font-light"}
+              >
+                <ConversationItem
+                  conversation={conversation}
+                  isActive={selectedContact?._id === conversation._id}
+                  onSelect={() =>
+                    handleContactSelect(
+                      conversation,
+                      conversation.phoneNumber,
+                      conversation.name
+                    )
+                  }
+                  isSelected={selectedContacts.includes(
+                    conversation.phoneNumber
+                  )}
+                  onToggleSelect={() =>
+                    toggleContactSelection(conversation.phoneNumber)
+                  }
+                  selectionMode={bulkMessageOpen}
+                  onArchive={() => handleArchiveConversation(conversation)}
+                  onDelete={() => handleDeleteConversation(conversation)}
+                  onMute={() => handleMuteConversation(conversation)}
+                />
+              </div>
+            ))
+          )}
         </TabsContent>
       </Tabs>
     </div>
@@ -214,110 +206,118 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
 export default ConversationList;
 
-
 function ConversationItem({
-    conversation,
-    isActive,
-    onSelect,
-    isSelected,
-    onToggleSelect,
-    selectionMode,
-    onArchive,
-    onDelete,
-    onMute,
-  }) {
-    return (
-      <div
-        className={`flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors ${
-          isActive
-            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-            : "hover:bg-muted/50"
-        }`}
-        onClick={selectionMode ? onToggleSelect : onSelect}
-      >
-        {selectionMode && (
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={onToggleSelect}
-            className="h-4 w-4 rounded border-gray-300"
-            onClick={(e) => e.stopPropagation()}
-          />
-        )}
-        <Avatar>
-          <AvatarImage src={conversation.avatar} />
-          <AvatarFallback>{conversation.initials}</AvatarFallback>
-        </Avatar>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <p className="font-medium truncate">{conversation.name ? conversation.name : conversation.phoneNumber}</p>
-            <p className="text-xs text-muted-foreground">{conversation.time}</p>
-          </div>
-          <p className="text-xs text-muted-foreground truncate">
-            {conversation.lastMessage}
+  conversation,
+  isActive,
+  onSelect,
+  isSelected,
+  onToggleSelect,
+  selectionMode,
+  onArchive,
+  onDelete,
+  onMute,
+}) {
+  return (
+    <div
+      className={`flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors ${
+        isActive
+          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          : "hover:bg-muted/50"
+      }`}
+      onClick={selectionMode ? onToggleSelect : onSelect}
+    >
+      {selectionMode && (
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={onToggleSelect}
+          className="h-4 w-4 rounded border-gray-300"
+          onClick={(e) => e.stopPropagation()}
+        />
+      )}
+      <Avatar>
+        <AvatarImage src={conversation.avatar} />
+        <AvatarFallback>{conversation.initials}</AvatarFallback>
+      </Avatar>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between">
+          <p className="font-medium truncate">
+            {conversation.name ? conversation.name : conversation.phoneNumber}
           </p>
+          {!conversation.unread > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {new Date(conversation.timestamp).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+          )}
         </div>
-        {conversation.unread > 0 && (
-          <Badge className="ml-auto bg-primary text-primary-foreground">
-            {conversation.unread}
-          </Badge>
-        )}
-        {!selectionMode && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 opacity-0 group-hover:opacity-100 hover:opacity-100"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMute();
-                }}
-              >
-                {conversation.muted ? (
-                  <>
-                    <Bell className="mr-2 h-4 w-4" />
-                    <span>Unmute</span>
-                  </>
-                ) : (
-                  <>
-                    <BellOff className="mr-2 h-4 w-4" />
-                    <span>Mute</span>
-                  </>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onArchive();
-                }}
-              >
-                <Archive className="mr-2 h-4 w-4" />
-                <span>{conversation.archived ? "Unarchive" : "Archive"}</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete();
-                }}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                <span>Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        <p className="text-xs text-muted-foreground truncate">
+          {conversation.lastMessage}
+        </p>
       </div>
-    );
-  }
+      {conversation.unread > 0 && (
+        <Badge className="ml-auto bg-primary text-primary-foreground">
+          New
+        </Badge>
+      )}
+      {!selectionMode && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 opacity-0 group-hover:opacity-100 hover:opacity-100"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                onMute();
+              }}
+            >
+              {conversation.muted ? (
+                <>
+                  <Bell className="mr-2 h-4 w-4" />
+                  <span>Unmute</span>
+                </>
+              ) : (
+                <>
+                  <BellOff className="mr-2 h-4 w-4" />
+                  <span>Mute</span>
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                onArchive();
+              }}
+            >
+              <Archive className="mr-2 h-4 w-4" />
+              <span>{conversation.archived ? "Unarchive" : "Archive"}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              <span>Delete</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </div>
+  );
+}
