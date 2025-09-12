@@ -430,10 +430,10 @@ export default function ContactsPage() {
     // Close dialog
     setImportDialogOpen(false);
 
-    toast({
-      title: "Contacts Imported",
-      description: `${importedContacts.length} contacts have been added to your list.`,
-    });
+    // toast({
+    //   title: "Contacts Imported",
+    //   description: `${importedContacts.length} contacts have been added to your list.`,
+    // });
   };
 
   const handleEdit = (contact) => {
