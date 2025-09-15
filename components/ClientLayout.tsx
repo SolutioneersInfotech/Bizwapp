@@ -94,6 +94,7 @@ export default function ClientLayout({
     "/help-support",
     "/data-deletion",
     "/forgot-password",
+    "/forgot-password/reset-password"
   ].includes(pathname);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);

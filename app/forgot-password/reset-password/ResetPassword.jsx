@@ -44,7 +44,7 @@ export default function ResetPassword() {
         className="flex flex-col gap-3 w-full max-w-sm"
       >
         <input
-          type="password"
+          type="text"
           placeholder="New password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
