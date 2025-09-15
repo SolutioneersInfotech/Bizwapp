@@ -305,62 +305,64 @@ export default function DashboardPage() {
 
                 {/* Scrollable Messages Area */}
                 <CardContent className="flex-1 overflow-y-auto">
-                  <div className="space-y-4">
-                    {messages.length > 0 ? (
-                      messages.map((conversation) => (
-                        <div
-                          key={conversation.id}
-                          className="flex items-center gap-4"
-                        >
-                          <Avatar>
-                            <AvatarImage src={conversation.avatar} />
-                            <AvatarFallback>
-                              {conversation.initials}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 space-y-1">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium leading-none">
-                                {conversation.name
-                                  ? conversation.name
-                                  : conversation.phoneNumber}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(
-                                  conversation.timestamp
-                                ).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </p>
-                            </div>
-                            <p className="text-xs text-muted-foreground line-clamp-1">
-                              {conversation.message}
-                            </p>
-                          </div>
-                          <Badge
-                            variant={
-                              conversation.unread === true
-                                ? "default"
-                                : "outline"
-                            }
-                            className={
-                              conversation.unread === true
-                                ? "bg-primary text-primary-foreground"
-                                : ""
-                            }
-                          >
-                            New
-                          </Badge>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="flex justify-center items-center py-8">
-                        <Spinner size={40} className="text-green-600" />
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
+  <div className="space-y-4">
+    {loading ? (
+      // Loader jab API call chal rahi ho
+      <div className="flex justify-center items-center py-8">
+        <Spinner size={40} className="text-green-600" />
+      </div>
+    ) : messages.length > 0 ? (
+      // Jab data mila ho
+      messages.map((conversation) => (
+        <div
+          key={conversation.id}
+          className="flex items-center gap-4"
+        >
+          <Avatar>
+            <AvatarImage src={conversation.avatar} />
+            <AvatarFallback>
+              {conversation.initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 space-y-1">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium leading-none">
+                {conversation.name
+                  ? conversation.name
+                  : conversation.phoneNumber}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(conversation.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground line-clamp-1">
+              {conversation.message}
+            </p>
+          </div>
+          <Badge
+            variant={
+              conversation.unread === true ? "default" : "outline"
+            }
+            className={
+              conversation.unread === true
+                ? "bg-primary text-primary-foreground"
+                : ""
+            }
+          >
+            New
+          </Badge>
+        </div>
+      ))
+    ) : (
+      // Jab API call khatam ho gayi aur koi data nahi mila
+      <p className="flex justify-center py-8">No contacts found</p>
+    )}
+  </div>
+</CardContent>
+
 
                 {/* Sticky Footer */}
                 <div className="border-t px-4 py-2">

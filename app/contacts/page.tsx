@@ -1119,7 +1119,7 @@ export default function ContactsPage() {
                       <TableHead>Phone</TableHead>
                       <TableHead>Tags</TableHead>
                       <TableHead>Last Contact</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Conversation</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
