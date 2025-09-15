@@ -1,3 +1,4 @@
+// app/forgot-password/reset-password/ResetPassword.jsx
 "use client";
 
 import { useState } from "react";
@@ -24,12 +25,12 @@ export default function ResetPassword() {
     }
 
     try {
-      const res = await axios.post("https://api.bizwapp.com/api/auth/reset-password", {
-        token,
-        password,
-      });
+      const res = await axios.post(
+        "https://api.bizwapp.com/api/auth/reset-password",
+        { token, password }
+      );
       setMsg(res.data.message);
-      setTimeout(() => router.push("/login"), 2000); // optional redirect
+      setTimeout(() => router.push("/login"), 2000); // redirect
     } catch (error) {
       setErr(error.response?.data?.message || "Something went wrong");
     }
@@ -43,7 +44,7 @@ export default function ResetPassword() {
         className="flex flex-col gap-3 w-full max-w-sm"
       >
         <input
-          type="text"
+          type="password"
           placeholder="New password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
