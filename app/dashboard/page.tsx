@@ -289,7 +289,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="pl-2">
                   <div className="h-[300px] w-full">
-                    <EngagementChart data={analytics.dailyStats} />
+                    <EngagementChart data={stats?.weekly} />
                   </div>
                 </CardContent>
               </Card>
@@ -305,64 +305,69 @@ export default function DashboardPage() {
 
                 {/* Scrollable Messages Area */}
                 <CardContent className="flex-1 overflow-y-auto">
-  <div className="space-y-4">
-    {loading ? (
-      // Loader jab API call chal rahi ho
-      <div className="flex justify-center items-center py-8">
-        <Spinner size={40} className="text-green-600" />
-      </div>
-    ) : messages.length > 0 ? (
-      // Jab data mila ho
-      messages.map((conversation) => (
-        <div
-          key={conversation.id}
-          className="flex items-center gap-4"
-        >
-          <Avatar>
-            <AvatarImage src={conversation.avatar} />
-            <AvatarFallback>
-              {conversation.initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 space-y-1">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium leading-none">
-                {conversation.name
-                  ? conversation.name
-                  : conversation.phoneNumber}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {new Date(conversation.timestamp).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-            <p className="text-xs text-muted-foreground line-clamp-1">
-              {conversation.message}
-            </p>
-          </div>
-          <Badge
-            variant={
-              conversation.unread === true ? "default" : "outline"
-            }
-            className={
-              conversation.unread === true
-                ? "bg-primary text-primary-foreground"
-                : ""
-            }
-          >
-            New
-          </Badge>
-        </div>
-      ))
-    ) : (
-      // Jab API call khatam ho gayi aur koi data nahi mila
-      <p className="flex justify-center py-8">No contacts found</p>
-    )}
-  </div>
-</CardContent>
-
+                  <div className="space-y-4">
+                    {loading ? (
+                      // Loader jab API call chal rahi ho
+                      <div className="flex justify-center items-center py-8">
+                        <Spinner size={40} className="text-green-600" />
+                      </div>
+                    ) : messages.length > 0 ? (
+                      // Jab data mila ho
+                      messages.map((conversation) => (
+                        <div
+                          key={conversation.id}
+                          className="flex items-center gap-4"
+                        >
+                          <Avatar>
+                            <AvatarImage src={conversation.avatar} />
+                            <AvatarFallback>
+                              {conversation.initials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium leading-none">
+                                {conversation.name
+                                  ? conversation.name
+                                  : conversation.phoneNumber}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(
+                                  conversation.timestamp
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-1">
+                              {conversation.message}
+                            </p>
+                          </div>
+                          <Badge
+                            variant={
+                              conversation.unread === true
+                                ? "default"
+                                : "outline"
+                            }
+                            className={
+                              conversation.unread === true
+                                ? "bg-primary text-primary-foreground"
+                                : ""
+                            }
+                          >
+                            New
+                          </Badge>
+                        </div>
+                      ))
+                    ) : (
+                      // Jab API call khatam ho gayi aur koi data nahi mila
+                      <p className="flex justify-center py-8">
+                        No contacts found
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
 
                 {/* Sticky Footer */}
                 <div className="border-t px-4 py-2">
@@ -420,12 +425,15 @@ export default function DashboardPage() {
 //   )
 // }
 
-function EngagementChart({ data = [] }) {
+function EngagementChart({ data }) {
+
+  console.log("data", data);
+  
   // If no data, show sample data
   const chartData =
     data && data.length > 0
       ? data
-      : Array.from({ length: 12 }).map((_, i) => ({
+      : Array.from({ length: 4 }).map((_, i) => ({
           date: `2023-${(i + 1).toString().padStart(2, "0")}-01`,
           sent: Math.floor(Math.random() * 100) + 50,
           delivered: Math.floor(Math.random() * 80) + 40,
@@ -436,6 +444,36 @@ function EngagementChart({ data = [] }) {
     ...chartData.map((d) => Math.max(d.sent, d.delivered)),
     100
   );
+
+  function getLast4Weeks() {
+    const weeks = [];
+    const today = new Date();
+
+    for (let i = 0; i < 4; i++) {
+      // current week ka end date (Sunday)
+      const end = new Date(today);
+      end.setDate(today.getDate() - today.getDay() - 7 * i);
+
+      // current week ka start date (Monday)
+      const start = new Date(end);
+      start.setDate(end.getDate() - 6);
+
+      const startStr = start.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      const endStr = end.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+
+      weeks.unshift(`${startStr} - ${endStr}`); // oldest → newest order
+    }
+
+    return weeks;
+  }
+
+  const weekLabels = getLast4Weeks();
 
   return (
     <div className="flex w-full flex-col">
@@ -453,12 +491,12 @@ function EngagementChart({ data = [] }) {
               {/* Bars */}
               <div className="flex w-full items-end justify-center gap-1 h-full">
                 <div
-                  className="w-3 rounded-md bg-primary/70"
+                  className="w-6 rounded-md bg-primary/70"
                   style={{ height: `${sentHeight}%` }}
                   title={`Sent: ${item.sent}`}
                 />
                 <div
-                  className="w-3 rounded-md bg-primary"
+                  className="w-6 rounded-md bg-primary"
                   style={{ height: `${deliveredHeight}%` }}
                   title={`Delivered: ${item.delivered}`}
                 />
@@ -466,11 +504,7 @@ function EngagementChart({ data = [] }) {
 
               {/* Month Label */}
               <div className="absolute -bottom-6 w-full text-center text-xs text-muted-foreground">
-                {item.date
-                  ? new Date(item.date).toLocaleDateString("en-US", {
-                      month: "short",
-                    })
-                  : `M${i + 1}`}
+                {weekLabels[i]}
               </div>
             </div>
           );
