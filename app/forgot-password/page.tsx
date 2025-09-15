@@ -10,12 +10,15 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Loader2, AlertCircle, CheckCircle } from "lucide-react"
+import axios from "axios"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(false);
+    const [msg, setMsg] = useState('');
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,10 +33,11 @@ export default function ForgotPasswordPage() {
     try {
       setIsLoading(true)
       // In a real app, this would call an API to send a password reset email
-      await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
+       const res = await axios.post('https://api.bizwapp.com/api/auth/forgot-password', { email });
+      setMsg(res.data.message);
       setSuccess(true)
-    } catch (err) {
-      setError("Failed to send reset email. Please try again.")
+    } catch (error) {
+      setError(error.response?.data?.message || 'Something went wrong')
     } finally {
       setIsLoading(false)
     }
