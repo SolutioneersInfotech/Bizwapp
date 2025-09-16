@@ -362,7 +362,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                       <p className="text-sm">{message.message}</p>
                       <div className="mt-1 flex items-center justify-end gap-1 text-xs opacity-70">
                         <span>
-                          {new Date(message.timestamp).toLocaleTimeString(
+                          {new Date(message.createdAt).toLocaleTimeString(
                             "en-US",
                             {
                               hour: "2-digit",

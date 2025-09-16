@@ -246,7 +246,7 @@ function ConversationItem({
           </p>
           {!conversation.unread > 0 && (
             <p className="text-xs text-muted-foreground">
-              {new Date(conversation.timestamp).toLocaleTimeString([], {
+              {new Date(conversation.createdAt).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
