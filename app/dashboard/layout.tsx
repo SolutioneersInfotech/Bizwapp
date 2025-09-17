@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { UserNav } from "@/components/user-nav"
 import ProfileAvatar from "@/components/profileAvatar"
 import ClientLayout from "@/components/ClientLayout"
+import { Button } from "@/components/ui/button"
 
 export default function DashboardLayout({
   children,
@@ -35,6 +36,10 @@ export default function DashboardLayout({
   //   return null
   // }
 
+  const handleConnect = () => {
+    window.location.href = "https://api.bizwapp.com/api/auth/onboarding/start";
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full overflow-hidden">
@@ -50,7 +55,7 @@ export default function DashboardLayout({
                       Demo Mode
                     </span>
                   ) : (
-                    <span>Connected to WhatsApp API</span>
+                    <Button onClick={handleConnect}>Connect WhatsApp Business</Button> 
                   )}
                 </div>
                 <ThemeToggle />
