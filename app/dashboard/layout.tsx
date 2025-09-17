@@ -49,15 +49,16 @@ export default function DashboardLayout({
             <div className="w-full flex items-center justify-end">
               {/* <h1 className="text-xl font-semibold">WhatsApp Business</h1> */}
               <div className="flex items-center gap-4">
-                <div className="text-sm text-muted-foreground hidden md:block">
-                  {authConfig?.phoneNumberId === "demo_phone_id" ? (
-                    <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-md text-xs font-medium">
-                      Demo Mode
-                    </span>
-                  ) : (
-                    <Button onClick={handleConnect}>Connect WhatsApp Business</Button> 
-                  )}
-                </div>
+                <div className="text-sm text-muted-foreground">
+  {authConfig?.phoneNumberId === "demo_phone_id" ? (
+    <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-md text-xs font-medium">
+      Demo Mode
+    </span>
+  ) : (
+    <Button onClick={handleConnect}>Connect WhatsApp Business</Button>
+  )}
+</div>
+
                 <ThemeToggle />
                 <UserNav />
                 {/* <ProfileAvatar /> */}

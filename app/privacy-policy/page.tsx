@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export default function PrivacyPolicyPage() {
-  const lastUpdated = "December 15, 2024";
+  const lastUpdated = "September 17, 2025";
 
   return (
     <div className="container mx-auto py-8 px-4">
