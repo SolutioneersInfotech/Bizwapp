@@ -3,14 +3,12 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  const cookieHeader = request.headers.get("cookie");
-  // console.log("Raw cookie header:", cookieHeader);
+  console.log("middlewarekhbkhb");
+  
+  const token = request.cookies.get("token")?.value; // cookie से token निकालना
 
-  const token = request.cookies.get("token");
-  // console.log("Parsed cookie:", token);
-
-  // console.log("request", request);
-
+  console.log("token", token);
+  
 
   const publicPaths = [
     '/login',
@@ -26,25 +24,27 @@ export function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
-  // console.log("path", path)
-
   const isPublicPath = publicPaths.some((publicPath) =>
     path.startsWith(publicPath)
   )
 
-  // console.log("checking", isPublicPath , token)
+  // ✅ अगर path private है और token नहीं है → redirect to /login
+  if (!token && !isPublicPath) {
+    const loginUrl = new URL('/login', request.url) // same domain पर login
+    return NextResponse.redirect(loginUrl)
+  }
 
-  // if (!isPublicPath && !token) {
-    
-  //   const loginUrl = new URL('/login', request.url)
-  //   return NextResponse.redirect(loginUrl)
-  // }
+  // ✅ अगर पहले से logged in है और वो /login या /signup पर जाने की कोशिश कर रहा है → redirect to home/dashboard
+  if (token && (path.startsWith('/login') || path.startsWith('/signup'))) {
+    const homeUrl = new URL('/', request.url)
+    return NextResponse.redirect(homeUrl)
+  }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: [   
+  matcher: [
     '/((?!_next/static|_next/image|favicon.ico|robots.txt|.*\\.svg|.*\\.png).*)',
   ],
 }
