@@ -8,6 +8,8 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value; // cookie से token निकालना
 
   console.log("token", token);
+
+  console.log("All Cookies in middleware:", request.cookies.getAll());
   
 
   const publicPaths = [
