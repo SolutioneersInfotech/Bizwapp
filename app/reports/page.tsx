@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import {
   Download,
@@ -68,7 +68,7 @@ export default function ReportsPage() {
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-4 p-3 pt-3 md:p-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h2 className="text-3xl font-bold tracking-tight ml-8 md:m-0">Reports & Analytics</h2>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="h-8 gap-1" onClick={handleExportData}>
@@ -79,33 +79,6 @@ export default function ReportsPage() {
               <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
               <span>{isLoading ? "Refreshing..." : "Refresh"}</span>
             </Button>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <Tabs defaultValue="overview" className="w-full md:w-auto mb-8  md:mb-0">
-            <TabsList className="bg-gray-200 grid grid-cols-2 gap-2 md:flex md:space-x-2">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="messages">Messages</TabsTrigger>
-              <TabsTrigger value="contacts">Contacts</TabsTrigger>
-              <TabsTrigger value="templates">Templates</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-            <Select value={reportType} onValueChange={setReportType}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Report Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="messages">Message Activity</SelectItem>
-                <SelectItem value="engagement">Engagement</SelectItem>
-                <SelectItem value="contacts">Contact Growth</SelectItem>
-                <SelectItem value="templates">Template Usage</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <DateRangePicker date={dateRange} onDateChange={setDateRange} />
           </div>
         </div>
 
@@ -175,151 +148,193 @@ export default function ReportsPage() {
           </Card>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="col-span-4 overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
-            <CardHeader>
-              <CardTitle>Message Activity</CardTitle>
-              <CardDescription>Message delivery and response rates over time</CardDescription>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={analytics.dailyStats}
-                    margin={{
-                      top: 10,
-                      right: 30,
-                      left: 0,
-                      bottom: 0,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="date"
-                      tickFormatter={(date) =>
-                        new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                      }
-                    />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Area
-                      type="monotone"
-                      dataKey="sent"
-                      stackId="1"
-                      stroke="#8884d8"
-                      fill="hsl(var(--primary))"
-                      fillOpacity={0.3}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="delivered"
-                      stackId="2"
-                      stroke="#82ca9d"
-                      fill="hsl(var(--primary))"
-                      fillOpacity={0.6}
-                    />
-                    <Area type="monotone" dataKey="read" stackId="3" stroke="#ffc658" fill="hsl(var(--primary))" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="overview" className="w-full md:w-auto mb-8  md:mb-0">
+          <TabsList className="bg-gray-200 grid grid-cols-2 gap-2 md:flex md:space-x-2">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="messages">Messages</TabsTrigger>
+            <TabsTrigger value="contacts">Contacts</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+          </TabsList>
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
 
-          <Card className="col-span-3 overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
-            <CardHeader>
-              <CardTitle>Message Types</CardTitle>
-              <CardDescription>Distribution of message types sent</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={messageTypeData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+
+
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <Select value={reportType} onValueChange={setReportType}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Report Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="messages">Message Activity</SelectItem>
+                  <SelectItem value="engagement">Engagement</SelectItem>
+                  <SelectItem value="contacts">Contact Growth</SelectItem>
+                  <SelectItem value="templates">Template Usage</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <DateRangePicker date={dateRange} onDateChange={setDateRange} />
+            </div>
+          </div>
+
+
+
+          <TabsContent value="messages">
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Card className="col-span-4 overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
+                <CardHeader>
+                  <CardTitle>Message Activity</CardTitle>
+                  <CardDescription>Message delivery and response rates over time</CardDescription>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={analytics.dailyStats}
+                        margin={{
+                          top: 10,
+                          right: 30,
+                          left: 0,
+                          bottom: 0,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="date"
+                          tickFormatter={(date) =>
+                            new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                          }
+                        />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Area
+                          type="monotone"
+                          dataKey="sent"
+                          stackId="1"
+                          stroke="#8884d8"
+                          fill="hsl(var(--primary))"
+                          fillOpacity={0.3}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="delivered"
+                          stackId="2"
+                          stroke="#82ca9d"
+                          fill="hsl(var(--primary))"
+                          fillOpacity={0.6}
+                        />
+                        <Area type="monotone" dataKey="read" stackId="3" stroke="#ffc658" fill="hsl(var(--primary))" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="col-span-3 overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
+                <CardHeader>
+                  <CardTitle>Message Types</CardTitle>
+                  <CardDescription>Distribution of message types sent</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={messageTypeData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {messageTypeData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+          </TabsContent>
+
+          <TabsContent value="contacts">
+
+            <div className="grid gap-4 md:grid-cols-1">
+              <Card className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
+                <CardHeader>
+                  <CardTitle>Response Time</CardTitle>
+                  <CardDescription>Average time to respond to customer messages</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={responseTimeData}
+                        margin={{
+                          top: 20,
+                          right: 30,
+                          left: 20,
+                          bottom: 5,
+                        }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="time" fill="hsl(var(--primary))" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="templates">
+
+            <Card className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
+              <CardHeader>
+                <CardTitle>Template Performance</CardTitle>
+                <CardDescription>Response rates for different message templates</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={templatePerformanceData}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
                     >
-                      {messageTypeData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
-            <CardHeader>
-              <CardTitle>Response Time</CardTitle>
-              <CardDescription>Average time to respond to customer messages</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={responseTimeData}
-                    margin={{
-                      top: 20,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="time" fill="hsl(var(--primary))" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
-            <CardHeader>
-              <CardTitle>Template Performance</CardTitle>
-              <CardDescription>Response rates for different message templates</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={templatePerformanceData}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="sent" stroke="#8884d8" />
-                    <Line type="monotone" dataKey="responses" stroke="#82ca9d" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="sent" stroke="#8884d8" />
+                      <Line type="monotone" dataKey="responses" stroke="#82ca9d" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          </Tabs>
       </div>
     </div>
+    
   )
 }
 
