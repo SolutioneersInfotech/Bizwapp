@@ -63,7 +63,7 @@ import { DialogPortal } from "@radix-ui/react-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import useDelete from "@/hooks/api/useDelete";
 import { Checkbox } from "@/components/ui/checkbox";
-import deleteMultipleContacts from "../../hooks/api/deleteMultipleContacts"
+import deleteMultipleContacts from "../../hooks/api/deleteMultipleContacts";
 
 export default function ContactsPage() {
   const { toast } = useToast();
@@ -137,7 +137,6 @@ export default function ContactsPage() {
   const [intervalUnit, setIntervalUnit] = useState("minutes");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-
   // Import dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importedContacts, setImportedContacts] = useState([]);
@@ -167,9 +166,7 @@ export default function ContactsPage() {
   const [mounted, setMounted] = useState(false);
   const [contactIdToDelete, setContactIdToDelete] = useState(null);
   const [tickedContacts, setTickedContacts] = useState([]);
-    const [isDeleting, setIsDeleting] = useState(false);
-
-
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [selectAll, setSelectAll] = useState(false);
 
@@ -640,38 +637,36 @@ export default function ContactsPage() {
   const handleBulkDelete = async () => {
     if (tickedContacts.length === 0) return;
 
-  setIsDeleteDialogOpen(true);
-
+    setIsDeleteDialogOpen(true);
 
     setIsDeleting(true);
   };
 
   const confirmBulkDelete = async () => {
-  try {
-    const result = await deleteMultipleContacts(tickedContacts);
-    
-    // Success message
-     setTickedContacts([]);
-    setIsDeleting(false);
+    try {
+      const result = await deleteMultipleContacts(tickedContacts);
 
-    toast.success(result.message);
-    
-    // Clear selection and refresh data
-    setSelectedContacts([]);
-    setSelectAll(false);    
-  } catch (error) {
-    console.error("Delete error:", error);
-    setIsDeleting(false);
-    toast.error("Failed to delete contacts");
-  } finally {
-    // Dialog close karo
-    setIsDeleteDialogOpen(false);
-    setContactsToDelete([]);
-    setIsDeleting(false);
-        setTickedContacts([]);
+      // Success message
+      setTickedContacts([]);
+      setIsDeleting(false);
 
-  }
-};
+      toast.success(result.message);
+
+      // Clear selection and refresh data
+      setSelectedContacts([]);
+      setSelectAll(false);
+    } catch (error) {
+      console.error("Delete error:", error);
+      setIsDeleting(false);
+      toast.error("Failed to delete contacts");
+    } finally {
+      // Dialog close karo
+      setIsDeleteDialogOpen(false);
+      setContactsToDelete([]);
+      setIsDeleting(false);
+      setTickedContacts([]);
+    }
+  };
 
   console.log("isMobileWithContactSupport", isMobileWithContactSupport);
 
@@ -769,7 +764,7 @@ export default function ContactsPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
-                  <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 mb-4 max-h-[70vh] overflow-y-auto">
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 mb-4">
                     <FileUp className="h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-4">
                       Click the button below to select a CSV or Excel
@@ -787,7 +782,7 @@ export default function ContactsPage() {
                       Click here to import CSV/XLSX file
                     </Button>
 
-                    <div className="w-full mt-6 flex flex-col items-center">
+                    <div className="w-full mt-6 flex flex-col items-center max-h-[60vh] overflow-y-auto">
                       {/* Google Sheet Input */}
                       <div className="w-full max-w-md flex flex-col gap-3">
                         <input
@@ -880,26 +875,27 @@ export default function ContactsPage() {
                       )}
 
                       {selectedContacts.length > 0 && (
-  <div className="border border-muted rounded-lg bg-muted/30 ">
-    {/* Sticky header */}
-    <div className="sticky top-0 bg-muted/50 backdrop-blur-sm p-4 border-b">
-      <h4 className="text-sm font-semibold text-muted-foreground">
-        Selected Contacts:
-      </h4>
-    </div>
+                        <div className="border border-muted rounded-lg bg-muted/30 ">
+                          {/* Sticky header */}
+                          <div className="sticky top-0 bg-muted/50 backdrop-blur-sm p-4 border-b">
+                            <h4 className="text-sm font-semibold text-muted-foreground">
+                              Selected Contacts:
+                            </h4>
+                          </div>
 
-    {/* Scrollable list */} 
-    <ul className="text-sm space-y-1 p-4 max-h-[250px] overflow-y-auto">
-      {selectedContacts.map((contact, index) => (
-        <li key={index} className="text-muted-foreground">
-          <span className="font-medium">{contact.name || "Unnamed"}</span> –{" "}
-          <span>{contact.phone || "No number"}</span>
-        </li>
-      ))}
-    </ul>
-  </div>
-)}
-
+                          {/* Scrollable list */}
+                          <ul className="text-sm space-y-1 p-4 max-h-[250px] overflow-y-auto">
+                            {selectedContacts.map((contact, index) => (
+                              <li key={index} className="text-muted-foreground">
+                                <span className="font-medium">
+                                  {contact.name || "Unnamed"}
+                                </span>{" "}
+                                – <span>{contact.phone || "No number"}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -987,78 +983,77 @@ export default function ContactsPage() {
               />
             </Dialog>
             <div>
-      {/* Bulk Actions Toolbar */}
-      {tickedContacts.length > 0 && (
-        <div className=" flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleBulkDelete}
-              disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-500 hover:text-white text-white py-1 px-4"
-            >
-              {
-              // isDeleting 
-              false 
-              ? (
-                <Spinner size={16} className="mr-2" />
-              ) : (
-                <Trash className="h-4 w-4 mr-2" />
+              {/* Bulk Actions Toolbar */}
+              {tickedContacts.length > 0 && (
+                <div className=" flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBulkDelete}
+                      disabled={isDeleting}
+                      className="bg-red-600 hover:bg-red-500 hover:text-white text-white py-1 px-4"
+                    >
+                      {
+                        // isDeleting
+                        false ? (
+                          <Spinner size={16} className="mr-2" />
+                        ) : (
+                          <Trash className="h-4 w-4 mr-2" />
+                        )
+                      }
+                      Delete Selected
+                    </Button>
+                  </div>
+                </div>
               )}
-              Delete Selected
-            </Button>
+            </div>
           </div>
-        </div>
-      )}
-
-    </div>
-          </div>
-          
         </div>
 
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Confirm Delete</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete {tickedContacts.length} contact(s)?
-            This action cannot be undone.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="max-h-60 overflow-y-auto">
-          <h4 className="text-sm font-medium mb-2">Contacts to be deleted:</h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            {getContacts?.contacts
-              ?.filter(contact => tickedContacts.includes(contact._id))
-              .map(contact => (
-                <li key={contact._id} className="flex items-center gap-2">
-                  • {contact.name} - {contact.phone}
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-        
-        <DialogFooter className="sm:justify-end gap-2">
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={() => setIsDeleteDialogOpen(false)}
-          >
-            Cancel
-          </Button>
-          <Button 
-            type="button" 
-            variant="destructive"
-            onClick={confirmBulkDelete}
-          >
-            Delete {tickedContacts.length} Contact(s)
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Confirm Delete</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete {tickedContacts.length}{" "}
+                contact(s)? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="max-h-60 overflow-y-auto">
+              <h4 className="text-sm font-medium mb-2">
+                Contacts to be deleted:
+              </h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                {getContacts?.contacts
+                  ?.filter((contact) => tickedContacts.includes(contact._id))
+                  .map((contact) => (
+                    <li key={contact._id} className="flex items-center gap-2">
+                      • {contact.name} - {contact.phone}
+                    </li>
+                  ))}
+              </ul>
+            </div>
+
+            <DialogFooter className="sm:justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={confirmBulkDelete}
+              >
+                Delete {tickedContacts.length} Contact(s)
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
@@ -1117,7 +1112,7 @@ export default function ContactsPage() {
                             }
                           }}
                         />
-                         {/* <span className="ml-2">{tickedContacts.length ==0 ? "" :  tickedContacts.length}</span> */}
+                        {/* <span className="ml-2">{tickedContacts.length ==0 ? "" :  tickedContacts.length}</span> */}
                       </TableHead>
                       <TableHead className="w-[250px]">Name</TableHead>
                       <TableHead>Phone</TableHead>
