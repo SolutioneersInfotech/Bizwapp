@@ -756,7 +756,7 @@ export default function ContactsPage() {
                   <span>Import</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[525px]">
+              <DialogContent className="sm:max-w-[525px] max-h-[90vh] flex flex-col">
                 <DialogHeader>
                   <DialogTitle>Import Contacts</DialogTitle>
                   <DialogDescription>
@@ -875,26 +875,27 @@ export default function ContactsPage() {
                       )}
 
                       {selectedContacts.length > 0 && (
-  <div className="border border-muted rounded-lg bg-muted/30 max-h-[180px] flex flex-col overflow-hidden">
-    {/* Sticky header */}
-    <div className="sticky top-0 bg-muted/50 backdrop-blur-sm p-3 border-b z-10">
-      <h4 className="text-sm font-semibold text-muted-foreground">
-        Selected Contacts:
-      </h4>
-    </div>
+                        <div className="border border-muted rounded-lg bg-muted/30 max-h-[180px] flex flex-col overflow-hidden">
+                          {/* Sticky header */}
+                          <div className="sticky top-0 bg-muted/50 backdrop-blur-sm p-3 border-b z-10">
+                            <h4 className="text-sm font-semibold text-muted-foreground">
+                              Selected Contacts:
+                            </h4>
+                          </div>
 
-    {/* Scrollable list */}
-    <ul className="text-sm space-y-1 p-3 overflow-y-auto flex-1">
-      {selectedContacts.map((contact, index) => (
-        <li key={index} className="text-muted-foreground">
-          <span className="font-medium">{contact.name || "Unnamed"}</span> –{" "}
-          <span>{contact.phone || "No number"}</span>
-        </li>
-      ))}
-    </ul>
-  </div>
-)}
-
+                          {/* Scrollable list */}
+                          <ul className="text-sm space-y-1 p-3 overflow-y-auto flex-1">
+                            {selectedContacts.map((contact, index) => (
+                              <li key={index} className="text-muted-foreground">
+                                <span className="font-medium">
+                                  {contact.name || "Unnamed"}
+                                </span>{" "}
+                                – <span>{contact.phone || "No number"}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </div>
 
