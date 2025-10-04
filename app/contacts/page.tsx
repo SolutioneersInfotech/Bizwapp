@@ -884,7 +884,7 @@ export default function ContactsPage() {
                           </div>
 
                           {/* Scrollable list */}
-                          <ul className="text-sm space-y-1 p-4 max-h-[250px] overflow-y-auto">
+                          <ul className="text-sm space-y-1 p-4 max-h-[100px] overflow-y-auto">
                             {selectedContacts.map((contact, index) => (
                               <li key={index} className="text-muted-foreground">
                                 <span className="font-medium">
