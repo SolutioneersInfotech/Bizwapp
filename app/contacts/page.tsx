@@ -880,7 +880,7 @@ export default function ContactsPage() {
                       )}
 
                       {selectedContacts.length > 0 && (
-  <div className="border border-muted rounded-lg bg-muted/30 max-h-[250px] overflow-y-auto">
+  <div className="border border-muted rounded-lg bg-muted/30 ">
     {/* Sticky header */}
     <div className="sticky top-0 bg-muted/50 backdrop-blur-sm p-4 border-b">
       <h4 className="text-sm font-semibold text-muted-foreground">
@@ -888,8 +888,8 @@ export default function ContactsPage() {
       </h4>
     </div>
 
-    {/* Scrollable list */}
-    <ul className="text-sm space-y-1 p-4">
+    {/* Scrollable list */} 
+    <ul className="text-sm space-y-1 p-4 max-h-[250px] overflow-y-auto">
       {selectedContacts.map((contact, index) => (
         <li key={index} className="text-muted-foreground">
           <span className="font-medium">{contact.name || "Unnamed"}</span> –{" "}
