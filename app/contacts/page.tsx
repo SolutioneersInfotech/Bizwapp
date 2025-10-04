@@ -761,7 +761,7 @@ export default function ContactsPage() {
                   <span>Import</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[525px]">
+              <DialogContent className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Import Contacts</DialogTitle>
                   <DialogDescription>
