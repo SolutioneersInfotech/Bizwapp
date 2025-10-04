@@ -769,7 +769,7 @@ export default function ContactsPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
-                  <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 mb-4">
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 mb-4 max-h-[70vh] overflow-y-auto">
                     <FileUp className="h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-4">
                       Click the button below to select a CSV or Excel
