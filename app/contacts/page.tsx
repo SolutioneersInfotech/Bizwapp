@@ -763,7 +763,7 @@ export default function ContactsPage() {
                     Upload a CSV or Excel file to import contacts.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="py-4">
+                <div className="flex-1 overflow-y-auto py-4 px-1">
                   <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 mb-4">
                     <FileUp className="h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-4">
@@ -875,27 +875,26 @@ export default function ContactsPage() {
                       )}
 
                       {selectedContacts.length > 0 && (
-                        <div className="border border-muted rounded-lg bg-muted/30 ">
-                          {/* Sticky header */}
-                          <div className="sticky top-0 bg-muted/50 backdrop-blur-sm p-4 border-b">
-                            <h4 className="text-sm font-semibold text-muted-foreground">
-                              Selected Contacts:
-                            </h4>
-                          </div>
+  <div className="border border-muted rounded-lg bg-muted/30 max-h-[180px] flex flex-col overflow-hidden">
+    {/* Sticky header */}
+    <div className="sticky top-0 bg-muted/50 backdrop-blur-sm p-3 border-b z-10">
+      <h4 className="text-sm font-semibold text-muted-foreground">
+        Selected Contacts:
+      </h4>
+    </div>
 
-                          {/* Scrollable list */}
-                          <ul className="text-sm space-y-1 p-4 max-h-[100px] overflow-y-auto">
-                            {selectedContacts.map((contact, index) => (
-                              <li key={index} className="text-muted-foreground">
-                                <span className="font-medium">
-                                  {contact.name || "Unnamed"}
-                                </span>{" "}
-                                – <span>{contact.phone || "No number"}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+    {/* Scrollable list */}
+    <ul className="text-sm space-y-1 p-3 overflow-y-auto flex-1">
+      {selectedContacts.map((contact, index) => (
+        <li key={index} className="text-muted-foreground">
+          <span className="font-medium">{contact.name || "Unnamed"}</span> –{" "}
+          <span>{contact.phone || "No number"}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
                     </div>
                   </div>
 
