@@ -203,7 +203,9 @@ export default function ContactsPage() {
       const formattedContacts = contacts.map((contact, index) => {
         const name = contact.name?.[0] || "Unknown";
         const email = contact.email?.[0] || "";
-        const phone = contact.tel?.[0] || "";
+        let phone = contact.tel?.[0] || "";
+
+        phone = phone.replace(/[-_\s().]/g, "");
 
         const initials = name
           .split(" ")
