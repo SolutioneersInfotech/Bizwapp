@@ -109,7 +109,7 @@ export default function ApiSettingsPage() {
   }
 
   const handleLogout = async () => {
-    await fetch("process.env.REACT_APP_BACKEND_URL/api/auth/logout", {
+    await fetch(`${process.env.REACT_APP_BACKEND_URL}auth/logout`, {
       method: "POST",
       credentials: "include",
     });

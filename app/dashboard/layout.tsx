@@ -37,7 +37,7 @@ export default function DashboardLayout({
   // }
 
   const handleConnect = () => {
-    window.location.href = "https://api.bizwapp.com/api/auth/onboarding/start";
+    window.location.href = `${process.env.REACT_APP_BACKEND_URL}auth/onboarding/start`;
   };
 
   return (

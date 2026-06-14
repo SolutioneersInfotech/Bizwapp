@@ -123,7 +123,7 @@ export default function AutomationPage() {
   }, [whatsappTemplates]);
 
   const { mutate } = usePostData(
-    "https://api.bizwapp.com/api/auth/add-google-sheet-contacts-send-temp"
+    "https://bizwapp-backend-production-2354.up.railway.app/api/auth/add-google-sheet-contacts-send-temp"
   );
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export default function AutomationPage() {
 
   const { data: googleSheetsData , refetch} = usePrefetchQuery(
     "googleSheets",
-    `https://api.bizwapp.com/api/auth/get-google-sheet-info/${userId}`
+    `https://bizwapp-backend-production-2354.up.railway.app/api/auth/get-google-sheet-info/${userId}`
   );
 
   useEffect(() => {

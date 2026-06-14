@@ -1,7 +1,7 @@
 import axios from "axios";
 
  const deleteMultipleContacts = async (contactIds) => {
-    const API_BASE_URL = "https://api.bizwapp.com"
+    const API_BASE_URL = "https://bizwapp-backend-production-2354.up.railway.app"
      try {
     
     const response = await axios.delete(

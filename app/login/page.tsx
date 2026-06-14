@@ -49,7 +49,7 @@ export default function LoginPage() {
   };
 
   const { mutate, isError, data } = usePostData(
-    "https://api.bizwapp.com/api/auth/login"
+    "https://bizwapp-backend-production-2354.up.railway.app/api/auth/login"
   );
 
   const { toast } = useToast();
@@ -110,11 +110,11 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-  window.location.href = 'https://bizwapp-backend-production.up.railway.app/api/auth/auth/google';
-};
+    window.location.href = "https://bizwapp-backend-production-2354.up.railway.app/api/auth/auth/google";
+  };
   
 const handleFacebookLogin = () => {
-    window.location.href = "https://bizwapp-backend-2.onrender.com/api/auth/auth/facebook";
+    window.location.href = "https://bizwapp-backend-production-2354.up.railway.app/api/auth/auth/facebook";
   };
 
   const handleSocialLogin = async (provider: string) => {

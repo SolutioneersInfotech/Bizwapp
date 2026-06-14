@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://api.bizwapp.com";
+const API_BASE_URL = "https://bizwapp-backend-production-2354.up.railway.app";
 
 // Get 5 latest messages by userId
 export const getLatestMessages = async (userId) => {

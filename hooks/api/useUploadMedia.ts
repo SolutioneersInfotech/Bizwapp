@@ -22,7 +22,7 @@ const useFacebookUpload = () => {
     formData.append('uploadUrl', uploadUrl); // This should be like: page-id/photos?access_token=PAGE_ACCESS_TOKEN
 
     try {
-      const res = await axios.post('https://api.bizwapp.com/api/auth/upload-to-fb', formData, {
+      const res = await axios.post('https://bizwapp-backend-production-2354.up.railway.app/api/auth/upload-to-fb', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

@@ -199,7 +199,7 @@ export default function ClientLayout({
   };
 
   const mutation = usePostData(
-    `https://api.bizwapp.com/api/auth/addContact/${userId}`
+    `https://bizwapp-backend-production-2354.up.railway.app/api/auth/addContact/${userId}`
   );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

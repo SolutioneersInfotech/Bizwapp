@@ -136,7 +136,7 @@ export default function NotificationsPage() {
       try {
         setLoading(true); // 🔹 Start loading
         const res = await axios.get(
-          `https://api.bizwapp.com/api/auth/notification/${userId}`
+          `https://bizwapp-backend-production-2354.up.railway.app/api/auth/notification/${userId}`
         );
         const logs = res.data;
 

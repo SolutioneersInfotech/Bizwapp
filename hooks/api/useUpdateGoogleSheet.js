@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const updateGoogleSheet = async ({ id, updateData }) => {
   const response = await fetch(
-    `http://api.bizwapp.com/api/auth/update-google-sheet-config/${id}`,
+    `http://bizwapp-backend-production-2354.up.railway.app/api/auth/update-google-sheet-config/${id}`,
     {
       method: "PUT",
       headers: {

@@ -27,7 +27,7 @@ export default function ResetPassword() {
 
     try {
       const res = await axios.post(
-        "https://api.bizwapp.com/api/auth/reset-password",
+        `${process.env.REACT_APP_BACKEND_URL}auth/reset-password`,
         { token, password }
       );
       setMsg(res.data.message);

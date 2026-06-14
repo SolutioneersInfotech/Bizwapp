@@ -176,7 +176,7 @@ export default function SettingsPage() {
   };
 
   const handleLogout = async () => {
-    await fetch("https://api.bizwapp.com/api/auth/logout", {
+    await fetch("https://bizwapp-backend-production-2354.up.railway.app/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });

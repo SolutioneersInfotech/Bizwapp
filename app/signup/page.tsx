@@ -34,8 +34,6 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import usePostData from "../../hooks/api/usePostData";
 import { useToast } from "@/hooks/use-toast";
-import { signIn } from "next-auth/react";
-
 type formData = {
   firstName: string;
   lastName: string;
@@ -44,7 +42,6 @@ type formData = {
   password: string;
 };
 
-type Provider = "Google" | "Facebook" | "GitHub" | "LinkedIn";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -63,7 +60,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { mutate, isError, data } = usePostData<formData>(
-    "https://api.bizwapp.com/api/auth/signup"
+    "https://bizwapp-backend-production-2354.up.railway.app/api/auth/signup"
   );
 
   const handleChange = (e) => {
@@ -175,9 +172,8 @@ export default function SignupPage() {
     setError("");
   };
 
-  const handleSocialSignup = async (provider: Provider) => {
-    console.log("Clicked provider:", provider); // should match e.g., "google"
-    signIn(provider.toLowerCase(), { callbackUrl: "/dashboard" }); // like "google", "facebook", etc.
+  const handleGoogleSignup = () => {
+    window.location.href = "https://bizwapp-backend-production-2354.up.railway.app/api/auth/auth/google";
   };
 
   return (
@@ -357,7 +353,7 @@ export default function SignupPage() {
                 <div className="mt-6 w-full">
                   <Button
                     variant="outline"
-                    onClick={() => handleSocialSignup("Google")}
+                    onClick={handleGoogleSignup}
                     className="w-full"
                   >
                     <FcGoogle className="mr-2 h-4 w-4" />

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://api.bizwapp.com"; // backend ka base url
+const API_URL = "https://bizwapp-backend-production-2354.up.railway.app"; // backend ka base url
 
 // delete by userId
  const clearNotification = async (userId) => {

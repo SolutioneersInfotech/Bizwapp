@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const getAllConversation = async(userId)=>{
 
-    const response = await fetch(`https://api.bizwapp.com/api/auth/conversationHistory/${userId}`)
+    const response = await fetch(`https://bizwapp-backend-production-2354.up.railway.app/api/auth/conversationHistory/${userId}`)
     if(!response.ok){
         throw new Error('Failed to get Conversation.')
     }

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 const fetchMessageHistory = async ({ queryKey }) => {
   const [,userId ,  phoneNumber] = queryKey;
 
-  const response = await fetch(`https://api.bizwapp.com/api/auth/gettingConversations/${userId}/${phoneNumber}`, {
+  const response = await fetch(`https://bizwapp-backend-production-2354.up.railway.app/api/auth/gettingConversations/${userId}/${phoneNumber}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

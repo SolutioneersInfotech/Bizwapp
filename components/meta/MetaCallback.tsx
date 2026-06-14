@@ -12,7 +12,7 @@ export default function MetaCallback() {
   const error = searchParams?.get("error");
   const state = searchParams?.get("state");
 
-  const { mutate } = usePostData("https://api.bizwapp.com/api/auth/signup");
+  const { mutate } = usePostData("https://bizwapp-backend-production-2354.up.railway.app/api/auth/signup");
 
   useEffect(() => {
     if (error) {

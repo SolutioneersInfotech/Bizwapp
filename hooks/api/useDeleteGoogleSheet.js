@@ -6,7 +6,7 @@ export const useDeleteGoogleSheet = () => {
   const queryClient = useQueryClient();
 
   const deleteSheet = async (sheetId) => {
-    const res = await fetch(`https://api.bizwapp.com/api/auth/delete-google-sheet-config/${sheetId}`, {
+    const res = await fetch(`https://bizwapp-backend-production-2354.up.railway.app/api/auth/delete-google-sheet-config/${sheetId}`, {
       method: "DELETE",
     });
 

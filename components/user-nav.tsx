@@ -30,7 +30,7 @@ export function UserNav() {
  const handleLogout = async () => {
 
   try {
-    const response = await fetch("https://api.bizwapp.com/api/auth/logout", {
+    const response = await fetch("https://bizwapp-backend-production-2354.up.railway.app/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });

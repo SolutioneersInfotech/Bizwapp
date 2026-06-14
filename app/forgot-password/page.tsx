@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
     try {
       setIsLoading(true)
       // In a real app, this would call an API to send a password reset email
-       const res = await axios.post('https://api.bizwapp.com/api/auth/forgot-password', { email });
+       const res = await axios.post('https://bizwapp-backend-production-2354.up.railway.app/api/auth/forgot-password', { email });
       setMsg(res.data.message);
       setSuccess(true)
     } catch (error) {

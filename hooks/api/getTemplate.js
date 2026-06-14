@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-const API_URL = "https://api.bizwapp.com/api/auth/getAllTemplates";
-// const API_URL = "https://bizwapp-backend-2.onrender.com/api/auth/get-twilio-template";
+const API_URL = "https://bizwapp-backend-production-2354.up.railway.app/api/auth/getAllTemplates";
+// const API_URL = "https://bizwapp-backend-production-2354.up.railway.app/api/auth/get-twilio-template";
 
 const fetchTemplates = async () => {
   const response = await fetch(API_URL, {

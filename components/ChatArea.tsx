@@ -137,7 +137,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   },[]);
 
   useEffect(() => {
-    socketRef.current = io("https://bizwapp-backend-2.onrender.com", {
+    socketRef.current = io("https://bizwapp-backend-production-2354.up.railway.app", {
       withCredentials: true,
       transports: ["websocket", "polling"],
     });

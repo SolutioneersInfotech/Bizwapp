@@ -239,7 +239,7 @@ export default function ContactsPage() {
     loading,
     error,
     refetch,
-  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
+  } = useGetContacts(`https://bizwapp-backend-production-2354.up.railway.app/api/auth/getContacts/${userId}`);
 
   const updateContactMutation = useUpdateContact();
 
@@ -362,7 +362,7 @@ export default function ContactsPage() {
   };
 
   const { mutate, isError, data } = usePostData(
-    `https://bizwapp-backend-2.onrender.com/api/auth/addContact/${userId}`
+    `https://bizwapp-backend-production-2354.up.railway.app/api/auth/addContact/${userId}`
   );
 
   // Handle import confirmation
@@ -413,7 +413,7 @@ export default function ContactsPage() {
         queryClient.invalidateQueries({
           queryKey: [
             "contacts",
-            `https://api.bizwapp.com/api/auth/getContacts/${userId}`,
+            `https://bizwapp-backend-production-2354.up.railway.app/api/auth/getContacts/${userId}`,
           ],
         });
       },
@@ -541,7 +541,7 @@ export default function ContactsPage() {
   };
 
   const { mutate: addContactMutate, status } = usePostData(
-    `https://api.bizwapp.com/api/auth/addContact/${userId}`
+    `https://bizwapp-backend-production-2354.up.railway.app/api/auth/addContact/${userId}`
   );
   const isLoading = status === "pending";
 
@@ -556,7 +556,7 @@ export default function ContactsPage() {
         queryClient.invalidateQueries({
           queryKey: [
             "contacts",
-            `https://api.bizwapp.com/api/auth/getContacts/${userId}`,
+            `https://bizwapp-backend-production-2354.up.railway.app/api/auth/getContacts/${userId}`,
           ],
         });
         toast({
@@ -613,7 +613,7 @@ export default function ContactsPage() {
   console.log("contactIdToDelete", contactIdToDelete);
 
   const { deleteItem } = useDelete(
-    `https://api.bizwapp.com/api/auth/deleteContact/${contactIdToDelete}`
+    `https://bizwapp-backend-production-2354.up.railway.app/api/auth/deleteContact/${contactIdToDelete}`
   );
 
   const handleDelete = async (contactId) => {
@@ -632,7 +632,7 @@ export default function ContactsPage() {
   queryClient.invalidateQueries({
     queryKey: [
       "contacts",
-      `https://api.bizwapp.com/api/auth/getContacts/${userId}`,
+      `https://bizwapp-backend-production-2354.up.railway.app/api/auth/getContacts/${userId}`,
     ],
   });
 

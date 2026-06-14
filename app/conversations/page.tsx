@@ -183,7 +183,7 @@ export default function ConversationsPage() {
     data: getContacts,
     loading,
     error,
-  } = useGetContacts(`https://api.bizwapp.com/api/auth/getContacts/${userId}`);
+  } = useGetContacts(`https://bizwapp-backend-production-2354.up.railway.app/api/auth/getContacts/${userId}`);
 
   useEffect(() => {
     setContact(getContacts);
@@ -295,7 +295,7 @@ export default function ConversationsPage() {
     isError,
     isPending,
     data,
-  } = usePostData(`https://api.bizwapp.com/api/auth/send-template`);
+  } = usePostData(`https://bizwapp-backend-production-2354.up.railway.app/api/auth/send-template`);
 
   const handleSendBulkMessage = async () => {
     console.log("selectedBulkTemplate", selectedBulkTemplate);
